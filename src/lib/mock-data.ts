@@ -1,4 +1,4 @@
-import { KPIData, MiniKPIData, ChartDataPoint, DonutSegment, ProfitabilityData, QuickAction, TopEmployee, Appointment } from "@/types";
+import { KPIData, MiniKPIData, ChartDataPoint, DonutSegment, ProfitabilityData, QuickAction, TopEmployee, Appointment, Client } from "@/types";
 import { DONUT_COLORS, CHART_COLORS } from "@/constants/colors";
 
 export const kpiData: KPIData[] = [
@@ -288,4 +288,174 @@ export const employeesList = [
   { id: "3", name: "هند القحطاني" },
   { id: "4", name: "لمى الشمري" },
   { id: "5", name: "ريم الدوسري" },
+];
+
+// Clients Page Data
+
+export const clientsKpiData: KPIData[] = [
+  {
+    id: "total-clients",
+    label: "clients.totalClients",
+    value: 324,
+    change: 6.2,
+    icon: "Users",
+    format: "number",
+  },
+  {
+    id: "active-clients",
+    label: "clients.activeClients",
+    value: 286,
+    change: 4.8,
+    icon: "UserPlus",
+    format: "number",
+  },
+  {
+    id: "inactive-clients",
+    label: "clients.inactiveClients",
+    value: 38,
+    change: -2.1,
+    icon: "UserCog",
+    format: "number",
+  },
+  {
+    id: "total-revenue",
+    label: "clients.totalRevenue",
+    value: 487500,
+    change: 12.5,
+    icon: "DollarSign",
+    format: "currency",
+  },
+];
+
+export const clientsByStatusData: DonutSegment[] = [
+  { name: "clients.statusActive", value: 286, color: CHART_COLORS.green },
+  { name: "clients.statusInactive", value: 38, color: CHART_COLORS.muted },
+];
+
+export const clientsGrowthData: ChartDataPoint[] = [
+  { name: "يناير", value: 180 },
+  { name: "فبراير", value: 195 },
+  { name: "مارس", value: 210 },
+  { name: "أبريل", value: 222 },
+  { name: "مايو", value: 238 },
+  { name: "يونيو", value: 248 },
+  { name: "يوليو", value: 260 },
+  { name: "أغسطس", value: 271 },
+  { name: "سبتمبر", value: 285 },
+  { name: "أكتوبر", value: 298 },
+  { name: "نوفمبر", value: 312 },
+  { name: "ديسمبر", value: 324 },
+];
+
+export const clientsListData: Client[] = [
+  {
+    id: "c1",
+    name: "فاطمة المنصور",
+    phone: "0551234567",
+    email: "fatima@example.com",
+    status: "active",
+    totalAppointments: 24,
+    totalSpent: 8400,
+    lastVisit: "2025-01-10",
+    joinDate: "2024-03-15",
+  },
+  {
+    id: "c2",
+    name: "نوف العبدالله",
+    phone: "0559876543",
+    email: "nouf@example.com",
+    status: "active",
+    totalAppointments: 18,
+    totalSpent: 9000,
+    lastVisit: "2025-01-12",
+    joinDate: "2024-02-20",
+  },
+  {
+    id: "c3",
+    name: "منال الحربي",
+    phone: "0553456789",
+    email: "manal@example.com",
+    status: "active",
+    totalAppointments: 32,
+    totalSpent: 14400,
+    lastVisit: "2025-01-14",
+    joinDate: "2023-11-05",
+  },
+  {
+    id: "c4",
+    name: "عبير السبيعي",
+    phone: "0557654321",
+    email: "abeer@example.com",
+    status: "inactive",
+    totalAppointments: 5,
+    totalSpent: 1500,
+    lastVisit: "2024-09-20",
+    joinDate: "2024-06-10",
+  },
+  {
+    id: "c5",
+    name: "هيا الغامدي",
+    phone: "0552345678",
+    email: "haya@example.com",
+    status: "active",
+    totalAppointments: 15,
+    totalSpent: 3000,
+    lastVisit: "2025-01-08",
+    joinDate: "2024-05-22",
+  },
+  {
+    id: "c6",
+    name: "ريان المطيري",
+    phone: "0558765432",
+    email: "rayan@example.com",
+    status: "active",
+    totalAppointments: 28,
+    totalSpent: 22400,
+    lastVisit: "2025-01-15",
+    joinDate: "2023-08-14",
+  },
+  {
+    id: "c7",
+    name: "دانة الشهري",
+    phone: "0554567890",
+    email: "dana@example.com",
+    status: "inactive",
+    totalAppointments: 3,
+    totalSpent: 450,
+    lastVisit: "2024-07-03",
+    joinDate: "2024-04-18",
+  },
+  {
+    id: "c8",
+    name: "لطيفة القرني",
+    phone: "0556789012",
+    email: "latifa@example.com",
+    status: "active",
+    totalAppointments: 20,
+    totalSpent: 7000,
+    lastVisit: "2025-01-11",
+    joinDate: "2024-01-09",
+  },
+  {
+    id: "c9",
+    name: "أميرة الزهراني",
+    phone: "0550123456",
+    email: "amira@example.com",
+    status: "active",
+    totalAppointments: 12,
+    totalSpent: 6000,
+    lastVisit: "2025-01-09",
+    joinDate: "2024-07-30",
+  },
+  {
+    id: "c10",
+    name: "سلمى العنزي",
+    phone: "0553210987",
+    email: "salma@example.com",
+    status: "active",
+    totalAppointments: 8,
+    totalSpent: 9600,
+    lastVisit: "2025-01-13",
+    joinDate: "2024-09-12",
+  },
 ];

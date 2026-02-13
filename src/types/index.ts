@@ -67,6 +67,20 @@ export interface DateRange {
   end: Date;
 }
 
+export type ClientStatus = "active" | "inactive";
+
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  status: ClientStatus;
+  totalAppointments: number;
+  totalSpent: number;
+  lastVisit: string;
+  joinDate: string;
+}
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
