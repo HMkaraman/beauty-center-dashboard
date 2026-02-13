@@ -1,0 +1,80 @@
+import {
+  LayoutDashboard,
+  CalendarDays,
+  Users,
+  UserCog,
+  Stethoscope,
+  Sparkles,
+  Wallet,
+  Receipt,
+  Package,
+  BarChart3,
+  Megaphone,
+  Settings,
+  DollarSign,
+  UserPlus,
+  TrendingUp,
+  CalendarPlus,
+  Construction,
+  Bell,
+  Search,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  MoreHorizontal,
+  Eye,
+  EyeOff,
+  ArrowUpRight,
+  ArrowDownRight,
+  CalendarCheck,
+  CalendarX,
+  Clock,
+  Plus,
+  type LucideProps,
+} from "lucide-react";
+
+const iconMap: Record<string, React.ComponentType<LucideProps>> = {
+  LayoutDashboard,
+  CalendarDays,
+  Users,
+  UserCog,
+  Stethoscope,
+  Sparkles,
+  Wallet,
+  Receipt,
+  Package,
+  BarChart3,
+  Megaphone,
+  Settings,
+  DollarSign,
+  UserPlus,
+  TrendingUp,
+  CalendarPlus,
+  Construction,
+  Bell,
+  Search,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  MoreHorizontal,
+  Eye,
+  EyeOff,
+  ArrowUpRight,
+  ArrowDownRight,
+  CalendarCheck,
+  CalendarX,
+  Clock,
+  Plus,
+};
+
+interface DynamicIconProps extends LucideProps {
+  name: string;
+}
+
+export function DynamicIcon({ name, ...props }: DynamicIconProps) {
+  const Icon = iconMap[name];
+  if (!Icon) return null;
+  return <Icon {...props} />;
+}
