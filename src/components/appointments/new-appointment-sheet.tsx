@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import {
   Sheet,
   SheetContent,
@@ -20,36 +21,86 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { servicesList, employeesList } from "@/lib/mock-data";
+import { useAppointmentsStore } from "@/store/useAppointmentsStore";
+import { Appointment } from "@/types";
 
 interface NewAppointmentSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editItem?: Appointment | null;
 }
 
-export function NewAppointmentSheet({ open, onOpenChange }: NewAppointmentSheetProps) {
-  const t = useTranslations("appointments");
+const emptyForm = {
+  clientName: "",
+  clientPhone: "",
+  service: "",
+  employee: "",
+  date: "",
+  time: "",
+  notes: "",
+};
 
-  const [form, setForm] = useState({
-    clientName: "",
-    clientPhone: "",
-    service: "",
-    employee: "",
-    date: "",
-    time: "",
-    notes: "",
-  });
+export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppointmentSheetProps) {
+  const t = useTranslations("appointments");
+  const tc = useTranslations("common");
+  const { addItem, updateItem } = useAppointmentsStore();
+
+  const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({
+        clientName: editItem.clientName,
+        clientPhone: editItem.clientPhone,
+        service: editItem.service,
+        employee: editItem.employee,
+        date: editItem.date,
+        time: editItem.time,
+        notes: editItem.notes || "",
+      });
+    } else {
+      setForm(emptyForm);
+    }
+  }, [editItem, open]);
 
   const handleSubmit = () => {
-    console.log("New appointment:", form);
-    setForm({
-      clientName: "",
-      clientPhone: "",
-      service: "",
-      employee: "",
-      date: "",
-      time: "",
-      notes: "",
-    });
+    if (!form.clientName || !form.service || !form.date || !form.time) {
+      toast.error(tc("requiredField"));
+      return;
+    }
+
+    const selectedService = servicesList.find((s) => s.name === form.service);
+
+    if (editItem) {
+      updateItem(editItem.id, {
+        clientName: form.clientName,
+        clientPhone: form.clientPhone,
+        service: form.service,
+        employee: form.employee,
+        date: form.date,
+        time: form.time,
+        notes: form.notes || undefined,
+        duration: selectedService?.duration || editItem.duration,
+        price: selectedService?.price || editItem.price,
+      });
+      toast.success(tc("updateSuccess"));
+    } else {
+      addItem({
+        clientName: form.clientName,
+        clientPhone: form.clientPhone,
+        service: form.service,
+        employee: form.employee,
+        date: form.date,
+        time: form.time,
+        duration: selectedService?.duration || 60,
+        status: "pending",
+        price: selectedService?.price || 0,
+        notes: form.notes || undefined,
+      });
+      toast.success(tc("addSuccess"));
+    }
+
+    setForm(emptyForm);
     onOpenChange(false);
   };
 
@@ -57,9 +108,9 @@ export function NewAppointmentSheet({ open, onOpenChange }: NewAppointmentSheetP
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("newAppointment")}</SheetTitle>
+          <SheetTitle>{editItem ? tc("editItem") : t("newAppointment")}</SheetTitle>
           <SheetDescription className="sr-only">
-            {t("newAppointment")}
+            {editItem ? tc("editItem") : t("newAppointment")}
           </SheetDescription>
         </SheetHeader>
 

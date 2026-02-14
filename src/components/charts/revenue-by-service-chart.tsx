@@ -32,6 +32,7 @@ function CustomTooltip({
 
 export function RevenueByServiceChart({ data }: RevenueByServiceChartProps) {
   const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
@@ -57,7 +58,7 @@ export function RevenueByServiceChart({ data }: RevenueByServiceChartProps) {
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-xs text-muted-foreground">الإجمالي</p>
+            <p className="text-xs text-muted-foreground">{tc("totalLabel")}</p>
             <p className="text-sm font-bold font-english text-foreground">
               {formatCompactNumber(total)}
             </p>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Globe, Sparkles } from "lucide-react";
+import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/constants/navigation";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
@@ -20,7 +21,14 @@ import { useEffect } from "react";
 export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations();
+  const locale = useLocale();
   const { isCollapsed, setCollapsed } = useSidebarStore();
+
+  const toggleLocale = () => {
+    const newLocale = locale === "ar" ? "en" : "ar";
+    document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
+    window.location.reload();
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -57,7 +65,7 @@ export function Sidebar() {
               animate={{ opacity: 1 }}
               className="text-base font-bold text-foreground"
             >
-              بيوتي سنتر
+              {t("common.beautyCenter")}
             </motion.span>
           )}
         </div>
@@ -113,9 +121,12 @@ export function Sidebar() {
 
         {/* Bottom */}
         <div className="border-t border-border p-3">
-          <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-secondary hover:text-foreground transition-colors">
+          <button
+            onClick={toggleLocale}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          >
             <Globe className="h-5 w-5 shrink-0" />
-            {!isCollapsed && <span>العربية</span>}
+            {!isCollapsed && <span>{locale === "ar" ? t("common.arabic") : t("common.english")}</span>}
           </button>
         </div>
       </motion.aside>

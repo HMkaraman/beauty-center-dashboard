@@ -23,10 +23,14 @@ function CustomTooltip({
   active,
   payload,
   label,
+  revenueLabel,
+  expensesLabel,
 }: {
   active?: boolean;
   payload?: Array<{ value: number; name: string; color: string }>;
   label?: string;
+  revenueLabel?: string;
+  expensesLabel?: string;
 }) {
   if (!active || !payload) return null;
 
@@ -35,7 +39,7 @@ function CustomTooltip({
       <p className="mb-2 text-xs text-muted-foreground">{label}</p>
       {payload.map((entry, index) => (
         <p key={index} className="text-xs font-english" style={{ color: entry.color }}>
-          {entry.name === "revenue" ? "الإيرادات" : "المصروفات"}:{" "}
+          {entry.name === "revenue" ? revenueLabel : expensesLabel}:{" "}
           {formatCompactNumber(entry.value)}
         </p>
       ))}
@@ -45,6 +49,7 @@ function CustomTooltip({
 
 export function RevenueExpensesChart({ data }: RevenueExpensesChartProps) {
   const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
 
   return (
     <ChartCard title={t("revenueVsExpenses")}>
@@ -75,7 +80,7 @@ export function RevenueExpensesChart({ data }: RevenueExpensesChartProps) {
               tickFormatter={(value) => formatCompactNumber(value)}
               orientation="right"
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip revenueLabel={tc("revenueLabel")} expensesLabel={tc("expensesLabel")} />} />
             <Area
               type="monotone"
               dataKey="revenue"

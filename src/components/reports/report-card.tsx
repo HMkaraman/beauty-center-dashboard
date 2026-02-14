@@ -2,8 +2,16 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MoreHorizontal } from "lucide-react";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Report } from "@/types";
 
 const typeIcons: Record<string, string> = {
@@ -26,9 +34,11 @@ const typeColors: Record<string, string> = {
 
 interface ReportCardProps {
   data: Report;
+  onEdit?: (item: Report) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function ReportCard({ data }: ReportCardProps) {
+export function ReportCard({ data, onEdit, onDelete }: ReportCardProps) {
   const t = useTranslations("reports");
 
   return (
@@ -37,14 +47,28 @@ export function ReportCard({ data }: ReportCardProps) {
       transition={{ duration: 0.2 }}
       className="rounded-lg border border-border bg-card p-5"
     >
-      <div className="flex items-start gap-3">
-        <div className={`rounded-lg p-2.5 ${typeColors[data.type]}`}>
-          <DynamicIcon name={typeIcons[data.type]} className="h-5 w-5" />
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <div className={`rounded-lg p-2.5 ${typeColors[data.type]}`}>
+            <DynamicIcon name={typeIcons[data.type]} className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-foreground text-sm truncate">{data.name}</h3>
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{data.description}</p>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-foreground text-sm truncate">{data.name}</h3>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{data.description}</p>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-xs">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">

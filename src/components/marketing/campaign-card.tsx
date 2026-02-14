@@ -2,15 +2,26 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CampaignStatusBadge } from "./campaign-status-badge";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { Campaign } from "@/types";
 
 interface CampaignCardProps {
   data: Campaign;
+  onEdit?: (item: Campaign) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function CampaignCard({ data }: CampaignCardProps) {
+export function CampaignCard({ data, onEdit, onDelete }: CampaignCardProps) {
   const t = useTranslations("marketing");
 
   return (
@@ -24,7 +35,21 @@ export function CampaignCard({ data }: CampaignCardProps) {
           <p className="font-medium text-foreground">{data.name}</p>
           <p className="text-xs font-english text-muted-foreground">{data.channel}</p>
         </div>
-        <CampaignStatusBadge status={data.status} />
+        <div className="flex items-center gap-2">
+          <CampaignStatusBadge status={data.status} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon-xs">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">

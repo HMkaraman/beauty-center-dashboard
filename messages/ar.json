@@ -479,6 +479,31 @@
     "language": "اللغة",
     "arabic": "العربية",
     "english": "English",
-    "sar": "ر.س"
+    "sar": "ر.س",
+    "deleteConfirmTitle": "تأكيد الحذف",
+    "deleteConfirmMessage": "هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirmDelete": "حذف",
+    "cancelAction": "إلغاء",
+    "addSuccess": "تمت الإضافة بنجاح",
+    "updateSuccess": "تم التحديث بنجاح",
+    "deleteSuccess": "تم الحذف بنجاح",
+    "error": "حدث خطأ",
+    "requiredField": "هذا الحقل مطلوب",
+    "searchPlaceholder": "بحث...",
+    "noResults": "لا توجد نتائج",
+    "more": "المزيد",
+    "menu": "القائمة",
+    "beautyCenter": "بيوتي سنتر",
+    "appointment": "موعد",
+    "totalLabel": "الإجمالي",
+    "revenueLabel": "الإيرادات",
+    "expensesLabel": "المصروفات",
+    "editItem": "تعديل"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "الصفحة غير موجودة",
+    "description": "عذراً، الصفحة التي تبحث عنها غير موجودة.",
+    "backToDashboard": "العودة للوحة التحكم"
   }
 }

@@ -1,142 +1,43 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { toast } from "sonner";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { inventoryCategories } from "@/lib/mock-data";
+import { useInventoryStore } from "@/store/useInventoryStore";
+import { InventoryItem } from "@/types";
 
-interface NewItemSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+interface NewItemSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: InventoryItem | null; }
+const emptyForm = { name: "", sku: "", category: "", quantity: "", unitPrice: "", minStockLevel: "" };
 
-export function NewItemSheet({ open, onOpenChange }: NewItemSheetProps) {
-  const t = useTranslations("inventory");
-
-  const [form, setForm] = useState({
-    name: "",
-    sku: "",
-    category: "",
-    quantity: "",
-    unitPrice: "",
-    minStockLevel: "",
-  });
-
+export function NewItemSheet({ open, onOpenChange, editItem }: NewItemSheetProps) {
+  const t = useTranslations("inventory"); const tc = useTranslations("common");
+  const { addItem, updateItem } = useInventoryStore();
+  const [form, setForm] = useState(emptyForm);
+  useEffect(() => { if (editItem) { setForm({ name: editItem.name, sku: editItem.sku, category: editItem.category, quantity: String(editItem.quantity), unitPrice: String(editItem.unitPrice), minStockLevel: "" }); } else { setForm(emptyForm); } }, [editItem, open]);
   const handleSubmit = () => {
-    console.log("New item:", form);
-    setForm({
-      name: "",
-      sku: "",
-      category: "",
-      quantity: "",
-      unitPrice: "",
-      minStockLevel: "",
-    });
-    onOpenChange(false);
+    if (!form.name || !form.sku) { toast.error(tc("requiredField")); return; }
+    const qty = Number(form.quantity) || 0; const price = Number(form.unitPrice) || 0;
+    const status = qty === 0 ? "out-of-stock" as const : qty <= 10 ? "low-stock" as const : "in-stock" as const;
+    if (editItem) { updateItem(editItem.id, { name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price, totalValue: qty * price, status }); toast.success(tc("updateSuccess")); }
+    else { addItem({ name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price, totalValue: qty * price, status }); toast.success(tc("addSuccess")); }
+    setForm(emptyForm); onOpenChange(false);
   };
-
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{t("newItem")}</SheetTitle>
-          <SheetDescription className="sr-only">
-            {t("newItem")}
-          </SheetDescription>
-        </SheetHeader>
-
-        <div className="flex-1 space-y-4 px-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("itemName")}</label>
-            <Input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("sku")}</label>
-            <Input
-              value={form.sku}
-              onChange={(e) => setForm({ ...form, sku: e.target.value })}
-              className="font-english"
-              dir="ltr"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("category")}</label>
-            <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("selectCategory")} />
-              </SelectTrigger>
-              <SelectContent>
-                {inventoryCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("quantity")}</label>
-            <Input
-              type="number"
-              value={form.quantity}
-              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-              className="font-english"
-              dir="ltr"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("unitPrice")}</label>
-            <Input
-              type="number"
-              value={form.unitPrice}
-              onChange={(e) => setForm({ ...form, unitPrice: e.target.value })}
-              className="font-english"
-              dir="ltr"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("minStockLevel")}</label>
-            <Input
-              type="number"
-              value={form.minStockLevel}
-              onChange={(e) => setForm({ ...form, minStockLevel: e.target.value })}
-              className="font-english"
-              dir="ltr"
-            />
-          </div>
-        </div>
-
-        <SheetFooter>
-          <Button onClick={handleSubmit}>{t("save")}</Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("close")}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+    <Sheet open={open} onOpenChange={onOpenChange}><SheetContent side="left" className="overflow-y-auto">
+      <SheetHeader><SheetTitle>{editItem ? tc("editItem") : t("newItem")}</SheetTitle><SheetDescription className="sr-only">{editItem ? tc("editItem") : t("newItem")}</SheetDescription></SheetHeader>
+      <div className="flex-1 space-y-4 px-4">
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("itemName")}</label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("sku")}</label><Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} className="font-english" dir="ltr" /></div>
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("category")}</label><Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}><SelectTrigger className="w-full"><SelectValue placeholder={t("selectCategory")} /></SelectTrigger><SelectContent>{inventoryCategories.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}</SelectContent></Select></div>
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("quantity")}</label><Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className="font-english" dir="ltr" /></div>
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("unitPrice")}</label><Input type="number" value={form.unitPrice} onChange={(e) => setForm({ ...form, unitPrice: e.target.value })} className="font-english" dir="ltr" /></div>
+        <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("minStockLevel")}</label><Input type="number" value={form.minStockLevel} onChange={(e) => setForm({ ...form, minStockLevel: e.target.value })} className="font-english" dir="ltr" /></div>
+      </div>
+      <SheetFooter><Button onClick={handleSubmit}>{t("save")}</Button><Button variant="outline" onClick={() => onOpenChange(false)}>{t("close")}</Button></SheetFooter>
+    </SheetContent></Sheet>
   );
 }

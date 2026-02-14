@@ -17,9 +17,11 @@ import { Appointment } from "@/types";
 
 interface AppointmentsTableProps {
   data: Appointment[];
+  onEdit?: (item: Appointment) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function AppointmentsTable({ data }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onEdit, onDelete }: AppointmentsTableProps) {
   const t = useTranslations("appointments");
 
   return (
@@ -69,11 +71,9 @@ export function AppointmentsTable({ data }: AppointmentsTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>{t("view")}</DropdownMenuItem>
-                    <DropdownMenuItem>{t("edit")}</DropdownMenuItem>
-                    <DropdownMenuItem>{t("confirm")}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEdit?.(appointment)}>{t("edit")}</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive">{t("delete")}</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(appointment.id)}>{t("delete")}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </td>

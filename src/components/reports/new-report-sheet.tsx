@@ -1,30 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
+import { toast } from "sonner";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { reportTypes } from "@/lib/mock-data";
+import { useReportsStore } from "@/store/useReportsStore";
+import { Report } from "@/types";
 
 interface NewReportSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editItem?: Report | null;
 }
 
-export function NewReportSheet({ open, onOpenChange }: NewReportSheetProps) {
-  const t = useTranslations("reports");
+const emptyForm = {
+  type: "",
+  name: "",
+  description: "",
+  startDate: "",
+  endDate: "",
+};
 
-  const [form, setForm] = useState({
-    type: "",
-    startDate: "",
-    endDate: "",
-  });
+export function NewReportSheet({ open, onOpenChange, editItem }: NewReportSheetProps) {
+  const t = useTranslations("reports");
+  const tc = useTranslations("common");
+  const { addItem, updateItem } = useReportsStore();
+
+  const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    if (editItem) {
+      setForm({
+        type: editItem.type,
+        name: editItem.name,
+        description: editItem.description,
+        startDate: editItem.lastGenerated,
+        endDate: "",
+      });
+    } else {
+      setForm(emptyForm);
+    }
+  }, [editItem, open]);
 
   const handleSubmit = () => {
-    console.log("New report:", form);
-    setForm({ type: "", startDate: "", endDate: "" });
+    if (!form.type || !form.startDate) {
+      toast.error(tc("requiredField"));
+      return;
+    }
+
+    if (editItem) {
+      updateItem(editItem.id, {
+        type: form.type as Report["type"],
+        name: form.name || editItem.name,
+        description: form.description || editItem.description,
+        lastGenerated: form.startDate,
+      });
+      toast.success(tc("updateSuccess"));
+    } else {
+      addItem({
+        type: form.type as Report["type"],
+        name: form.name,
+        description: form.description,
+        lastGenerated: form.startDate,
+        downloads: 0,
+        fileSize: "0 MB",
+      });
+      toast.success(tc("addSuccess"));
+    }
+
+    setForm(emptyForm);
     onOpenChange(false);
   };
 
@@ -32,8 +93,10 @@ export function NewReportSheet({ open, onOpenChange }: NewReportSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("newReport")}</SheetTitle>
-          <SheetDescription className="sr-only">{t("newReport")}</SheetDescription>
+          <SheetTitle>{editItem ? tc("editItem") : t("newReport")}</SheetTitle>
+          <SheetDescription className="sr-only">
+            {editItem ? tc("editItem") : t("newReport")}
+          </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 space-y-4 px-4">
@@ -45,26 +108,56 @@ export function NewReportSheet({ open, onOpenChange }: NewReportSheetProps) {
               </SelectTrigger>
               <SelectContent>
                 {reportTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("reportName")}</label>
+            <Input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("description")}</label>
+            <Input
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("startDate")}</label>
-            <Input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} className="font-english" />
+            <Input
+              type="date"
+              value={form.startDate}
+              onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              className="font-english"
+            />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("endDate")}</label>
-            <Input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className="font-english" />
+            <Input
+              type="date"
+              value={form.endDate}
+              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+              className="font-english"
+            />
           </div>
         </div>
 
         <SheetFooter>
           <Button onClick={handleSubmit}>{t("generate")}</Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("close")}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t("close")}
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

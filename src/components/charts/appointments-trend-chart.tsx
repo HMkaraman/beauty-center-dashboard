@@ -22,10 +22,12 @@ function CustomTooltip({
   active,
   payload,
   label,
+  appointmentLabel,
 }: {
   active?: boolean;
   payload?: Array<{ value: number }>;
   label?: string;
+  appointmentLabel?: string;
 }) {
   if (!active || !payload?.[0]) return null;
 
@@ -33,7 +35,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
       <p className="text-xs font-english text-foreground">
-        {payload[0].value} موعد
+        {payload[0].value} {appointmentLabel}
       </p>
     </div>
   );
@@ -41,6 +43,7 @@ function CustomTooltip({
 
 export function AppointmentsTrendChart({ data }: AppointmentsTrendChartProps) {
   const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
 
   return (
     <ChartCard title={t("appointmentsTrend")}>
@@ -64,7 +67,7 @@ export function AppointmentsTrendChart({ data }: AppointmentsTrendChartProps) {
               tickLine={false}
               orientation="right"
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip appointmentLabel={tc("appointment")} />} />
             <Line
               type="monotone"
               dataKey="appointments"

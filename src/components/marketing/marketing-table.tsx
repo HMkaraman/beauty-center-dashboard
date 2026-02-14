@@ -16,9 +16,11 @@ import { Campaign } from "@/types";
 
 interface MarketingTableProps {
   data: Campaign[];
+  onEdit?: (item: Campaign) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function MarketingTable({ data }: MarketingTableProps) {
+export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) {
   const t = useTranslations("marketing");
 
   return (
@@ -56,10 +58,9 @@ export function MarketingTable({ data }: MarketingTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>{t("view")}</DropdownMenuItem>
-                    <DropdownMenuItem>{t("edit")}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEdit?.(campaign)}>{t("edit")}</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive">{t("delete")}</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(campaign.id)}>{t("delete")}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </td>

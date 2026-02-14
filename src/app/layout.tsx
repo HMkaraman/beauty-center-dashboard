@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Kufi_Arabic, Outfit } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const notoKufiArabic = Noto_Kufi_Arabic({
@@ -37,6 +38,14 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           {children}
+          <Toaster
+            position={dir === "rtl" ? "bottom-left" : "bottom-right"}
+            dir={dir}
+            richColors
+            toastOptions={{
+              className: "font-[family-name:var(--font-noto-kufi-arabic)]",
+            }}
+          />
         </NextIntlClientProvider>
       </body>
     </html>

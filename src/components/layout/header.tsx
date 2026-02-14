@@ -60,7 +60,7 @@ export function Header({ title }: HeaderProps) {
           </button>
           <Avatar className="h-8 w-8 border border-border">
             <AvatarFallback className="bg-gold/15 text-xs text-gold">
-              م
+              {t("common.beautyCenter").charAt(0)}
             </AvatarFallback>
           </Avatar>
         </div>

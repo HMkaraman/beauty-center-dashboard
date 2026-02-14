@@ -50,12 +50,12 @@ export function MobileNav() {
           <SheetTrigger asChild>
             <button className="flex flex-col items-center gap-1 px-2 py-1 text-xs text-sidebar-foreground">
               <MoreHorizontal className="h-5 w-5" />
-              <span>المزيد</span>
+              <span>{t("common.more")}</span>
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="bg-sidebar border-border">
             <SheetHeader>
-              <SheetTitle className="text-foreground">القائمة</SheetTitle>
+              <SheetTitle className="text-foreground">{t("common.menu")}</SheetTitle>
             </SheetHeader>
             <nav className="grid grid-cols-3 gap-4 py-4">
               {remainingItems.map((item) => (
