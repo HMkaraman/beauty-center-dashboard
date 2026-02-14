@@ -81,6 +81,22 @@ export interface Client {
   joinDate: string;
 }
 
+export type EmployeeStatus = "active" | "on-leave" | "inactive";
+
+export interface Employee {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  role: string;
+  specialties: string;
+  status: EmployeeStatus;
+  appointments: number;
+  revenue: number;
+  rating: number;
+  hireDate: string;
+}
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
