@@ -97,6 +97,101 @@ export interface Employee {
   hireDate: string;
 }
 
+// Services
+export type ServiceStatus = "active" | "inactive";
+
+export interface Service {
+  id: string;
+  name: string;
+  category: string;
+  duration: number;
+  price: number;
+  status: ServiceStatus;
+  bookings: number;
+}
+
+// Doctors
+export type DoctorStatus = "active" | "on-leave" | "inactive";
+
+export interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  phone: string;
+  email: string;
+  status: DoctorStatus;
+  rating: number;
+  consultations: number;
+  licenseNumber: string;
+}
+
+// Inventory
+export type InventoryStatus = "in-stock" | "low-stock" | "out-of-stock";
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  quantity: number;
+  unitPrice: number;
+  totalValue: number;
+  status: InventoryStatus;
+}
+
+// Expenses
+export type ExpenseStatus = "approved" | "pending" | "rejected";
+
+export interface Expense {
+  id: string;
+  date: string;
+  description: string;
+  category: string;
+  amount: number;
+  paymentMethod: string;
+  status: ExpenseStatus;
+}
+
+// Finance
+export type TransactionType = "income" | "expense";
+
+export interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  category: string;
+  type: TransactionType;
+  amount: number;
+}
+
+// Marketing
+export type CampaignStatus = "active" | "paused" | "completed" | "draft";
+
+export interface Campaign {
+  id: string;
+  name: string;
+  channel: string;
+  status: CampaignStatus;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  reach: number;
+  conversions: number;
+}
+
+// Reports
+export type ReportType = "financial" | "appointments" | "clients" | "employees" | "inventory" | "marketing";
+
+export interface Report {
+  id: string;
+  type: ReportType;
+  name: string;
+  description: string;
+  lastGenerated: string;
+  downloads: number;
+  fileSize: string;
+}
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
