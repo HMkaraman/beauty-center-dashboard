@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
       data: data.map((row) => ({
         ...row,
         commissionRate: row.commissionRate ? parseFloat(row.commissionRate) : 0,
+        salary: row.salary ? parseFloat(row.salary) : 0,
         appointments: appointmentCountMap[row.id] ?? 0,
         revenue: revenueMap[row.id] ?? 0,
         rating: 0,
@@ -145,6 +146,13 @@ export async function POST(req: NextRequest) {
         commissionRate: validated.commissionRate !== undefined
           ? String(validated.commissionRate)
           : undefined,
+        nationalId: validated.nationalId,
+        passportNumber: validated.passportNumber,
+        dateOfBirth: validated.dateOfBirth,
+        address: validated.address,
+        emergencyContact: validated.emergencyContact,
+        salary: validated.salary !== undefined ? String(validated.salary) : undefined,
+        notes: validated.notes,
       })
       .returning();
 
@@ -152,6 +160,7 @@ export async function POST(req: NextRequest) {
       {
         ...created,
         commissionRate: created.commissionRate ? parseFloat(created.commissionRate) : 0,
+        salary: created.salary ? parseFloat(created.salary) : 0,
       },
       201
     );

@@ -129,6 +129,13 @@ export interface Employee {
   revenue: number;
   rating: number;
   hireDate: string;
+  nationalId?: string;
+  passportNumber?: string;
+  dateOfBirth?: string;
+  address?: string;
+  emergencyContact?: string;
+  salary?: number;
+  notes?: string;
 }
 
 // Employee Detail types
@@ -163,7 +170,7 @@ export interface EmployeeCommission {
 }
 
 export interface EmployeeDetailResponse {
-  employee: Employee & { commissionRate: number; image: string | null };
+  employee: Employee & { commissionRate: number; image: string | null; salary: number; nationalId: string; passportNumber: string; dateOfBirth: string; address: string; emergencyContact: string; notes: string };
   kpis: EmployeeKPIs;
   analytics: EmployeeAnalytics;
   recentAppointments: Appointment[];
@@ -196,6 +203,23 @@ export interface Doctor {
   rating: number;
   consultations: number;
   licenseNumber: string;
+  bio?: string;
+  education?: string;
+  certificates?: string;
+  yearsOfExperience?: number;
+  compensationType?: string;
+  salary?: number;
+  commissionRate?: number;
+  notes?: string;
+}
+
+export interface DoctorCommission {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  rate: number;
+  date: string;
+  clientName?: string;
 }
 
 // Doctor Detail types
@@ -206,6 +230,7 @@ export interface DoctorKPIs {
   completedConsultations: number;
   revenueGenerated: number;
   avgRevenuePerConsultation: number;
+  commissionEarned: number;
   uniquePatients: number;
   patientRetentionRate: number;
   cancellationRate: number;
@@ -221,10 +246,11 @@ export interface DoctorAnalytics {
 }
 
 export interface DoctorDetailResponse {
-  doctor: Doctor & { image: string | null };
+  doctor: Doctor & { image: string | null; commissionRate: number; salary: number; compensationType: string; bio: string; education: string; certificates: string; yearsOfExperience: number; notes: string };
   kpis: DoctorKPIs;
   analytics: DoctorAnalytics;
   recentAppointments: Appointment[];
+  recentCommissions: DoctorCommission[];
 }
 
 // Inventory

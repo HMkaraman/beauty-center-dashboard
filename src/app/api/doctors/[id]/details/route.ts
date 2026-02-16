@@ -7,7 +7,7 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { doctors, appointments, invoices } from "@/db/schema";
+import { doctors, appointments, invoices, doctorCommissions } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import type { DoctorPerformanceTier } from "@/types";
 
@@ -41,7 +41,19 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       )
       .orderBy(desc(appointments.date), desc(appointments.time));
 
-    // 3. Compute KPIs
+    // 3. Fetch doctor commissions
+    const allCommissions = await db
+      .select()
+      .from(doctorCommissions)
+      .where(
+        and(
+          eq(doctorCommissions.tenantId, tenantId),
+          eq(doctorCommissions.doctorId, id)
+        )
+      )
+      .orderBy(desc(doctorCommissions.date));
+
+    // 4. Compute KPIs
     const completedAppointments = allAppointments.filter(
       (a) => a.status === "completed"
     );
@@ -105,11 +117,18 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     const rating = parseFloat(doctor.rating || "0");
 
+    // Commission earned
+    const commissionEarned = allCommissions.reduce(
+      (sum, c) => sum + parseFloat(c.amount),
+      0
+    );
+
     const kpis = {
       totalConsultations: totalAppts,
       completedConsultations: completedCount,
       revenueGenerated,
       avgRevenuePerConsultation,
+      commissionEarned,
       uniquePatients,
       patientRetentionRate,
       cancellationRate,
@@ -186,6 +205,31 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       price: parseFloat(a.price),
     }));
 
+    // Build recent commissions (last 10) with client name from invoice
+    const recentCommissionRows = allCommissions.slice(0, 10);
+    const commissionInvoiceIds = recentCommissionRows.map((c) => c.invoiceId);
+    let invoiceMap: Record<string, string> = {};
+    if (commissionInvoiceIds.length > 0) {
+      const commissionInvoices = await db
+        .select({ id: invoices.id, clientName: invoices.clientName })
+        .from(invoices)
+        .where(eq(invoices.tenantId, tenantId));
+      for (const inv of commissionInvoices) {
+        if (commissionInvoiceIds.includes(inv.id)) {
+          invoiceMap[inv.id] = inv.clientName;
+        }
+      }
+    }
+
+    const recentCommissions = recentCommissionRows.map((c) => ({
+      id: c.id,
+      invoiceId: c.invoiceId,
+      amount: parseFloat(c.amount),
+      rate: parseFloat(c.rate),
+      date: c.date,
+      clientName: invoiceMap[c.invoiceId] || "",
+    }));
+
     return success({
       doctor: {
         id: doctor.id,
@@ -197,11 +241,20 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         rating,
         consultations: totalAppts,
         licenseNumber: doctor.licenseNumber || "",
+        bio: doctor.bio || "",
+        education: doctor.education || "",
+        certificates: doctor.certificates || "",
+        yearsOfExperience: doctor.yearsOfExperience || 0,
+        compensationType: doctor.compensationType || "",
+        salary: doctor.salary ? parseFloat(doctor.salary) : 0,
+        commissionRate: doctor.commissionRate ? parseFloat(doctor.commissionRate) : 0,
+        notes: doctor.notes || "",
         image: doctor.image,
       },
       kpis,
       analytics,
       recentAppointments,
+      recentCommissions,
     });
   } catch (error) {
     console.error("GET /api/doctors/[id]/details error:", error);

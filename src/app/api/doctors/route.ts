@@ -50,6 +50,8 @@ export async function GET(req: NextRequest) {
       data: data.map((row) => ({
         ...row,
         rating: row.rating ? parseFloat(row.rating) : 0,
+        salary: row.salary ? parseFloat(row.salary) : 0,
+        commissionRate: row.commissionRate ? parseFloat(row.commissionRate) : 0,
       })),
       pagination: {
         page,
@@ -88,6 +90,14 @@ export async function POST(req: NextRequest) {
         email: validated.email,
         status: validated.status,
         licenseNumber: validated.licenseNumber,
+        bio: validated.bio,
+        education: validated.education,
+        certificates: validated.certificates,
+        yearsOfExperience: validated.yearsOfExperience,
+        compensationType: validated.compensationType,
+        salary: validated.salary !== undefined ? String(validated.salary) : undefined,
+        commissionRate: validated.commissionRate !== undefined ? String(validated.commissionRate) : undefined,
+        notes: validated.notes,
       })
       .returning();
 
@@ -95,6 +105,8 @@ export async function POST(req: NextRequest) {
       {
         ...created,
         rating: created.rating ? parseFloat(created.rating) : 0,
+        salary: created.salary ? parseFloat(created.salary) : 0,
+        commissionRate: created.commissionRate ? parseFloat(created.commissionRate) : 0,
       },
       201
     );

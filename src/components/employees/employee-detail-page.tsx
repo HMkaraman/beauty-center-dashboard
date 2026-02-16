@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Phone, Mail, Calendar, Clock, TrendingUp,
   DollarSign, XCircle, Users, Percent, BarChart3, Briefcase,
+  IdCard, AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -146,6 +147,27 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
             {t("specialties")}: {employee.specialties}
           </div>
         )}
+        {/* Additional profile info */}
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {employee.salary > 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <DollarSign className="h-3.5 w-3.5" />
+              <span>{t("monthlySalary")}: <span className="font-english">{formatCurrency(employee.salary, locale)}</span></span>
+            </div>
+          )}
+          {employee.nationalId && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <IdCard className="h-3.5 w-3.5" />
+              <span>{t("nationalId")}: <span className="font-english">{employee.nationalId}</span></span>
+            </div>
+          )}
+          {employee.emergencyContact && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AlertCircle className="h-3.5 w-3.5" />
+              <span>{t("emergencyContact")}: {employee.emergencyContact}</span>
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* KPI Grid */}

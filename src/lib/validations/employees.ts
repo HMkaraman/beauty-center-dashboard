@@ -8,6 +8,13 @@ export const employeeSchema = z.object({
   specialties: z.string().optional(),
   status: z.enum(["active", "on-leave", "inactive"]),
   commissionRate: z.number().optional(),
+  nationalId: z.string().optional(),
+  passportNumber: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  address: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  salary: z.number().optional(),
+  notes: z.string().optional(),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeSchema>;

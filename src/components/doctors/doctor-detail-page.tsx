@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Phone, Mail, Calendar, Clock, TrendingUp,
-  DollarSign, XCircle, Users, Star, BarChart3, Award,
+  DollarSign, XCircle, Users, Star, BarChart3, Award, Briefcase, GraduationCap, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,7 +14,9 @@ import { DoctorStatusBadge } from "./doctor-status-badge";
 import { DoctorPerformanceBadge } from "./doctor-performance-badge";
 import { DoctorInsightsPanel } from "./doctor-insights-panel";
 import { DoctorDetailAppointmentsTable } from "./doctor-detail-appointments-table";
+import { DoctorDetailCommissionsTable } from "./doctor-detail-commissions-table";
 import { DoctorAppointmentCard } from "./doctor-appointment-card";
+import { DoctorCommissionCard } from "./doctor-commission-card";
 import { useDoctorDetails } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/formatters";
 
@@ -46,7 +48,7 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
     );
   }
 
-  const { doctor, kpis, analytics, recentAppointments } = data;
+  const { doctor, kpis, analytics, recentAppointments, recentCommissions } = data;
 
   const kpiCards = [
     {
@@ -65,6 +67,11 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
       icon: <TrendingUp className="h-5 w-5 text-gold" />,
     },
     {
+      label: t("kpiCommissionEarned"),
+      value: formatCurrency(kpis.commissionEarned, locale),
+      icon: <Briefcase className="h-5 w-5 text-gold" />,
+    },
+    {
       label: t("kpiUniquePatients"),
       value: String(kpis.uniquePatients),
       icon: <Users className="h-5 w-5 text-gold" />,
@@ -78,11 +85,6 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
       label: t("kpiCancellationRate"),
       value: `${kpis.cancellationRate}%`,
       icon: <XCircle className="h-5 w-5 text-gold" />,
-    },
-    {
-      label: t("kpiLastConsultation"),
-      value: kpis.lastConsultationDate || t("never"),
-      icon: <Clock className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiRating"),
@@ -146,6 +148,47 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
             </div>
           </div>
         </div>
+
+        {/* Bio, Education, Certificates, Compensation info */}
+        <div className="mt-4 space-y-3">
+          {doctor.bio && (
+            <div className="rounded-md bg-secondary/30 p-3 text-sm text-muted-foreground">
+              <span className="font-semibold">{t("bio")}:</span> {doctor.bio}
+            </div>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {doctor.education && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <GraduationCap className="h-3.5 w-3.5" />
+                <span>{t("education")}: {doctor.education}</span>
+              </div>
+            )}
+            {doctor.certificates && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FileText className="h-3.5 w-3.5" />
+                <span>{t("certificates")}: {doctor.certificates}</span>
+              </div>
+            )}
+            {doctor.yearsOfExperience > 0 && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-3.5 w-3.5" />
+                <span>{t("yearsOfExperience")}: <span className="font-english">{doctor.yearsOfExperience}</span></span>
+              </div>
+            )}
+            {doctor.salary > 0 && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <DollarSign className="h-3.5 w-3.5" />
+                <span>{t("monthlySalary")}: <span className="font-english">{formatCurrency(doctor.salary, locale)}</span></span>
+              </div>
+            )}
+            {doctor.commissionRate > 0 && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Briefcase className="h-3.5 w-3.5" />
+                <span>{t("commissionRatePercent")}: <span className="font-english">{doctor.commissionRate}%</span></span>
+              </div>
+            )}
+          </div>
+        </div>
       </motion.div>
 
       {/* KPI Grid */}
@@ -173,11 +216,14 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
       {/* Insights Panel */}
       <DoctorInsightsPanel analytics={analytics} />
 
-      {/* Tabs: Consultations */}
+      {/* Tabs: Consultations & Commissions */}
       <Tabs defaultValue="consultations">
         <TabsList>
           <TabsTrigger value="consultations">
             {t("tabConsultations")} ({recentAppointments.length})
+          </TabsTrigger>
+          <TabsTrigger value="commissions">
+            {t("tabCommissions")} ({recentCommissions.length})
           </TabsTrigger>
         </TabsList>
 
@@ -192,6 +238,22 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
             ) : (
               recentAppointments.map((appt) => (
                 <DoctorAppointmentCard key={appt.id} data={appt} />
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="commissions">
+          <DoctorDetailCommissionsTable data={recentCommissions} />
+          {/* Mobile cards */}
+          <div className="space-y-3 md:hidden">
+            {recentCommissions.length === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                {t("noCommissions")}
+              </div>
+            ) : (
+              recentCommissions.map((comm) => (
+                <DoctorCommissionCard key={comm.id} data={comm} />
               ))
             )}
           </div>

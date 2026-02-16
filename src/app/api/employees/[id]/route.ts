@@ -31,6 +31,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     return success({
       ...employee,
       commissionRate: employee.commissionRate ? parseFloat(employee.commissionRate) : 0,
+      salary: employee.salary ? parseFloat(employee.salary) : 0,
     });
   } catch (error) {
     console.error("GET /api/employees/[id] error:", error);
@@ -61,6 +62,9 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (validated.commissionRate !== undefined) {
       updateData.commissionRate = String(validated.commissionRate);
     }
+    if (validated.salary !== undefined) {
+      updateData.salary = String(validated.salary);
+    }
 
     const [updated] = await db
       .update(employees)
@@ -73,6 +77,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return success({
       ...updated,
       commissionRate: updated.commissionRate ? parseFloat(updated.commissionRate) : 0,
+      salary: updated.salary ? parseFloat(updated.salary) : 0,
     });
   } catch (error) {
     console.error("PATCH /api/employees/[id] error:", error);

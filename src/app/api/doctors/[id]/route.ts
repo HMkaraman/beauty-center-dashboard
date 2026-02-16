@@ -31,6 +31,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     return success({
       ...doctor,
       rating: doctor.rating ? parseFloat(doctor.rating) : 0,
+      salary: doctor.salary ? parseFloat(doctor.salary) : 0,
+      commissionRate: doctor.commissionRate ? parseFloat(doctor.commissionRate) : 0,
     });
   } catch (error) {
     console.error("GET /api/doctors/[id] error:", error);
@@ -53,12 +55,20 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const validated = result.data;
 
+    const updateData: Record<string, unknown> = {
+      ...validated,
+      updatedAt: new Date(),
+    };
+    if (validated.salary !== undefined) {
+      updateData.salary = String(validated.salary);
+    }
+    if (validated.commissionRate !== undefined) {
+      updateData.commissionRate = String(validated.commissionRate);
+    }
+
     const [updated] = await db
       .update(doctors)
-      .set({
-        ...validated,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(and(eq(doctors.id, id), eq(doctors.tenantId, session.user.tenantId)))
       .returning();
 
@@ -67,6 +77,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return success({
       ...updated,
       rating: updated.rating ? parseFloat(updated.rating) : 0,
+      salary: updated.salary ? parseFloat(updated.salary) : 0,
+      commissionRate: updated.commissionRate ? parseFloat(updated.commissionRate) : 0,
     });
   } catch (error) {
     console.error("PATCH /api/doctors/[id] error:", error);
