@@ -12,7 +12,7 @@ export default function DashboardLayout({
     <AuthGuard>
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <div className="md:me-[72px] xl:me-[260px] transition-all duration-200">
+        <div className="md:ms-[72px] xl:ms-[260px] transition-all duration-200">
           <Header />
           <main className="p-4 pb-20 md:p-6 md:pb-6">{children}</main>
         </div>

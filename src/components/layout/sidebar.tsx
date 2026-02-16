@@ -58,7 +58,7 @@ export function Sidebar() {
         animate={{ width: isCollapsed ? 72 : 260 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          "fixed top-0 end-0 z-40 hidden h-screen flex-col border-s border-border bg-sidebar md:flex"
+          "fixed top-0 start-0 z-40 hidden h-screen flex-col border-e border-border bg-sidebar md:flex"
         )}
       >
         {/* Logo */}
@@ -89,7 +89,7 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                     isActive
-                      ? "bg-gold/10 text-gold border-e-2 border-gold"
+                      ? "bg-gold/10 text-gold border-s-2 border-gold"
                       : "text-sidebar-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
@@ -113,7 +113,7 @@ export function Sidebar() {
                   <li key={item.id}>
                     <Tooltip>
                       <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                      <TooltipContent side="left" sideOffset={8}>
+                      <TooltipContent side="right" sideOffset={8}>
                         {t(item.labelKey)}
                       </TooltipContent>
                     </Tooltip>
@@ -133,7 +133,7 @@ export function Sidebar() {
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-secondary hover:text-foreground transition-colors"
           >
             <Globe className="h-5 w-5 shrink-0" />
-            {!isCollapsed && <span>{locale === "ar" ? t("common.arabic") : t("common.english")}</span>}
+            {!isCollapsed && <span>{locale === "ar" ? t("common.english") : t("common.arabic")}</span>}
           </button>
           <button
             onClick={handleLogout}
