@@ -8,9 +8,13 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { invoices, invoiceItems, tenantSettings } from "@/db/schema";
+import { invoices, invoiceItems, tenantSettings, appointments } from "@/db/schema";
 import { invoiceSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import {
+  createIncomeTransaction,
+  calculateEmployeeCommission,
+} from "@/lib/business-logic/finance";
 
 export async function GET(req: NextRequest) {
   try {
@@ -152,6 +156,37 @@ export async function POST(req: NextRequest) {
           total: String(item.total),
         }))
       );
+    }
+
+    // When invoice is created as "paid" (checkout flow), create income transaction + commission
+    if (validated.status === "paid") {
+      const invoiceTotal = parseFloat(newInvoice.total);
+
+      await createIncomeTransaction({
+        tenantId,
+        invoiceId: newInvoice.id,
+        invoiceNumber,
+        total: invoiceTotal,
+        date: validated.date,
+        clientName: validated.clientName,
+      });
+
+      if (validated.appointmentId) {
+        const [appointment] = await db
+          .select({ employeeId: appointments.employeeId })
+          .from(appointments)
+          .where(eq(appointments.id, validated.appointmentId));
+
+        if (appointment?.employeeId) {
+          await calculateEmployeeCommission({
+            tenantId,
+            employeeId: appointment.employeeId,
+            invoiceId: newInvoice.id,
+            invoiceTotal,
+            date: validated.date,
+          });
+        }
+      }
     }
 
     // Fetch created items

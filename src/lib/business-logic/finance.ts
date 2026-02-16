@@ -43,6 +43,26 @@ export async function createExpenseTransaction(params: {
   });
 }
 
+// Create reversal transaction when a paid invoice is voided
+export async function createReversalTransaction(params: {
+  tenantId: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  total: number;
+  date: string;
+  clientName: string;
+}) {
+  await db.insert(transactions).values({
+    tenantId: params.tenantId,
+    date: params.date,
+    description: `Void: Invoice ${params.invoiceNumber} - ${params.clientName}`,
+    category: "خدمات", // Services
+    type: "income",
+    amount: String(-params.total),
+    invoiceId: params.invoiceId,
+  });
+}
+
 // Calculate and record employee commission when invoice is paid
 export async function calculateEmployeeCommission(params: {
   tenantId: string;

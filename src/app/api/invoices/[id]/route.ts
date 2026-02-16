@@ -8,11 +8,12 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { invoices, invoiceItems, appointments } from "@/db/schema";
+import { invoices, invoiceItems, appointments, transactions } from "@/db/schema";
 import { invoiceSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import {
   createIncomeTransaction,
+  createReversalTransaction,
   calculateEmployeeCommission,
 } from "@/lib/business-logic/finance";
 
@@ -154,6 +155,21 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // When a paid invoice is voided, create a reversal transaction
+    if (
+      validated.status === "void" &&
+      existing.status === "paid"
+    ) {
+      await createReversalTransaction({
+        tenantId,
+        invoiceId: id,
+        invoiceNumber: updated.invoiceNumber,
+        total: parseFloat(updated.total),
+        date: updated.date,
+        clientName: updated.clientName,
+      });
+    }
+
     const items = await db
       .select()
       .from(invoiceItems)
@@ -192,6 +208,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
       .where(and(eq(invoices.id, id), eq(invoices.tenantId, tenantId)));
 
     if (!existing) return notFound("Invoice not found");
+
+    // Block deletion of paid invoices — must void instead
+    if (existing.status === "paid") {
+      return badRequest("Cannot delete a paid invoice. Void it instead.");
+    }
+
+    // Clean up any orphan transactions referencing this invoice
+    await db.delete(transactions).where(eq(transactions.invoiceId, id));
 
     // Cascade delete: items are deleted via FK onDelete cascade
     await db

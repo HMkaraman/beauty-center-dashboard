@@ -8,7 +8,7 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { expenses } from "@/db/schema";
+import { expenses, transactions } from "@/db/schema";
 import { expenseSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { createExpenseTransaction } from "@/lib/business-logic/finance";
@@ -116,6 +116,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
       .where(and(eq(expenses.id, id), eq(expenses.tenantId, tenantId)));
 
     if (!existing) return notFound("Expense not found");
+
+    // Block deletion of approved expenses
+    if (existing.status === "approved") {
+      return badRequest("Cannot delete an approved expense.");
+    }
+
+    // Clean up any orphan transactions referencing this expense
+    await db.delete(transactions).where(eq(transactions.expenseId, id));
 
     await db
       .delete(expenses)
