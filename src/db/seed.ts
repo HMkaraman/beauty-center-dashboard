@@ -1,5 +1,5 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
 import { hash } from "bcryptjs";
 import * as schema from "./schema";
 
@@ -8,8 +8,8 @@ if (!DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
-const sql = neon(DATABASE_URL);
-const db = drizzle(sql, { schema });
+const client = postgres(DATABASE_URL);
+const db = drizzle(client, { schema });
 
 async function seed() {
   console.log("🌱 Seeding database...");
