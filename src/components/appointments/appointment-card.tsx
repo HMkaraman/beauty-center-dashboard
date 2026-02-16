@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ interface AppointmentCardProps {
 
 export function AppointmentCard({ data, onEdit, onDelete }: AppointmentCardProps) {
   const t = useTranslations("appointments");
+  const locale = useLocale();
 
   return (
     <motion.div
@@ -74,7 +75,7 @@ export function AppointmentCard({ data, onEdit, onDelete }: AppointmentCardProps
           <span>{data.duration}{t("minutes")}</span>
         </div>
         <p className="text-sm font-bold font-english text-foreground">
-          {formatCurrency(data.price)}
+          {formatCurrency(data.price, locale)}
         </p>
       </div>
     </motion.div>

@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -12,6 +12,7 @@ interface InventoryItemCardProps { data: InventoryItem; onEdit?: (item: Inventor
 
 export function InventoryItemCard({ data, onEdit, onDelete }: InventoryItemCardProps) {
   const t = useTranslations("inventory");
+  const locale = useLocale();
   return (
     <motion.div whileHover={{ y: -2, boxShadow: "0 8px 30px rgba(196, 149, 106, 0.15)" }} transition={{ duration: 0.2 }} className="rounded-lg border border-border bg-card p-4 md:hidden">
       <div className="flex items-start justify-between">
@@ -24,11 +25,11 @@ export function InventoryItemCard({ data, onEdit, onDelete }: InventoryItemCardP
       <p className="mt-1 text-xs text-muted-foreground">{data.category}</p>
       <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
         <div className="flex justify-between"><span>{t("quantity")}: <span className="font-english">{data.quantity}</span></span></div>
-        <div className="flex justify-between"><span>{t("unitPrice")}: <span className="font-english">{formatCurrency(data.unitPrice)}</span></span></div>
+        <div className="flex justify-between"><span>{t("unitPrice")}: <span className="font-english">{formatCurrency(data.unitPrice, locale)}</span></span></div>
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs text-muted-foreground">{t("totalValue")}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.totalValue)}</p>
+        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.totalValue, locale)}</p>
       </div>
     </motion.div>
   );

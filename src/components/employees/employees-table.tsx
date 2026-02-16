@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ interface EmployeesTableProps {
 
 export function EmployeesTable({ data, onEdit, onDelete }: EmployeesTableProps) {
   const t = useTranslations("employees");
+  const locale = useLocale();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -36,7 +37,7 @@ export function EmployeesTable({ data, onEdit, onDelete }: EmployeesTableProps) 
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.phone}</td>
             <td className="px-4 py-3"><EmployeeStatusBadge status={employee.status} /></td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.appointments}</td>
-            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(employee.revenue)}</td>
+            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(employee.revenue, locale)}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.rating > 0 ? employee.rating : "—"}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.hireDate}</td>
             <td className="px-4 py-3">

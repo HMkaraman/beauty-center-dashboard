@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "./chart-card";
 import { TopEmployee } from "@/types";
 import { formatCurrency } from "@/lib/formatters";
@@ -11,6 +11,7 @@ interface TopEmployeesChartProps {
 
 export function TopEmployeesChart({ data }: TopEmployeesChartProps) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const maxRevenue = Math.max(...data.map((e) => e.revenue));
 
   return (
@@ -32,7 +33,7 @@ export function TopEmployeesChart({ data }: TopEmployeesChartProps) {
                   </div>
                 </div>
                 <span className="text-sm font-english text-foreground">
-                  {formatCurrency(employee.revenue)}
+                  {formatCurrency(employee.revenue, locale)}
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">

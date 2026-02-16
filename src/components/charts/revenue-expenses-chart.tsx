@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 import { ChartCard } from "./chart-card";
 import { ChartDataPoint } from "@/types";
 import { CHART_COLORS } from "@/constants/colors";
+import { useTranslatedChartData } from "@/hooks/useTranslatedChartData";
 import { formatCompactNumber } from "@/lib/formatters";
 
 interface RevenueExpensesChartProps {
@@ -50,12 +51,13 @@ function CustomTooltip({
 export function RevenueExpensesChart({ data }: RevenueExpensesChartProps) {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
+  const translatedData = useTranslatedChartData(data);
 
   return (
     <ChartCard title={t("revenueVsExpenses")}>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+          <AreaChart data={translatedData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <defs>
               <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={CHART_COLORS.gold} stopOpacity={0.3} />

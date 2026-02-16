@@ -45,18 +45,18 @@ export const profitabilityData: ProfitabilityData = {
 };
 
 export const revenueExpensesData: ChartDataPoint[] = [
-  { name: "يناير", revenue: 38000, expenses: 25000 },
-  { name: "فبراير", revenue: 42000, expenses: 27000 },
-  { name: "مارس", revenue: 35000, expenses: 23000 },
-  { name: "أبريل", revenue: 48000, expenses: 30000 },
-  { name: "مايو", revenue: 52000, expenses: 32000 },
-  { name: "يونيو", revenue: 45000, expenses: 28000 },
-  { name: "يوليو", revenue: 40000, expenses: 26000 },
-  { name: "أغسطس", revenue: 38000, expenses: 24000 },
-  { name: "سبتمبر", revenue: 44000, expenses: 29000 },
-  { name: "أكتوبر", revenue: 50000, expenses: 31000 },
-  { name: "نوفمبر", revenue: 47000, expenses: 30000 },
-  { name: "ديسمبر", revenue: 55000, expenses: 35000 },
+  { name: "common.months.january", revenue: 38000, expenses: 25000 },
+  { name: "common.months.february", revenue: 42000, expenses: 27000 },
+  { name: "common.months.march", revenue: 35000, expenses: 23000 },
+  { name: "common.months.april", revenue: 48000, expenses: 30000 },
+  { name: "common.months.may", revenue: 52000, expenses: 32000 },
+  { name: "common.months.june", revenue: 45000, expenses: 28000 },
+  { name: "common.months.july", revenue: 40000, expenses: 26000 },
+  { name: "common.months.august", revenue: 38000, expenses: 24000 },
+  { name: "common.months.september", revenue: 44000, expenses: 29000 },
+  { name: "common.months.october", revenue: 50000, expenses: 31000 },
+  { name: "common.months.november", revenue: 47000, expenses: 30000 },
+  { name: "common.months.december", revenue: 55000, expenses: 35000 },
 ];
 
 export const revenueByServiceData: DonutSegment[] = [
@@ -69,13 +69,13 @@ export const revenueByServiceData: DonutSegment[] = [
 ];
 
 export const appointmentsTrendData: ChartDataPoint[] = [
-  { name: "السبت", appointments: 45 },
-  { name: "الأحد", appointments: 52 },
-  { name: "الإثنين", appointments: 38 },
-  { name: "الثلاثاء", appointments: 41 },
-  { name: "الأربعاء", appointments: 55 },
-  { name: "الخميس", appointments: 48 },
-  { name: "الجمعة", appointments: 30 },
+  { name: "common.days.saturday", appointments: 45 },
+  { name: "common.days.sunday", appointments: 52 },
+  { name: "common.days.monday", appointments: 38 },
+  { name: "common.days.tuesday", appointments: 41 },
+  { name: "common.days.wednesday", appointments: 55 },
+  { name: "common.days.thursday", appointments: 48 },
+  { name: "common.days.friday", appointments: 30 },
 ];
 
 export const topEmployees: TopEmployee[] = [
@@ -333,18 +333,18 @@ export const clientsByStatusData: DonutSegment[] = [
 ];
 
 export const clientsGrowthData: ChartDataPoint[] = [
-  { name: "يناير", value: 180 },
-  { name: "فبراير", value: 195 },
-  { name: "مارس", value: 210 },
-  { name: "أبريل", value: 222 },
-  { name: "مايو", value: 238 },
-  { name: "يونيو", value: 248 },
-  { name: "يوليو", value: 260 },
-  { name: "أغسطس", value: 271 },
-  { name: "سبتمبر", value: 285 },
-  { name: "أكتوبر", value: 298 },
-  { name: "نوفمبر", value: 312 },
-  { name: "ديسمبر", value: 324 },
+  { name: "common.months.january", value: 180 },
+  { name: "common.months.february", value: 195 },
+  { name: "common.months.march", value: 210 },
+  { name: "common.months.april", value: 222 },
+  { name: "common.months.may", value: 238 },
+  { name: "common.months.june", value: 248 },
+  { name: "common.months.july", value: 260 },
+  { name: "common.months.august", value: 271 },
+  { name: "common.months.september", value: 285 },
+  { name: "common.months.october", value: 298 },
+  { name: "common.months.november", value: 312 },
+  { name: "common.months.december", value: 324 },
 ];
 
 export const clientsListData: Client[] = [
@@ -675,18 +675,18 @@ export const servicesByCategoryData: DonutSegment[] = [
 ];
 
 export const servicesBookingsTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 95 },
-  { name: "فبراير", value: 102 },
-  { name: "مارس", value: 88 },
-  { name: "أبريل", value: 110 },
-  { name: "مايو", value: 118 },
-  { name: "يونيو", value: 105 },
-  { name: "يوليو", value: 92 },
-  { name: "أغسطس", value: 85 },
-  { name: "سبتمبر", value: 108 },
-  { name: "أكتوبر", value: 115 },
-  { name: "نوفمبر", value: 112 },
-  { name: "ديسمبر", value: 125 },
+  { name: "common.months.january", value: 95 },
+  { name: "common.months.february", value: 102 },
+  { name: "common.months.march", value: 88 },
+  { name: "common.months.april", value: 110 },
+  { name: "common.months.may", value: 118 },
+  { name: "common.months.june", value: 105 },
+  { name: "common.months.july", value: 92 },
+  { name: "common.months.august", value: 85 },
+  { name: "common.months.september", value: 108 },
+  { name: "common.months.october", value: 115 },
+  { name: "common.months.november", value: 112 },
+  { name: "common.months.december", value: 125 },
 ];
 
 export const servicesListData: Service[] = [
@@ -728,18 +728,18 @@ export const doctorsBySpecialtyData: DonutSegment[] = [
 ];
 
 export const doctorsConsultationsTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 22 },
-  { name: "فبراير", value: 25 },
-  { name: "مارس", value: 28 },
-  { name: "أبريل", value: 24 },
-  { name: "مايو", value: 30 },
-  { name: "يونيو", value: 27 },
-  { name: "يوليو", value: 26 },
-  { name: "أغسطس", value: 23 },
-  { name: "سبتمبر", value: 29 },
-  { name: "أكتوبر", value: 32 },
-  { name: "نوفمبر", value: 28 },
-  { name: "ديسمبر", value: 30 },
+  { name: "common.months.january", value: 22 },
+  { name: "common.months.february", value: 25 },
+  { name: "common.months.march", value: 28 },
+  { name: "common.months.april", value: 24 },
+  { name: "common.months.may", value: 30 },
+  { name: "common.months.june", value: 27 },
+  { name: "common.months.july", value: 26 },
+  { name: "common.months.august", value: 23 },
+  { name: "common.months.september", value: 29 },
+  { name: "common.months.october", value: 32 },
+  { name: "common.months.november", value: 28 },
+  { name: "common.months.december", value: 30 },
 ];
 
 export const doctorsListData: Doctor[] = [
@@ -775,18 +775,18 @@ export const inventoryByCategoryData: DonutSegment[] = [
 ];
 
 export const inventoryStockTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 142 },
-  { name: "فبراير", value: 138 },
-  { name: "مارس", value: 145 },
-  { name: "أبريل", value: 150 },
-  { name: "مايو", value: 148 },
-  { name: "يونيو", value: 155 },
-  { name: "يوليو", value: 152 },
-  { name: "أغسطس", value: 149 },
-  { name: "سبتمبر", value: 158 },
-  { name: "أكتوبر", value: 160 },
-  { name: "نوفمبر", value: 154 },
-  { name: "ديسمبر", value: 156 },
+  { name: "common.months.january", value: 142 },
+  { name: "common.months.february", value: 138 },
+  { name: "common.months.march", value: 145 },
+  { name: "common.months.april", value: 150 },
+  { name: "common.months.may", value: 148 },
+  { name: "common.months.june", value: 155 },
+  { name: "common.months.july", value: 152 },
+  { name: "common.months.august", value: 149 },
+  { name: "common.months.september", value: 158 },
+  { name: "common.months.october", value: 160 },
+  { name: "common.months.november", value: 154 },
+  { name: "common.months.december", value: 156 },
 ];
 
 export const inventoryListData: InventoryItem[] = [
@@ -829,18 +829,18 @@ export const expensesByCategoryData: DonutSegment[] = [
 ];
 
 export const expensesMonthlyTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 25000 },
-  { name: "فبراير", value: 27000 },
-  { name: "مارس", value: 23000 },
-  { name: "أبريل", value: 30000 },
-  { name: "مايو", value: 32000 },
-  { name: "يونيو", value: 28000 },
-  { name: "يوليو", value: 26000 },
-  { name: "أغسطس", value: 24000 },
-  { name: "سبتمبر", value: 29000 },
-  { name: "أكتوبر", value: 31000 },
-  { name: "نوفمبر", value: 30000 },
-  { name: "ديسمبر", value: 28500 },
+  { name: "common.months.january", value: 25000 },
+  { name: "common.months.february", value: 27000 },
+  { name: "common.months.march", value: 23000 },
+  { name: "common.months.april", value: 30000 },
+  { name: "common.months.may", value: 32000 },
+  { name: "common.months.june", value: 28000 },
+  { name: "common.months.july", value: 26000 },
+  { name: "common.months.august", value: 24000 },
+  { name: "common.months.september", value: 29000 },
+  { name: "common.months.october", value: 31000 },
+  { name: "common.months.november", value: 30000 },
+  { name: "common.months.december", value: 28500 },
 ];
 
 export const expensesListData: Expense[] = [
@@ -891,18 +891,18 @@ export const financeRevenueByCategoryData: DonutSegment[] = [
 ];
 
 export const financeRevenueExpensesTrendData: ChartDataPoint[] = [
-  { name: "يناير", revenue: 38000, expenses: 25000 },
-  { name: "فبراير", revenue: 42000, expenses: 27000 },
-  { name: "مارس", revenue: 35000, expenses: 23000 },
-  { name: "أبريل", revenue: 48000, expenses: 30000 },
-  { name: "مايو", revenue: 52000, expenses: 32000 },
-  { name: "يونيو", revenue: 45000, expenses: 28000 },
-  { name: "يوليو", revenue: 40000, expenses: 26000 },
-  { name: "أغسطس", revenue: 38000, expenses: 24000 },
-  { name: "سبتمبر", revenue: 44000, expenses: 29000 },
-  { name: "أكتوبر", revenue: 50000, expenses: 31000 },
-  { name: "نوفمبر", revenue: 47000, expenses: 30000 },
-  { name: "ديسمبر", revenue: 55000, expenses: 35000 },
+  { name: "common.months.january", revenue: 38000, expenses: 25000 },
+  { name: "common.months.february", revenue: 42000, expenses: 27000 },
+  { name: "common.months.march", revenue: 35000, expenses: 23000 },
+  { name: "common.months.april", revenue: 48000, expenses: 30000 },
+  { name: "common.months.may", revenue: 52000, expenses: 32000 },
+  { name: "common.months.june", revenue: 45000, expenses: 28000 },
+  { name: "common.months.july", revenue: 40000, expenses: 26000 },
+  { name: "common.months.august", revenue: 38000, expenses: 24000 },
+  { name: "common.months.september", revenue: 44000, expenses: 29000 },
+  { name: "common.months.october", revenue: 50000, expenses: 31000 },
+  { name: "common.months.november", revenue: 47000, expenses: 30000 },
+  { name: "common.months.december", revenue: 55000, expenses: 35000 },
 ];
 
 export const financeTransactionsData: Transaction[] = [
@@ -954,18 +954,18 @@ export const marketingByChannelData: DonutSegment[] = [
 ];
 
 export const marketingReachTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 28000 },
-  { name: "فبراير", value: 32000 },
-  { name: "مارس", value: 29000 },
-  { name: "أبريل", value: 35000 },
-  { name: "مايو", value: 38000 },
-  { name: "يونيو", value: 42000 },
-  { name: "يوليو", value: 36000 },
-  { name: "أغسطس", value: 33000 },
-  { name: "سبتمبر", value: 40000 },
-  { name: "أكتوبر", value: 44000 },
-  { name: "نوفمبر", value: 41000 },
-  { name: "ديسمبر", value: 45200 },
+  { name: "common.months.january", value: 28000 },
+  { name: "common.months.february", value: 32000 },
+  { name: "common.months.march", value: 29000 },
+  { name: "common.months.april", value: 35000 },
+  { name: "common.months.may", value: 38000 },
+  { name: "common.months.june", value: 42000 },
+  { name: "common.months.july", value: 36000 },
+  { name: "common.months.august", value: 33000 },
+  { name: "common.months.september", value: 40000 },
+  { name: "common.months.october", value: 44000 },
+  { name: "common.months.november", value: 41000 },
+  { name: "common.months.december", value: 45200 },
 ];
 
 export const marketingCampaignsData: Campaign[] = [
@@ -1006,18 +1006,18 @@ export const reportsByTypeData: DonutSegment[] = [
 ];
 
 export const reportsDownloadsTrendData: ChartDataPoint[] = [
-  { name: "يناير", value: 85 },
-  { name: "فبراير", value: 92 },
-  { name: "مارس", value: 78 },
-  { name: "أبريل", value: 105 },
-  { name: "مايو", value: 110 },
-  { name: "يونيو", value: 98 },
-  { name: "يوليو", value: 88 },
-  { name: "أغسطس", value: 95 },
-  { name: "سبتمبر", value: 102 },
-  { name: "أكتوبر", value: 115 },
-  { name: "نوفمبر", value: 120 },
-  { name: "ديسمبر", value: 124 },
+  { name: "common.months.january", value: 85 },
+  { name: "common.months.february", value: 92 },
+  { name: "common.months.march", value: 78 },
+  { name: "common.months.april", value: 105 },
+  { name: "common.months.may", value: 110 },
+  { name: "common.months.june", value: 98 },
+  { name: "common.months.july", value: 88 },
+  { name: "common.months.august", value: 95 },
+  { name: "common.months.september", value: 102 },
+  { name: "common.months.october", value: 115 },
+  { name: "common.months.november", value: 120 },
+  { name: "common.months.december", value: 124 },
 ];
 
 export const reportsListData: Report[] = [

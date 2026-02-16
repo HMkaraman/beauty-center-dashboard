@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,6 +11,7 @@ interface ExpensesTableProps { data: Expense[]; onEdit?: (item: Expense) => void
 
 export function ExpensesTable({ data, onEdit, onDelete }: ExpensesTableProps) {
   const t = useTranslations("expenses");
+  const locale = useLocale();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto"><table className="w-full text-sm">
       <thead><tr className="border-b border-border">
@@ -27,7 +28,7 @@ export function ExpensesTable({ data, onEdit, onDelete }: ExpensesTableProps) {
           <td className="px-4 py-3 font-english text-muted-foreground">{expense.date}</td>
           <td className="px-4 py-3"><p className="font-medium text-foreground">{expense.description}</p></td>
           <td className="px-4 py-3 text-muted-foreground">{expense.category}</td>
-          <td className="px-4 py-3 font-english text-foreground">{formatCurrency(expense.amount)}</td>
+          <td className="px-4 py-3 font-english text-foreground">{formatCurrency(expense.amount, locale)}</td>
           <td className="px-4 py-3 text-muted-foreground">{expense.paymentMethod}</td>
           <td className="px-4 py-3"><ExpenseStatusBadge status={expense.status} /></td>
           <td className="px-4 py-3"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>

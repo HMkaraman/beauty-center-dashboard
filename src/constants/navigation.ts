@@ -1,18 +1,18 @@
 import { NavItem } from "@/types";
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: "dashboard", labelKey: "nav.dashboard", icon: "LayoutDashboard", route: "/", isMVP: true },
-  { id: "appointments", labelKey: "nav.appointments", icon: "CalendarDays", route: "/appointments", isMVP: false },
-  { id: "clients", labelKey: "nav.clients", icon: "Users", route: "/clients", isMVP: false },
-  { id: "employees", labelKey: "nav.employees", icon: "UserCog", route: "/employees", isMVP: false },
-  { id: "doctors", labelKey: "nav.doctors", icon: "Stethoscope", route: "/doctors", isMVP: false },
-  { id: "services", labelKey: "nav.services", icon: "Sparkles", route: "/services", isMVP: false },
-  { id: "finance", labelKey: "nav.finance", icon: "Wallet", route: "/finance", isMVP: false },
-  { id: "expenses", labelKey: "nav.expenses", icon: "Receipt", route: "/expenses", isMVP: false },
-  { id: "inventory", labelKey: "nav.inventory", icon: "Package", route: "/inventory", isMVP: false },
-  { id: "reports", labelKey: "nav.reports", icon: "BarChart3", route: "/reports", isMVP: false },
-  { id: "marketing", labelKey: "nav.marketing", icon: "Megaphone", route: "/marketing", isMVP: false },
-  { id: "settings", labelKey: "nav.settings", icon: "Settings", route: "/settings", isMVP: false },
+  { id: "dashboard", labelKey: "nav.dashboard", icon: "LayoutDashboard", route: "/" },
+  { id: "appointments", labelKey: "nav.appointments", icon: "CalendarDays", route: "/appointments" },
+  { id: "clients", labelKey: "nav.clients", icon: "Users", route: "/clients" },
+  { id: "employees", labelKey: "nav.employees", icon: "UserCog", route: "/employees" },
+  { id: "doctors", labelKey: "nav.doctors", icon: "Stethoscope", route: "/doctors" },
+  { id: "services", labelKey: "nav.services", icon: "Sparkles", route: "/services" },
+  { id: "finance", labelKey: "nav.finance", icon: "Wallet", route: "/finance" },
+  { id: "expenses", labelKey: "nav.expenses", icon: "Receipt", route: "/expenses" },
+  { id: "inventory", labelKey: "nav.inventory", icon: "Package", route: "/inventory" },
+  { id: "reports", labelKey: "nav.reports", icon: "BarChart3", route: "/reports" },
+  { id: "marketing", labelKey: "nav.marketing", icon: "Megaphone", route: "/marketing" },
+  { id: "settings", labelKey: "nav.settings", icon: "Settings", route: "/settings" },
 ];
 
 export const MOBILE_NAV_ITEMS = NAV_ITEMS.filter((item) =>

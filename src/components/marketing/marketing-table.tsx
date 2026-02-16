@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,7 @@ interface MarketingTableProps {
 
 export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) {
   const t = useTranslations("marketing");
+  const locale = useLocale();
 
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
@@ -47,9 +48,9 @@ export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) 
               <td className="px-4 py-3"><CampaignStatusBadge status={campaign.status} /></td>
               <td className="px-4 py-3 font-english text-muted-foreground">{campaign.startDate}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{campaign.endDate}</td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(campaign.budget)}</td>
-              <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.reach)}</td>
-              <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.conversions)}</td>
+              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(campaign.budget, locale)}</td>
+              <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.reach, locale)}</td>
+              <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.conversions, locale)}</td>
               <td className="px-4 py-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

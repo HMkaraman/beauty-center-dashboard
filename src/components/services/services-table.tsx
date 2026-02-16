@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ interface ServicesTableProps { data: Service[]; onEdit?: (item: Service) => void
 
 export function ServicesTable({ data, onEdit, onDelete }: ServicesTableProps) {
   const t = useTranslations("services");
+  const locale = useLocale();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -30,7 +31,7 @@ export function ServicesTable({ data, onEdit, onDelete }: ServicesTableProps) {
             <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar size="sm"><AvatarFallback>{service.name.charAt(0)}</AvatarFallback></Avatar><p className="font-medium text-foreground">{service.name}</p></div></td>
             <td className="px-4 py-3 text-muted-foreground">{service.category}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{service.duration}{t("minutes")}</td>
-            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(service.price)}</td>
+            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(service.price, locale)}</td>
             <td className="px-4 py-3"><ServiceStatusBadge status={service.status} /></td>
             <td className="px-4 py-3 font-english text-muted-foreground">{service.bookings}</td>
             <td className="px-4 py-3">

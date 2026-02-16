@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { DonutSegment } from "@/types";
 import { formatCurrency } from "@/lib/formatters";
@@ -17,6 +17,7 @@ function CustomTooltip({
   active?: boolean;
   payload?: Array<{ payload: DonutSegment }>;
 }) {
+  const locale = useLocale();
   if (!active || !payload?.[0]) return null;
 
   const segment = payload[0].payload;
@@ -24,7 +25,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="text-xs text-foreground">{segment.name}</p>
       <p className="text-xs font-english text-muted-foreground">
-        {formatCurrency(segment.value)}
+        {formatCurrency(segment.value, locale)}
       </p>
     </div>
   );
@@ -32,6 +33,7 @@ function CustomTooltip({
 
 export function ExpensesCategoryChart({ data }: ExpensesCategoryChartProps) {
   const t = useTranslations("expenses");
+  const locale = useLocale();
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   const translatedData = data.map((d) => ({
@@ -64,7 +66,7 @@ export function ExpensesCategoryChart({ data }: ExpensesCategoryChartProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <p className="text-xs text-muted-foreground">{t("total")}</p>
             <p className="text-sm font-bold font-english text-foreground">
-              {formatCurrency(total)}
+              {formatCurrency(total, locale)}
             </p>
           </div>
         </div>

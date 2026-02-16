@@ -32,7 +32,14 @@ export default async function RootLayout({
   const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html lang={locale} dir={dir} className="dark">
+    <html lang={locale} dir={dir} className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.classList.remove("dark","light");document.documentElement.classList.add(t)}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body
         className={`${notoKufiArabic.variable} ${outfit.variable} antialiased`}
       >

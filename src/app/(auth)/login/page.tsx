@@ -17,6 +17,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    document.cookie = "auth=true;path=/;max-age=86400";
     router.push("/");
   };
 

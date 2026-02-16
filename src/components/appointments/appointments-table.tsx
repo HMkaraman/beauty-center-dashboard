@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ interface AppointmentsTableProps {
 
 export function AppointmentsTable({ data, onEdit, onDelete }: AppointmentsTableProps) {
   const t = useTranslations("appointments");
+  const locale = useLocale();
 
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
@@ -62,7 +63,7 @@ export function AppointmentsTable({ data, onEdit, onDelete }: AppointmentsTableP
               <td className="px-4 py-3">
                 <AppointmentStatusBadge status={appointment.status} />
               </td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(appointment.price)}</td>
+              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(appointment.price, locale)}</td>
               <td className="px-4 py-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

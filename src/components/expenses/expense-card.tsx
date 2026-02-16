@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -12,6 +12,7 @@ interface ExpenseCardProps { data: Expense; onEdit?: (item: Expense) => void; on
 
 export function ExpenseCard({ data, onEdit, onDelete }: ExpenseCardProps) {
   const t = useTranslations("expenses");
+  const locale = useLocale();
   return (
     <motion.div whileHover={{ y: -2, boxShadow: "0 8px 30px rgba(196, 149, 106, 0.15)" }} transition={{ duration: 0.2 }} className="rounded-lg border border-border bg-card p-4 md:hidden">
       <div className="flex items-start justify-between">
@@ -27,7 +28,7 @@ export function ExpenseCard({ data, onEdit, onDelete }: ExpenseCardProps) {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs font-english text-muted-foreground">{data.date}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.amount)}</p>
+        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.amount, locale)}</p>
       </div>
     </motion.div>
   );

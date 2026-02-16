@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
 import { CHART_COLORS } from "@/constants/colors";
+import { useTranslatedChartData } from "@/hooks/useTranslatedChartData";
 
 interface ClientsGrowthChartProps {
   data: ChartDataPoint[];
@@ -43,12 +44,13 @@ function CustomTooltip({
 
 export function ClientsGrowthChart({ data }: ClientsGrowthChartProps) {
   const t = useTranslations("clients");
+  const translatedData = useTranslatedChartData(data);
 
   return (
     <ChartCard title={t("monthlyGrowth")}>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+          <LineChart data={translatedData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke={CHART_COLORS.border}

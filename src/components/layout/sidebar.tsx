@@ -4,11 +4,12 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Globe, Sparkles } from "lucide-react";
+import { Globe, LogOut, Sparkles } from "lucide-react";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/constants/navigation";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
+import { useRouter } from "next/navigation";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import {
   Tooltip,
@@ -22,12 +23,18 @@ export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations();
   const locale = useLocale();
+  const router = useRouter();
   const { isCollapsed, setCollapsed } = useSidebarStore();
 
   const toggleLocale = () => {
     const newLocale = locale === "ar" ? "en" : "ar";
     document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
     window.location.reload();
+  };
+
+  const handleLogout = () => {
+    document.cookie = "auth=;path=/;max-age=0";
+    router.push("/login");
   };
 
   useEffect(() => {
@@ -120,13 +127,20 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom */}
-        <div className="border-t border-border p-3">
+        <div className="border-t border-border p-3 space-y-1">
           <button
             onClick={toggleLocale}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-secondary hover:text-foreground transition-colors"
           >
             <Globe className="h-5 w-5 shrink-0" />
             {!isCollapsed && <span>{locale === "ar" ? t("common.arabic") : t("common.english")}</span>}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-red/10 hover:text-red transition-colors"
+          >
+            <LogOut className="h-5 w-5 shrink-0" />
+            {!isCollapsed && <span>{t("common.logout")}</span>}
           </button>
         </div>
       </motion.aside>

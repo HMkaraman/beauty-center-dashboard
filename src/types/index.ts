@@ -33,7 +33,6 @@ export interface NavItem {
   labelKey: string;
   icon: string;
   route: string;
-  isMVP: boolean;
 }
 
 export interface ProfitabilityData {

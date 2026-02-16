@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { DonutSegment } from "@/types";
 import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
@@ -17,6 +17,7 @@ function CustomTooltip({
   active?: boolean;
   payload?: Array<{ payload: DonutSegment }>;
 }) {
+  const locale = useLocale();
   if (!active || !payload?.[0]) return null;
 
   const segment = payload[0].payload;
@@ -24,7 +25,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="text-xs text-foreground">{segment.name}</p>
       <p className="text-xs font-english text-muted-foreground">
-        {formatCurrency(segment.value)}
+        {formatCurrency(segment.value, locale)}
       </p>
     </div>
   );

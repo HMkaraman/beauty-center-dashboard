@@ -1,5 +1,6 @@
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("ar-SA", {
+export function formatCurrency(value: number, locale: string = "ar"): string {
+  const intlLocale = locale === "ar" ? "ar-SA" : "en-US";
+  return new Intl.NumberFormat(intlLocale, {
     style: "currency",
     currency: "SAR",
     minimumFractionDigits: 0,
@@ -21,6 +22,7 @@ export function formatPercentage(value: number): string {
   return `${value}%`;
 }
 
-export function formatNumber(value: number): string {
-  return new Intl.NumberFormat("ar-SA").format(value);
+export function formatNumber(value: number, locale: string = "ar"): string {
+  const intlLocale = locale === "ar" ? "ar-SA" : "en-US";
+  return new Intl.NumberFormat(intlLocale).format(value);
 }

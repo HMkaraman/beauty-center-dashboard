@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
+import { useThemeStore } from "@/store/useThemeStore";
 
 const colorOptions = [
   { name: "Gold", value: "#C4956A" },
@@ -15,7 +16,7 @@ const colorOptions = [
 
 export function AppearanceCard() {
   const t = useTranslations("settings");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const { theme, setTheme } = useThemeStore();
   const [primaryColor, setPrimaryColor] = useState("#C4956A");
 
   return (

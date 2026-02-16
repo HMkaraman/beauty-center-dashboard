@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
 import { CHART_COLORS } from "@/constants/colors";
@@ -28,13 +28,14 @@ function CustomTooltip({
   payload?: Array<{ value: number }>;
   label?: string;
 }) {
+  const locale = useLocale();
   if (!active || !payload?.[0]) return null;
 
   return (
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
       <p className="text-xs font-english text-foreground">
-        {formatCurrency(payload[0].value)}
+        {formatCurrency(payload[0].value, locale)}
       </p>
     </div>
   );

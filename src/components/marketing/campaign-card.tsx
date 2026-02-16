@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ interface CampaignCardProps {
 
 export function CampaignCard({ data, onEdit, onDelete }: CampaignCardProps) {
   const t = useTranslations("marketing");
+  const locale = useLocale();
 
   return (
     <motion.div
@@ -54,11 +55,11 @@ export function CampaignCard({ data, onEdit, onDelete }: CampaignCardProps) {
 
       <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
         <div className="flex justify-between">
-          <span>{t("budget")}: <span className="font-english">{formatCurrency(data.budget)}</span></span>
+          <span>{t("budget")}: <span className="font-english">{formatCurrency(data.budget, locale)}</span></span>
         </div>
         <div className="flex justify-between">
-          <span>{t("reach")}: <span className="font-english">{formatNumber(data.reach)}</span></span>
-          <span>{t("conversions")}: <span className="font-english">{formatNumber(data.conversions)}</span></span>
+          <span>{t("reach")}: <span className="font-english">{formatNumber(data.reach, locale)}</span></span>
+          <span>{t("conversions")}: <span className="font-english">{formatNumber(data.conversions, locale)}</span></span>
         </div>
       </div>
 

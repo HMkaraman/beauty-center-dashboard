@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { TrendingUp } from "lucide-react";
 import { ProfitabilityData } from "@/types";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
@@ -11,6 +11,7 @@ interface ProfitabilityBannerProps {
 
 export function ProfitabilityBanner({ data }: ProfitabilityBannerProps) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const isHealthy = data.margin > 25;
 
   return (
@@ -44,19 +45,19 @@ export function ProfitabilityBanner({ data }: ProfitabilityBannerProps) {
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("revenue")}</p>
             <p className="text-sm font-bold font-english text-foreground">
-              {formatCurrency(data.revenue)}
+              {formatCurrency(data.revenue, locale)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("expenses")}</p>
             <p className="text-sm font-bold font-english text-red">
-              {formatCurrency(data.expenses)}
+              {formatCurrency(data.expenses, locale)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("netProfit")}</p>
             <p className="text-sm font-bold font-english text-green">
-              {formatCurrency(data.profit)}
+              {formatCurrency(data.profit, locale)}
             </p>
           </div>
         </div>

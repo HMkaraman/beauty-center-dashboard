@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { DynamicIcon } from "./dynamic-icon";
 import { ChangeBadge } from "./change-badge";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
@@ -13,11 +13,12 @@ interface KPICardProps {
 
 export function KPICard({ data }: KPICardProps) {
   const t = useTranslations();
+  const locale = useLocale();
 
   const formattedValue =
     data.format === "currency"
-      ? formatCurrency(data.value)
-      : formatNumber(data.value);
+      ? formatCurrency(data.value, locale)
+      : formatNumber(data.value, locale);
 
   return (
     <motion.div
