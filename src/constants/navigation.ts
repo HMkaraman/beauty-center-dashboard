@@ -8,7 +8,6 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "doctors", labelKey: "nav.doctors", icon: "Stethoscope", route: "/doctors" },
   { id: "services", labelKey: "nav.services", icon: "Sparkles", route: "/services" },
   { id: "finance", labelKey: "nav.finance", icon: "Wallet", route: "/finance" },
-  { id: "expenses", labelKey: "nav.expenses", icon: "Receipt", route: "/expenses" },
   { id: "inventory", labelKey: "nav.inventory", icon: "Package", route: "/inventory" },
   { id: "reports", labelKey: "nav.reports", icon: "BarChart3", route: "/reports" },
   { id: "marketing", labelKey: "nav.marketing", icon: "Megaphone", route: "/marketing" },

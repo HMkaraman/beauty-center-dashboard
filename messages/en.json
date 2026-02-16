@@ -327,6 +327,11 @@
   },
   "finance": {
     "title": "Finance",
+    "tabs": {
+      "overview": "Overview",
+      "transactions": "Transactions",
+      "expenses": "Expenses"
+    },
     "totalRevenue": "Total Revenue",
     "totalExpenses": "Total Expenses",
     "netProfit": "Net Profit",

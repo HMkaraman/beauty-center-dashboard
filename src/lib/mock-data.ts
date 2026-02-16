@@ -98,7 +98,7 @@ export const miniKpiData: MiniKPIData[] = [
 export const quickActions: QuickAction[] = [
   { id: "new-appointment", labelKey: "dashboard.newAppointment", icon: "CalendarPlus", color: "#C4956A", route: "/appointments" },
   { id: "add-client", labelKey: "dashboard.addClient", icon: "UserPlus", color: "#7ECB8B", route: "/clients" },
-  { id: "record-expense", labelKey: "dashboard.recordExpense", icon: "Receipt", color: "#E07B7B", route: "/expenses" },
+  { id: "record-expense", labelKey: "dashboard.recordExpense", icon: "Receipt", color: "#E07B7B", route: "/finance" },
   { id: "view-reports", labelKey: "dashboard.viewReports", icon: "BarChart3", color: "#8B7FF5", route: "/reports" },
 ];
 

@@ -327,6 +327,11 @@
   },
   "finance": {
     "title": "المالية",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "transactions": "المعاملات",
+      "expenses": "المصروفات"
+    },
     "totalRevenue": "إجمالي الإيرادات",
     "totalExpenses": "إجمالي المصروفات",
     "netProfit": "صافي الربح",
