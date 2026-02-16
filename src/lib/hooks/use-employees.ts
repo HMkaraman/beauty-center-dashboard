@@ -37,6 +37,14 @@ export function useUpdateEmployee() {
   });
 }
 
+export function useEmployeeDetails(id: string) {
+  return useQuery({
+    queryKey: ["employees", id, "details"],
+    queryFn: () => employeesApi.getDetails(id),
+    enabled: !!id,
+  });
+}
+
 export function useDeleteEmployee() {
   const queryClient = useQueryClient();
   return useMutation({

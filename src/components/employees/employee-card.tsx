@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface EmployeeCardProps {
 export function EmployeeCard({ data, onEdit, onDelete }: EmployeeCardProps) {
   const t = useTranslations("employees");
   const locale = useLocale();
+  const router = useRouter();
   return (
     <motion.div whileHover={{ y: -2, boxShadow: "0 8px 30px rgba(196, 149, 106, 0.15)" }} transition={{ duration: 0.2 }} className="rounded-lg border border-border bg-card p-4 md:hidden">
       <div className="flex items-start justify-between">
@@ -26,7 +28,7 @@ export function EmployeeCard({ data, onEdit, onDelete }: EmployeeCardProps) {
         <div className="flex items-center gap-2">
           <EmployeeStatusBadge status={data.status} />
           <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
+            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => router.push(`/employees/${data.id}`)}>{t("view")}</DropdownMenuItem><DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>

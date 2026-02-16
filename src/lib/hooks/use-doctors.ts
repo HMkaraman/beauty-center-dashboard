@@ -37,6 +37,14 @@ export function useUpdateDoctor() {
   });
 }
 
+export function useDoctorDetails(id: string) {
+  return useQuery({
+    queryKey: ["doctors", id, "details"],
+    queryFn: () => doctorsApi.getDetails(id),
+    enabled: !!id,
+  });
+}
+
 export function useDeleteDoctor() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { Doctor } from "@/types";
+import type { Doctor, DoctorDetailResponse } from "@/types";
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -23,4 +23,5 @@ export const doctorsApi = {
   update: (id: string, data: Partial<Doctor>) =>
     apiFetch<Doctor>(`/doctors/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/doctors/${id}`, { method: "DELETE" }),
+  getDetails: (id: string) => apiFetch<DoctorDetailResponse>(`/doctors/${id}/details`),
 };

@@ -3,6 +3,7 @@ import { tenants } from "./tenants";
 import { clients } from "./clients";
 import { services } from "./services";
 import { employees } from "./employees";
+import { doctors } from "./doctors";
 
 export const appointmentStatusEnum = pgEnum("appointment_status", [
   "confirmed",
@@ -22,6 +23,7 @@ export const appointments = pgTable("appointments", {
   service: varchar("service_name", { length: 255 }).notNull(),
   employeeId: text("employee_id").references(() => employees.id, { onDelete: "set null" }),
   employee: varchar("employee_name", { length: 255 }).notNull(),
+  doctorId: text("doctor_id").references(() => doctors.id, { onDelete: "set null" }),
   date: varchar("date", { length: 10 }).notNull(),
   time: varchar("time", { length: 5 }).notNull(),
   duration: integer("duration").notNull(),

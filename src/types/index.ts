@@ -131,6 +131,45 @@ export interface Employee {
   hireDate: string;
 }
 
+// Employee Detail types
+export type EmployeePerformanceTier = "star" | "solid" | "growing" | "new";
+
+export interface EmployeeKPIs {
+  totalAppointments: number;
+  completedAppointments: number;
+  revenueGenerated: number;
+  avgRevenuePerVisit: number;
+  commissionEarned: number;
+  uniqueClients: number;
+  clientRetentionRate: number;
+  cancellationRate: number;
+  utilizationRate: number;
+}
+
+export interface EmployeeAnalytics {
+  topServices: { serviceName: string; count: number }[];
+  topClients: { clientName: string; count: number }[];
+  performanceTier: EmployeePerformanceTier;
+  monthlyRevenue: { month: string; revenue: number }[];
+}
+
+export interface EmployeeCommission {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  rate: number;
+  date: string;
+  clientName?: string;
+}
+
+export interface EmployeeDetailResponse {
+  employee: Employee & { commissionRate: number; image: string | null };
+  kpis: EmployeeKPIs;
+  analytics: EmployeeAnalytics;
+  recentAppointments: Appointment[];
+  recentCommissions: EmployeeCommission[];
+}
+
 // Services
 export type ServiceStatus = "active" | "inactive";
 
@@ -157,6 +196,35 @@ export interface Doctor {
   rating: number;
   consultations: number;
   licenseNumber: string;
+}
+
+// Doctor Detail types
+export type DoctorPerformanceTier = "star" | "solid" | "growing" | "new";
+
+export interface DoctorKPIs {
+  totalConsultations: number;
+  completedConsultations: number;
+  revenueGenerated: number;
+  avgRevenuePerConsultation: number;
+  uniquePatients: number;
+  patientRetentionRate: number;
+  cancellationRate: number;
+  lastConsultationDate: string | null;
+  rating: number;
+}
+
+export interface DoctorAnalytics {
+  topProcedures: { serviceName: string; count: number }[];
+  topPatients: { clientName: string; count: number }[];
+  performanceTier: DoctorPerformanceTier;
+  monthlyConsultations: { month: string; count: number }[];
+}
+
+export interface DoctorDetailResponse {
+  doctor: Doctor & { image: string | null };
+  kpis: DoctorKPIs;
+  analytics: DoctorAnalytics;
+  recentAppointments: Appointment[];
 }
 
 // Inventory

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ interface DoctorsTableProps { data: Doctor[]; onEdit?: (item: Doctor) => void; o
 
 export function DoctorsTable({ data, onEdit, onDelete }: DoctorsTableProps) {
   const t = useTranslations("doctors");
+  const router = useRouter();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -36,7 +38,7 @@ export function DoctorsTable({ data, onEdit, onDelete }: DoctorsTableProps) {
             <td className="px-4 py-3 font-english text-muted-foreground">{doctor.consultations}</td>
             <td className="px-4 py-3">
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(doctor)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(doctor.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
+                <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => router.push(`/doctors/${doctor.id}`)}>{t("view")}</DropdownMenuItem><DropdownMenuItem onClick={() => onEdit?.(doctor)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(doctor.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
               </DropdownMenu>
             </td>
           </tr>

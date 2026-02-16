@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ interface EmployeesTableProps {
 export function EmployeesTable({ data, onEdit, onDelete }: EmployeesTableProps) {
   const t = useTranslations("employees");
   const locale = useLocale();
+  const router = useRouter();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -43,6 +45,7 @@ export function EmployeesTable({ data, onEdit, onDelete }: EmployeesTableProps) 
             <td className="px-4 py-3">
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => router.push(`/employees/${employee.id}`)}>{t("view")}</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onEdit?.(employee)}>{t("edit")}</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(employee.id)}>{t("delete")}</DropdownMenuItem>
