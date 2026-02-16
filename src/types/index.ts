@@ -191,6 +191,35 @@ export interface Report {
   fileSize: string;
 }
 
+// Invoices
+export type InvoiceStatus = "paid" | "unpaid" | "void";
+export type InvoicePaymentMethod = "cash" | "card" | "bank_transfer";
+
+export interface InvoiceItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  discount: number;
+  total: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  clientName: string;
+  clientPhone: string;
+  appointmentId?: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  total: number;
+  status: InvoiceStatus;
+  paymentMethod?: InvoicePaymentMethod;
+  notes?: string;
+}
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";

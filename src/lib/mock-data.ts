@@ -1,4 +1,4 @@
-import { KPIData, MiniKPIData, ChartDataPoint, DonutSegment, ProfitabilityData, QuickAction, TopEmployee, Appointment, Client, Employee, Service, Doctor, InventoryItem, Expense, Transaction, Campaign, Report } from "@/types";
+import { KPIData, MiniKPIData, ChartDataPoint, DonutSegment, ProfitabilityData, QuickAction, TopEmployee, Appointment, Client, Employee, Service, Doctor, InventoryItem, Expense, Transaction, Campaign, Report, Invoice } from "@/types";
 import { DONUT_COLORS, CHART_COLORS } from "@/constants/colors";
 
 export const kpiData: KPIData[] = [
@@ -934,6 +934,40 @@ export const financeCategories = [
 export const transactionTypes = [
   { value: "income", label: "إيرادات" },
   { value: "expense", label: "مصروفات" },
+];
+
+// Invoices Page Data
+
+export const invoicesKpiData: KPIData[] = [
+  { id: "total-invoices", label: "invoices.totalInvoices", value: 10, change: 8.5, icon: "FileText", format: "number" },
+  { id: "paid-amount", label: "invoices.paidAmount", value: 3445.75, change: 12.3, icon: "CircleDollarSign", format: "currency" },
+  { id: "unpaid-amount", label: "invoices.unpaidAmount", value: 870, change: -5.2, icon: "Clock", format: "currency" },
+  { id: "avg-invoice", label: "invoices.avgInvoiceValue", value: 344.58, change: 3.1, icon: "TrendingUp", format: "currency" },
+];
+
+export const invoicesByStatusData: DonutSegment[] = [
+  { name: "invoices.statusPaid", value: 7, color: DONUT_COLORS[1] },
+  { name: "invoices.statusUnpaid", value: 2, color: DONUT_COLORS[4] },
+  { name: "invoices.statusVoid", value: 1, color: DONUT_COLORS[3] },
+];
+
+export const invoicesListData: Invoice[] = [
+  { id: "inv-1", invoiceNumber: "INV-001", date: "2025-11-10", clientName: "فاطمة محمد", clientPhone: "0501234567", appointmentId: "apt-1", items: [{ description: "مساج سويدي", quantity: 1, unitPrice: 250, discount: 0, total: 250 }, { description: "تنظيف بشرة عميق", quantity: 1, unitPrice: 280, discount: 0, total: 280 }], subtotal: 530, taxRate: 15, taxAmount: 79.5, total: 609.5, status: "paid", paymentMethod: "card", notes: "عميلة VIP" },
+  { id: "inv-2", invoiceNumber: "INV-002", date: "2025-11-10", clientName: "نورة عبدالله", clientPhone: "0507654321", appointmentId: "apt-2", items: [{ description: "مساج بالأحجار الساخنة", quantity: 1, unitPrice: 350, discount: 10, total: 315 }], subtotal: 315, taxRate: 15, taxAmount: 47.25, total: 362.25, status: "paid", paymentMethod: "cash" },
+  { id: "inv-3", invoiceNumber: "INV-003", date: "2025-11-09", clientName: "هدى سالم", clientPhone: "0501112233", appointmentId: "apt-3", items: [{ description: "فيشل كلاسيكي", quantity: 1, unitPrice: 200, discount: 0, total: 200 }], subtotal: 200, taxRate: 15, taxAmount: 30, total: 230, status: "paid", paymentMethod: "card" },
+  { id: "inv-4", invoiceNumber: "INV-004", date: "2025-11-11", clientName: "سارة الأحمدي", clientPhone: "0551234567", items: [{ description: "تنظيف بشرة عميق", quantity: 1, unitPrice: 350, discount: 0, total: 350 }, { description: "ماسك ترطيب", quantity: 1, unitPrice: 120, discount: 0, total: 120 }], subtotal: 470, taxRate: 0, taxAmount: 0, total: 470, status: "unpaid" },
+  { id: "inv-5", invoiceNumber: "INV-005", date: "2025-11-08", clientName: "مريم خالد", clientPhone: "0509988776", items: [{ description: "مساج عميق", quantity: 1, unitPrice: 280, discount: 0, total: 280 }], subtotal: 280, taxRate: 15, taxAmount: 42, total: 322, status: "void", paymentMethod: "cash", notes: "تم إلغاء الحجز" },
+  { id: "inv-6", invoiceNumber: "INV-006", date: "2025-11-12", clientName: "ريم العتيبي", clientPhone: "0554433221", items: [{ description: "استشارة طبيب", quantity: 1, unitPrice: 0, discount: 0, total: 0 }], subtotal: 0, taxRate: 0, taxAmount: 0, total: 0, status: "paid", paymentMethod: "cash", notes: "استشارة مجانية" },
+  { id: "inv-7", invoiceNumber: "INV-007", date: "2025-11-12", clientName: "عائشة محمود", clientPhone: "0502233445", items: [{ description: "مساج سويدي", quantity: 1, unitPrice: 250, discount: 20, total: 200 }, { description: "تقشير كيميائي", quantity: 1, unitPrice: 180, discount: 0, total: 180 }], subtotal: 380, taxRate: 15, taxAmount: 57, total: 437, status: "paid", paymentMethod: "bank_transfer" },
+  { id: "inv-8", invoiceNumber: "INV-008", date: "2025-11-13", clientName: "لمياء القحطاني", clientPhone: "0556677889", items: [{ description: "حمام مغربي", quantity: 1, unitPrice: 400, discount: 0, total: 400 }], subtotal: 400, taxRate: 0, taxAmount: 0, total: 400, status: "unpaid" },
+  { id: "inv-9", invoiceNumber: "INV-009", date: "2025-11-13", clientName: "دانة الشمري", clientPhone: "0501122334", items: [{ description: "فيشل كلاسيكي", quantity: 1, unitPrice: 200, discount: 50, total: 100 }], subtotal: 100, taxRate: 15, taxAmount: 15, total: 115, status: "paid", paymentMethod: "card", notes: "خصم 50% - عميلة جديدة" },
+  { id: "inv-10", invoiceNumber: "INV-010", date: "2025-11-14", clientName: "هند الحربي", clientPhone: "0559900112", items: [{ description: "مساج بالأحجار الساخنة", quantity: 1, unitPrice: 350, discount: 0, total: 350 }, { description: "تنظيف بشرة عميق", quantity: 1, unitPrice: 280, discount: 0, total: 280 }, { description: "ماسك ذهبي", quantity: 1, unitPrice: 150, discount: 0, total: 150 }], subtotal: 780, taxRate: 15, taxAmount: 117, total: 897, status: "paid", paymentMethod: "card" },
+];
+
+export const invoicePaymentMethods = [
+  { value: "cash", label: "نقداً" },
+  { value: "card", label: "بطاقة" },
+  { value: "bank_transfer", label: "تحويل بنكي" },
 ];
 
 // Marketing Page Data

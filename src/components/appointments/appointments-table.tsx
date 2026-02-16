@@ -19,9 +19,10 @@ interface AppointmentsTableProps {
   data: Appointment[];
   onEdit?: (item: Appointment) => void;
   onDelete?: (id: string) => void;
+  onCheckout?: (item: Appointment) => void;
 }
 
-export function AppointmentsTable({ data, onEdit, onDelete }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onEdit, onDelete, onCheckout }: AppointmentsTableProps) {
   const t = useTranslations("appointments");
   const locale = useLocale();
 
@@ -72,6 +73,9 @@ export function AppointmentsTable({ data, onEdit, onDelete }: AppointmentsTableP
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {(appointment.status === "confirmed" || appointment.status === "pending") && (
+                      <DropdownMenuItem onClick={() => onCheckout?.(appointment)}>{t("checkout")}</DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => onEdit?.(appointment)}>{t("edit")}</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(appointment.id)}>{t("delete")}</DropdownMenuItem>

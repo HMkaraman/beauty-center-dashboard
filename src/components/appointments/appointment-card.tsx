@@ -20,9 +20,10 @@ interface AppointmentCardProps {
   data: Appointment;
   onEdit?: (item: Appointment) => void;
   onDelete?: (id: string) => void;
+  onCheckout?: (item: Appointment) => void;
 }
 
-export function AppointmentCard({ data, onEdit, onDelete }: AppointmentCardProps) {
+export function AppointmentCard({ data, onEdit, onDelete, onCheckout }: AppointmentCardProps) {
   const t = useTranslations("appointments");
   const locale = useLocale();
 
@@ -51,6 +52,9 @@ export function AppointmentCard({ data, onEdit, onDelete }: AppointmentCardProps
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {(data.status === "confirmed" || data.status === "pending") && (
+                <DropdownMenuItem onClick={() => onCheckout?.(data)}>{t("checkout")}</DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem>

@@ -10,6 +10,7 @@ import { AppointmentsTrendChart } from "@/components/charts/appointments-trend-c
 import { AppointmentsTable } from "./appointments-table";
 import { AppointmentCard } from "./appointment-card";
 import { NewAppointmentSheet } from "./new-appointment-sheet";
+import { CheckoutSheet } from "@/components/invoices/checkout-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
@@ -34,10 +35,11 @@ import { Appointment } from "@/types";
 export function AppointmentsPageContent() {
   const t = useTranslations("appointments");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useAppointmentsStore();
+  const { items, searchQuery, setSearchQuery, deleteItem, updateItem } = useAppointmentsStore();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Appointment | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [checkoutItem, setCheckoutItem] = useState<Appointment | null>(null);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -53,6 +55,16 @@ export function AppointmentsPageContent() {
   const handleEdit = (item: Appointment) => {
     setEditItem(item);
     setSheetOpen(true);
+  };
+
+  const handleCheckout = (item: Appointment) => {
+    setCheckoutItem(item);
+  };
+
+  const handleCheckoutComplete = () => {
+    if (checkoutItem) {
+      updateItem(checkoutItem.id, { status: "completed" });
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -103,10 +115,10 @@ export function AppointmentsPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} />
+            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} />
             <div className="space-y-3 md:hidden">
               {filtered.map((appointment) => (
-                <AppointmentCard key={appointment.id} data={appointment} onEdit={handleEdit} onDelete={handleDelete} />
+                <AppointmentCard key={appointment.id} data={appointment} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} />
               ))}
             </div>
           </>
@@ -117,6 +129,13 @@ export function AppointmentsPageContent() {
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         editItem={editItem}
+      />
+
+      <CheckoutSheet
+        open={!!checkoutItem}
+        onOpenChange={(open) => !open && setCheckoutItem(null)}
+        appointment={checkoutItem}
+        onComplete={handleCheckoutComplete}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
