@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { financeCategories, transactionTypes } from "@/lib/mock-data";
-import { useFinanceStore } from "@/store/useFinanceStore";
+import { useCreateTransaction, useUpdateTransaction } from "@/lib/hooks/use-finance";
 import { Transaction } from "@/types";
 
 interface NewTransactionSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: Transaction | null; }
@@ -15,14 +15,14 @@ const emptyForm = { description: "", category: "", type: "", amount: "", date: "
 
 export function NewTransactionSheet({ open, onOpenChange, editItem }: NewTransactionSheetProps) {
   const t = useTranslations("finance"); const tc = useTranslations("common");
-  const { addItem, updateItem } = useFinanceStore();
+  const createTransaction = useCreateTransaction();
+  const updateTransaction = useUpdateTransaction();
   const [form, setForm] = useState(emptyForm);
   useEffect(() => { if (editItem) { setForm({ description: editItem.description, category: editItem.category, type: editItem.type, amount: String(editItem.amount), date: editItem.date }); } else { setForm(emptyForm); } }, [editItem, open]);
   const handleSubmit = () => {
     if (!form.description || !form.type || !form.amount) { toast.error(tc("requiredField")); return; }
-    if (editItem) { updateItem(editItem.id, { description: form.description, category: form.category, type: form.type as "income" | "expense", amount: Number(form.amount), date: form.date }); toast.success(tc("updateSuccess")); }
-    else { addItem({ description: form.description, category: form.category, type: form.type as "income" | "expense", amount: Number(form.amount), date: form.date || new Date().toISOString().split("T")[0] }); toast.success(tc("addSuccess")); }
-    setForm(emptyForm); onOpenChange(false);
+    if (editItem) { updateTransaction.mutate({ id: editItem.id, data: { description: form.description, category: form.category, type: form.type as "income" | "expense", amount: Number(form.amount), date: form.date } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
+    else { createTransaction.mutate({ description: form.description, category: form.category, type: form.type as "income" | "expense", amount: Number(form.amount), date: form.date || new Date().toISOString().split("T")[0] }, { onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
   };
   return (
     <Sheet open={open} onOpenChange={onOpenChange}><SheetContent side="left" className="overflow-y-auto">

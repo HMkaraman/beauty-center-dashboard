@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { expenseCategories, paymentMethods } from "@/lib/mock-data";
-import { useExpensesStore } from "@/store/useExpensesStore";
+import { useCreateExpense, useUpdateExpense } from "@/lib/hooks/use-expenses";
 import { Expense } from "@/types";
 
 interface NewExpenseSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: Expense | null; }
@@ -15,14 +15,14 @@ const emptyForm = { description: "", category: "", amount: "", paymentMethod: ""
 
 export function NewExpenseSheet({ open, onOpenChange, editItem }: NewExpenseSheetProps) {
   const t = useTranslations("expenses"); const tc = useTranslations("common");
-  const { addItem, updateItem } = useExpensesStore();
+  const createExpense = useCreateExpense();
+  const updateExpense = useUpdateExpense();
   const [form, setForm] = useState(emptyForm);
   useEffect(() => { if (editItem) { setForm({ description: editItem.description, category: editItem.category, amount: String(editItem.amount), paymentMethod: editItem.paymentMethod, date: editItem.date, notes: "" }); } else { setForm(emptyForm); } }, [editItem, open]);
   const handleSubmit = () => {
     if (!form.description || !form.amount) { toast.error(tc("requiredField")); return; }
-    if (editItem) { updateItem(editItem.id, { description: form.description, category: form.category, amount: Number(form.amount), paymentMethod: form.paymentMethod, date: form.date }); toast.success(tc("updateSuccess")); }
-    else { addItem({ description: form.description, category: form.category, amount: Number(form.amount), paymentMethod: form.paymentMethod, date: form.date || new Date().toISOString().split("T")[0], status: "pending" }); toast.success(tc("addSuccess")); }
-    setForm(emptyForm); onOpenChange(false);
+    if (editItem) { updateExpense.mutate({ id: editItem.id, data: { description: form.description, category: form.category, amount: Number(form.amount), paymentMethod: form.paymentMethod, date: form.date } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
+    else { createExpense.mutate({ description: form.description, category: form.category, amount: Number(form.amount), paymentMethod: form.paymentMethod, date: form.date || new Date().toISOString().split("T")[0], status: "pending" }, { onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
   };
   return (
     <Sheet open={open} onOpenChange={onOpenChange}><SheetContent side="left" className="overflow-y-auto">

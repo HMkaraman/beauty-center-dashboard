@@ -28,13 +28,16 @@ import {
   marketingByChannelData,
   marketingReachTrendData,
 } from "@/lib/mock-data";
-import { useMarketingStore } from "@/store/useMarketingStore";
+import { useCampaigns, useDeleteCampaign } from "@/lib/hooks/use-marketing";
 import { Campaign } from "@/types";
 
 export function MarketingPageContent() {
   const t = useTranslations("marketing");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useMarketingStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useCampaigns({ search: searchQuery || undefined });
+  const deleteCampaign = useDeleteCampaign();
+  const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Campaign | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -59,9 +62,12 @@ export function MarketingPageContent() {
 
   const confirmDelete = () => {
     if (deleteId) {
-      deleteItem(deleteId);
-      toast.success(tc("deleteSuccess"));
-      setDeleteId(null);
+      deleteCampaign.mutate(deleteId, {
+        onSuccess: () => {
+          toast.success(tc("deleteSuccess"));
+          setDeleteId(null);
+        },
+      });
     }
   };
 

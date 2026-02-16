@@ -27,18 +27,21 @@ import {
   reportsByTypeData,
   reportsDownloadsTrendData,
 } from "@/lib/mock-data";
-import { useReportsStore } from "@/store/useReportsStore";
+import { useReports, useDeleteReport } from "@/lib/hooks/use-reports";
 import { Report } from "@/types";
 
 export function ReportsPageContent() {
   const t = useTranslations("reports");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useReportsStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useReports({ search: searchQuery });
+  const deleteReport = useDeleteReport();
+  const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Report | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = items.filter((item) => {
+  const filtered = items.filter((item: Report) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -59,9 +62,12 @@ export function ReportsPageContent() {
 
   const confirmDelete = () => {
     if (deleteId) {
-      deleteItem(deleteId);
-      toast.success(tc("deleteSuccess"));
-      setDeleteId(null);
+      deleteReport.mutate(deleteId, {
+        onSuccess: () => {
+          toast.success(tc("deleteSuccess"));
+          setDeleteId(null);
+        },
+      });
     }
   };
 
@@ -101,7 +107,7 @@ export function ReportsPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((report) => (
+            {filtered.map((report: Report) => (
               <ReportCard key={report.id} data={report} onEdit={handleEdit} onDelete={handleDelete} />
             ))}
           </div>

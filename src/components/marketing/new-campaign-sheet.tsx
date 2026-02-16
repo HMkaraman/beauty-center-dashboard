@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { marketingChannels } from "@/lib/mock-data";
-import { useMarketingStore } from "@/store/useMarketingStore";
+import { useCreateCampaign, useUpdateCampaign } from "@/lib/hooks/use-marketing";
 import { Campaign } from "@/types";
 
 interface NewCampaignSheetProps {
@@ -42,7 +42,8 @@ const emptyForm = {
 export function NewCampaignSheet({ open, onOpenChange, editItem }: NewCampaignSheetProps) {
   const t = useTranslations("marketing");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useMarketingStore();
+  const createCampaign = useCreateCampaign();
+  const updateCampaign = useUpdateCampaign();
 
   const [form, setForm] = useState(emptyForm);
 
@@ -68,16 +69,21 @@ export function NewCampaignSheet({ open, onOpenChange, editItem }: NewCampaignSh
     }
 
     if (editItem) {
-      updateItem(editItem.id, {
+      updateCampaign.mutate({ id: editItem.id, data: {
         name: form.name,
         channel: form.channel,
         startDate: form.startDate,
         endDate: form.endDate,
         budget: Number(form.budget) || editItem.budget,
+      } }, {
+        onSuccess: () => {
+          toast.success(tc("updateSuccess"));
+          setForm(emptyForm);
+          onOpenChange(false);
+        },
       });
-      toast.success(tc("updateSuccess"));
     } else {
-      addItem({
+      createCampaign.mutate({
         name: form.name,
         channel: form.channel,
         status: "draft",
@@ -86,12 +92,14 @@ export function NewCampaignSheet({ open, onOpenChange, editItem }: NewCampaignSh
         budget: Number(form.budget) || 0,
         reach: 0,
         conversions: 0,
+      }, {
+        onSuccess: () => {
+          toast.success(tc("addSuccess"));
+          setForm(emptyForm);
+          onOpenChange(false);
+        },
       });
-      toast.success(tc("addSuccess"));
     }
-
-    setForm(emptyForm);
-    onOpenChange(false);
   };
 
   return (

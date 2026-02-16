@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { doctorSpecialties } from "@/lib/mock-data";
-import { useDoctorsStore } from "@/store/useDoctorsStore";
+import { useCreateDoctor, useUpdateDoctor } from "@/lib/hooks/use-doctors";
 import { Doctor } from "@/types";
 
 interface NewDoctorSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: Doctor | null; }
@@ -17,7 +17,8 @@ const emptyForm = { name: "", specialty: "", phone: "", email: "", licenseNumber
 export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetProps) {
   const t = useTranslations("doctors");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useDoctorsStore();
+  const createDoctor = useCreateDoctor();
+  const updateDoctor = useUpdateDoctor();
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -28,13 +29,15 @@ export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetP
   const handleSubmit = () => {
     if (!form.name || !form.specialty) { toast.error(tc("requiredField")); return; }
     if (editItem) {
-      updateItem(editItem.id, { name: form.name, specialty: form.specialty, phone: form.phone, email: form.email, licenseNumber: form.licenseNumber });
-      toast.success(tc("updateSuccess"));
+      updateDoctor.mutate({ id: editItem.id, data: { name: form.name, specialty: form.specialty, phone: form.phone, email: form.email, licenseNumber: form.licenseNumber } }, {
+        onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
+      });
     } else {
-      addItem({ name: form.name, specialty: form.specialty, phone: form.phone, email: form.email, licenseNumber: form.licenseNumber, status: "active", rating: 0, consultations: 0 });
-      toast.success(tc("addSuccess"));
+      createDoctor.mutate({ name: form.name, specialty: form.specialty, phone: form.phone, email: form.email, licenseNumber: form.licenseNumber, status: "active" }, {
+        onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
+      });
     }
-    setForm(emptyForm); onOpenChange(false);
+    return;
   };
 
   return (

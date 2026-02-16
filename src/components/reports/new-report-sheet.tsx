@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { reportTypes } from "@/lib/mock-data";
-import { useReportsStore } from "@/store/useReportsStore";
+import { useCreateReport } from "@/lib/hooks/use-reports";
 import { Report } from "@/types";
 
 interface NewReportSheetProps {
@@ -41,7 +41,7 @@ const emptyForm = {
 export function NewReportSheet({ open, onOpenChange, editItem }: NewReportSheetProps) {
   const t = useTranslations("reports");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useReportsStore();
+  const createReport = useCreateReport();
 
   const [form, setForm] = useState(emptyForm);
 
@@ -65,28 +65,23 @@ export function NewReportSheet({ open, onOpenChange, editItem }: NewReportSheetP
       return;
     }
 
-    if (editItem) {
-      updateItem(editItem.id, {
-        type: form.type as Report["type"],
-        name: form.name || editItem.name,
-        description: form.description || editItem.description,
-        lastGenerated: form.startDate,
-      });
-      toast.success(tc("updateSuccess"));
-    } else {
-      addItem({
+    createReport.mutate(
+      {
         type: form.type as Report["type"],
         name: form.name,
         description: form.description,
         lastGenerated: form.startDate,
         downloads: 0,
         fileSize: "0 MB",
-      });
-      toast.success(tc("addSuccess"));
-    }
-
-    setForm(emptyForm);
-    onOpenChange(false);
+      },
+      {
+        onSuccess: () => {
+          toast.success(tc("addSuccess"));
+          setForm(emptyForm);
+          onOpenChange(false);
+        },
+      }
+    );
   };
 
   return (

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { employeeRoles } from "@/lib/mock-data";
-import { useEmployeesStore } from "@/store/useEmployeesStore";
+import { useCreateEmployee, useUpdateEmployee } from "@/lib/hooks/use-employees";
 import { Employee } from "@/types";
 
 interface NewEmployeeSheetProps {
@@ -22,7 +22,8 @@ const emptyForm = { name: "", phone: "", email: "", role: "", specialties: "", h
 export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSheetProps) {
   const t = useTranslations("employees");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useEmployeesStore();
+  const createEmployee = useCreateEmployee();
+  const updateEmployee = useUpdateEmployee();
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -34,14 +35,11 @@ export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSh
   const handleSubmit = () => {
     if (!form.name || !form.role) { toast.error(tc("requiredField")); return; }
     if (editItem) {
-      updateItem(editItem.id, { name: form.name, phone: form.phone, email: form.email, role: form.role, specialties: form.specialties, hireDate: form.hireDate });
-      toast.success(tc("updateSuccess"));
+      updateEmployee.mutate({ id: editItem.id, data: { name: form.name, phone: form.phone, email: form.email, role: form.role, specialties: form.specialties, hireDate: form.hireDate } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } });
     } else {
-      addItem({ name: form.name, phone: form.phone, email: form.email, role: form.role, specialties: form.specialties, status: "active", appointments: 0, revenue: 0, rating: 0, hireDate: form.hireDate || new Date().toISOString().split("T")[0] });
-      toast.success(tc("addSuccess"));
+      createEmployee.mutate({ name: form.name, phone: form.phone, email: form.email, role: form.role, specialties: form.specialties, status: "active", hireDate: form.hireDate || new Date().toISOString().split("T")[0] }, { onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); } });
     }
-    setForm(emptyForm);
-    onOpenChange(false);
+    return;
   };
 
   return (

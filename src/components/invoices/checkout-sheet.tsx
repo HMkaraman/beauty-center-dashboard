@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { invoicePaymentMethods } from "@/lib/mock-data";
-import { useInvoicesStore } from "@/store/useInvoicesStore";
+import { useCreateInvoice } from "@/lib/hooks/use-invoices";
 import { formatCurrency } from "@/lib/formatters";
 import { Appointment, InvoicePaymentMethod } from "@/types";
 
@@ -26,7 +26,7 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
   const t = useTranslations("invoices");
   const tc = useTranslations("common");
   const locale = useLocale();
-  const { addItem } = useInvoicesStore();
+  const createInvoice = useCreateInvoice();
 
   const [extras, setExtras] = useState<ExtraRow[]>([]);
   const [discountPercent, setDiscountPercent] = useState("0");
@@ -54,7 +54,7 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
     const serviceItem = { description: appointment.service, quantity: 1, unitPrice: appointment.price, discount: disc, total: appointment.price * (1 - disc / 100) };
     const extraItems = extras.filter((e) => e.description).map((e) => ({ description: e.description, quantity: 1, unitPrice: Number(e.unitPrice) || 0, discount: disc, total: (Number(e.unitPrice) || 0) * (1 - disc / 100) }));
 
-    addItem({
+    createInvoice.mutate({
       invoiceNumber: `INV-${String(Date.now()).slice(-3)}`,
       date: new Date().toISOString().split("T")[0],
       clientName: appointment.clientName,
@@ -68,12 +68,14 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
       status: "paid",
       paymentMethod,
       notes: notes || undefined,
+    }, {
+      onSuccess: () => {
+        toast.success(t("checkoutSuccess"));
+        setExtras([]); setDiscountPercent("0"); setTaxRate("0"); setPaymentMethod("cash"); setNotes("");
+        onComplete?.();
+        onOpenChange(false);
+      },
     });
-
-    toast.success(t("checkoutSuccess"));
-    setExtras([]); setDiscountPercent("0"); setTaxRate("0"); setPaymentMethod("cash"); setNotes("");
-    onComplete?.();
-    onOpenChange(false);
   };
 
   if (!appointment) return null;

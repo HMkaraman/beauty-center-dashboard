@@ -15,13 +15,16 @@ import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { employeesKpiData, employeesByDepartmentData, employeesRevenueData } from "@/lib/mock-data";
-import { useEmployeesStore } from "@/store/useEmployeesStore";
+import { useEmployees, useDeleteEmployee } from "@/lib/hooks/use-employees";
 import { Employee } from "@/types";
 
 export function EmployeesPageContent() {
   const t = useTranslations("employees");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useEmployeesStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useEmployees();
+  const items = data?.data ?? [];
+  const deleteEmployee = useDeleteEmployee();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -34,7 +37,7 @@ export function EmployeesPageContent() {
 
   const handleEdit = (item: Employee) => { setEditItem(item); setSheetOpen(true); };
   const handleDelete = (id: string) => { setDeleteId(id); };
-  const confirmDelete = () => { if (deleteId) { deleteItem(deleteId); toast.success(tc("deleteSuccess")); setDeleteId(null); } };
+  const confirmDelete = () => { if (deleteId) { deleteEmployee.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } }); setDeleteId(null); } };
 
   return (
     <div className="space-y-6">

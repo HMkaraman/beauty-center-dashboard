@@ -14,19 +14,22 @@ import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { expensesKpiData, expensesByCategoryData, expensesMonthlyTrendData } from "@/lib/mock-data";
-import { useExpensesStore } from "@/store/useExpensesStore";
+import { useExpenses, useDeleteExpense } from "@/lib/hooks/use-expenses";
 import { Expense } from "@/types";
 
 export function ExpensesPageContent() {
   const t = useTranslations("expenses"); const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useExpensesStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useExpenses({ search: searchQuery || undefined });
+  const deleteExpense = useDeleteExpense();
+  const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Expense | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const filtered = items.filter((item) => { if (!searchQuery) return true; const q = searchQuery.toLowerCase(); return item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q); });
   const handleEdit = (item: Expense) => { setEditItem(item); setSheetOpen(true); };
   const handleDelete = (id: string) => { setDeleteId(id); };
-  const confirmDelete = () => { if (deleteId) { deleteItem(deleteId); toast.success(tc("deleteSuccess")); setDeleteId(null); } };
+  const confirmDelete = () => { if (deleteId) { deleteExpense.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); setDeleteId(null); } }); } };
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{expensesKpiData.map((kpi) => (<KPICard key={kpi.id} data={kpi} />))}</div>

@@ -1,18 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSettings, useUpdateSettings } from "@/lib/hooks/use-settings";
 
 export function BusinessInfoCard() {
   const t = useTranslations("settings");
+  const tc = useTranslations("common");
+  const { data: settings, isLoading } = useSettings();
+  const updateSettings = useUpdateSettings();
+
   const [form, setForm] = useState({
-    phone: "0112345678",
-    email: "info@beautycenter.sa",
-    address: "الرياض، حي النخيل، شارع الأمير محمد بن عبدالعزيز",
-    taxNumber: "300012345600003",
+    phone: "",
+    email: "",
+    address: "",
+    taxNumber: "",
   });
+
+  useEffect(() => {
+    if (settings) {
+      setForm({
+        phone: (settings.phone as string) || "",
+        email: (settings.email as string) || "",
+        address: (settings.address as string) || "",
+        taxNumber: (settings.taxNumber as string) || "",
+      });
+    }
+  }, [settings]);
+
+  const handleSave = () => {
+    updateSettings.mutate(form, {
+      onSuccess: () => toast.success(tc("updateSuccess")),
+      onError: () => toast.error(tc("error")),
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h3 className="text-base font-semibold text-foreground mb-4">{t("businessInfo")}</h3>
+        <div className="animate-pulse space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="h-10 bg-muted rounded" />
+            <div className="h-10 bg-muted rounded" />
+            <div className="h-10 bg-muted rounded sm:col-span-2" />
+            <div className="h-10 bg-muted rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -36,7 +76,9 @@ export function BusinessInfoCard() {
         </div>
       </div>
       <div className="mt-4 flex justify-end">
-        <Button size="sm">{t("save")}</Button>
+        <Button size="sm" onClick={handleSave} disabled={updateSettings.isPending}>
+          {updateSettings.isPending ? t("saving") : t("save")}
+        </Button>
       </div>
     </div>
   );

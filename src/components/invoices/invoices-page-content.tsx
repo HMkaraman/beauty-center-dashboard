@@ -23,13 +23,16 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { invoicesKpiData } from "@/lib/mock-data";
-import { useInvoicesStore } from "@/store/useInvoicesStore";
+import { useInvoices, useUpdateInvoice } from "@/lib/hooks/use-invoices";
 import { Invoice } from "@/types";
 
 export function InvoicesPageContent() {
   const t = useTranslations("invoices");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, updateItem } = useInvoicesStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useInvoices({ search: searchQuery || undefined });
+  const updateInvoice = useUpdateInvoice();
+  const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [viewItem, setViewItem] = useState<Invoice | null>(null);
   const [voidId, setVoidId] = useState<string | null>(null);
@@ -54,9 +57,12 @@ export function InvoicesPageContent() {
 
   const confirmVoid = () => {
     if (voidId) {
-      updateItem(voidId, { status: "void" });
-      toast.success(t("voidSuccess"));
-      setVoidId(null);
+      updateInvoice.mutate({ id: voidId, data: { status: "void" } }, {
+        onSuccess: () => {
+          toast.success(t("voidSuccess"));
+          setVoidId(null);
+        },
+      });
     }
   };
 

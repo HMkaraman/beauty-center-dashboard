@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { invoicePaymentMethods } from "@/lib/mock-data";
-import { useInvoicesStore } from "@/store/useInvoicesStore";
+import { useCreateInvoice, useUpdateInvoice } from "@/lib/hooks/use-invoices";
 import { Invoice } from "@/types";
 
 interface NewInvoiceSheetProps {
@@ -25,7 +25,8 @@ const emptyItem: ItemRow = { description: "", quantity: "1", unitPrice: "", disc
 export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceSheetProps) {
   const t = useTranslations("invoices");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useInvoicesStore();
+  const createInvoice = useCreateInvoice();
+  const updateInvoice = useUpdateInvoice();
 
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -85,13 +86,14 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
     };
 
     if (editItem) {
-      updateItem(editItem.id, invoiceData);
-      toast.success(tc("updateSuccess"));
+      updateInvoice.mutate({ id: editItem.id, data: invoiceData }, {
+        onSuccess: () => { toast.success(tc("updateSuccess")); onOpenChange(false); },
+      });
     } else {
-      addItem(invoiceData);
-      toast.success(tc("addSuccess"));
+      createInvoice.mutate(invoiceData, {
+        onSuccess: () => { toast.success(tc("addSuccess")); onOpenChange(false); },
+      });
     }
-    onOpenChange(false);
   };
 
   return (

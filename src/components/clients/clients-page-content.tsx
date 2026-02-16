@@ -18,26 +18,25 @@ import {
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { clientsKpiData, clientsByStatusData, clientsGrowthData } from "@/lib/mock-data";
-import { useClientsStore } from "@/store/useClientsStore";
+import { useClients, useDeleteClient } from "@/lib/hooks/use-clients";
 import { Client } from "@/types";
 
 export function ClientsPageContent() {
   const t = useTranslations("clients");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useClientsStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data, isLoading } = useClients({ search: searchQuery });
+  const deleteClient = useDeleteClient();
+  const clients = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = items.filter((item) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return item.name.toLowerCase().includes(q) || item.phone.includes(q) || item.email.toLowerCase().includes(q);
-  });
+  const filtered = clients;
 
   const handleEdit = (item: Client) => { setEditItem(item); setSheetOpen(true); };
   const handleDelete = (id: string) => { setDeleteId(id); };
-  const confirmDelete = () => { if (deleteId) { deleteItem(deleteId); toast.success(tc("deleteSuccess")); setDeleteId(null); } };
+  const confirmDelete = () => { if (deleteId) { deleteClient.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); setDeleteId(null); } }); } };
 
   return (
     <div className="space-y-6">

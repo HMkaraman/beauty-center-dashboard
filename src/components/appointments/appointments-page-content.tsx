@@ -29,13 +29,17 @@ import {
   appointmentsByStatusData,
   appointmentsTrendData,
 } from "@/lib/mock-data";
-import { useAppointmentsStore } from "@/store/useAppointmentsStore";
+import { useAppointments, useDeleteAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 
 export function AppointmentsPageContent() {
   const t = useTranslations("appointments");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem, updateItem } = useAppointmentsStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useAppointments();
+  const items = data?.data ?? [];
+  const deleteAppointment = useDeleteAppointment();
+  const updateAppointment = useUpdateAppointment();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Appointment | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -63,7 +67,7 @@ export function AppointmentsPageContent() {
 
   const handleCheckoutComplete = () => {
     if (checkoutItem) {
-      updateItem(checkoutItem.id, { status: "completed" });
+      updateAppointment.mutate({ id: checkoutItem.id, data: { status: "completed" } });
     }
   };
 
@@ -73,8 +77,7 @@ export function AppointmentsPageContent() {
 
   const confirmDelete = () => {
     if (deleteId) {
-      deleteItem(deleteId);
-      toast.success(tc("deleteSuccess"));
+      deleteAppointment.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } });
       setDeleteId(null);
     }
   };

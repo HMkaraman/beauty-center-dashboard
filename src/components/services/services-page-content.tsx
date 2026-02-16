@@ -15,26 +15,25 @@ import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { servicesKpiData, servicesByCategoryData, servicesBookingsTrendData } from "@/lib/mock-data";
-import { useServicesStore } from "@/store/useServicesStore";
+import { useServices, useDeleteService } from "@/lib/hooks/use-services";
 import { Service } from "@/types";
 
 export function ServicesPageContent() {
   const t = useTranslations("services");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useServicesStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data, isLoading } = useServices({ search: searchQuery });
+  const deleteService = useDeleteService();
+  const services = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Service | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = items.filter((item) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return item.name.toLowerCase().includes(q) || item.category.toLowerCase().includes(q);
-  });
+  const filtered = services;
 
   const handleEdit = (item: Service) => { setEditItem(item); setSheetOpen(true); };
   const handleDelete = (id: string) => { setDeleteId(id); };
-  const confirmDelete = () => { if (deleteId) { deleteItem(deleteId); toast.success(tc("deleteSuccess")); setDeleteId(null); } };
+  const confirmDelete = () => { if (deleteId) { deleteService.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); setDeleteId(null); } }); } };
 
   return (
     <div className="space-y-6">

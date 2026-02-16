@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Globe, LogOut, Sparkles } from "lucide-react";
 import { useLocale } from "next-intl";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/constants/navigation";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
-import { useRouter } from "next/navigation";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import {
   Tooltip,
@@ -23,7 +23,6 @@ export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations();
   const locale = useLocale();
-  const router = useRouter();
   const { isCollapsed, setCollapsed } = useSidebarStore();
 
   const toggleLocale = () => {
@@ -33,8 +32,7 @@ export function Sidebar() {
   };
 
   const handleLogout = () => {
-    document.cookie = "auth=;path=/;max-age=0";
-    router.push("/login");
+    signOut({ callbackUrl: "/login" });
   };
 
   useEffect(() => {

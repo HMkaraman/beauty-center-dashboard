@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { inventoryCategories } from "@/lib/mock-data";
-import { useInventoryStore } from "@/store/useInventoryStore";
+import { useCreateInventoryItem, useUpdateInventoryItem } from "@/lib/hooks/use-inventory";
 import { InventoryItem } from "@/types";
 
 interface NewItemSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: InventoryItem | null; }
@@ -15,16 +15,16 @@ const emptyForm = { name: "", sku: "", category: "", quantity: "", unitPrice: ""
 
 export function NewItemSheet({ open, onOpenChange, editItem }: NewItemSheetProps) {
   const t = useTranslations("inventory"); const tc = useTranslations("common");
-  const { addItem, updateItem } = useInventoryStore();
+  const createInventoryItem = useCreateInventoryItem();
+  const updateInventoryItem = useUpdateInventoryItem();
   const [form, setForm] = useState(emptyForm);
   useEffect(() => { if (editItem) { setForm({ name: editItem.name, sku: editItem.sku, category: editItem.category, quantity: String(editItem.quantity), unitPrice: String(editItem.unitPrice), minStockLevel: "" }); } else { setForm(emptyForm); } }, [editItem, open]);
   const handleSubmit = () => {
     if (!form.name || !form.sku) { toast.error(tc("requiredField")); return; }
     const qty = Number(form.quantity) || 0; const price = Number(form.unitPrice) || 0;
-    const status = qty === 0 ? "out-of-stock" as const : qty <= 10 ? "low-stock" as const : "in-stock" as const;
-    if (editItem) { updateItem(editItem.id, { name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price, totalValue: qty * price, status }); toast.success(tc("updateSuccess")); }
-    else { addItem({ name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price, totalValue: qty * price, status }); toast.success(tc("addSuccess")); }
-    setForm(emptyForm); onOpenChange(false);
+    if (editItem) { updateInventoryItem.mutate({ id: editItem.id, data: { name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
+    else { createInventoryItem.mutate({ name: form.name, sku: form.sku, category: form.category, quantity: qty, unitPrice: price }, { onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); } }); }
+    return;
   };
   return (
     <Sheet open={open} onOpenChange={onOpenChange}><SheetContent side="left" className="overflow-y-auto">

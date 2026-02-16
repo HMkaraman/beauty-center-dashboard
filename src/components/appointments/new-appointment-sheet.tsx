@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { servicesList, employeesList } from "@/lib/mock-data";
-import { useAppointmentsStore } from "@/store/useAppointmentsStore";
+import { useCreateAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 
 interface NewAppointmentSheetProps {
@@ -43,7 +43,8 @@ const emptyForm = {
 export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppointmentSheetProps) {
   const t = useTranslations("appointments");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useAppointmentsStore();
+  const createAppointment = useCreateAppointment();
+  const updateAppointment = useUpdateAppointment();
 
   const [form, setForm] = useState(emptyForm);
 
@@ -72,7 +73,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     const selectedService = servicesList.find((s) => s.name === form.service);
 
     if (editItem) {
-      updateItem(editItem.id, {
+      updateAppointment.mutate({ id: editItem.id, data: {
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         service: form.service,
@@ -82,10 +83,9 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         notes: form.notes || undefined,
         duration: selectedService?.duration || editItem.duration,
         price: selectedService?.price || editItem.price,
-      });
-      toast.success(tc("updateSuccess"));
+      } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } });
     } else {
-      addItem({
+      createAppointment.mutate({
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         service: form.service,
@@ -96,12 +96,9 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         status: "pending",
         price: selectedService?.price || 0,
         notes: form.notes || undefined,
-      });
-      toast.success(tc("addSuccess"));
+      }, { onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); } });
     }
-
-    setForm(emptyForm);
-    onOpenChange(false);
+    return;
   };
 
   return (

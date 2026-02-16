@@ -15,26 +15,25 @@ import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { doctorsKpiData, doctorsBySpecialtyData, doctorsConsultationsTrendData } from "@/lib/mock-data";
-import { useDoctorsStore } from "@/store/useDoctorsStore";
+import { useDoctors, useDeleteDoctor } from "@/lib/hooks/use-doctors";
 import { Doctor } from "@/types";
 
 export function DoctorsPageContent() {
   const t = useTranslations("doctors");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useDoctorsStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data, isLoading } = useDoctors({ search: searchQuery });
+  const deleteDoctor = useDeleteDoctor();
+  const doctors = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Doctor | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const filtered = items.filter((item) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return item.name.toLowerCase().includes(q) || item.specialty.toLowerCase().includes(q) || item.phone.includes(q) || item.email.toLowerCase().includes(q);
-  });
+  const filtered = doctors;
 
   const handleEdit = (item: Doctor) => { setEditItem(item); setSheetOpen(true); };
   const handleDelete = (id: string) => { setDeleteId(id); };
-  const confirmDelete = () => { if (deleteId) { deleteItem(deleteId); toast.success(tc("deleteSuccess")); setDeleteId(null); } };
+  const confirmDelete = () => { if (deleteId) { deleteDoctor.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); setDeleteId(null); } }); } };
 
   return (
     <div className="space-y-6">

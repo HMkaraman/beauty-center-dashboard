@@ -20,13 +20,16 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { useFinanceStore } from "@/store/useFinanceStore";
+import { useTransactions, useDeleteTransaction } from "@/lib/hooks/use-finance";
 import { Transaction } from "@/types";
 
 export function FinanceTransactionsTab() {
   const t = useTranslations("finance");
   const tc = useTranslations("common");
-  const { items, searchQuery, setSearchQuery, deleteItem } = useFinanceStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data } = useTransactions({ search: searchQuery || undefined });
+  const deleteTransaction = useDeleteTransaction();
+  const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Transaction | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -51,9 +54,12 @@ export function FinanceTransactionsTab() {
 
   const confirmDelete = () => {
     if (deleteId) {
-      deleteItem(deleteId);
-      toast.success(tc("deleteSuccess"));
-      setDeleteId(null);
+      deleteTransaction.mutate(deleteId, {
+        onSuccess: () => {
+          toast.success(tc("deleteSuccess"));
+          setDeleteId(null);
+        },
+      });
     }
   };
 

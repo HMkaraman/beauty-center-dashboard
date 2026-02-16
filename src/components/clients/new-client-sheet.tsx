@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useClientsStore } from "@/store/useClientsStore";
+import { useCreateClient, useUpdateClient } from "@/lib/hooks/use-clients";
 import { Client } from "@/types";
 
 interface NewClientSheetProps {
@@ -22,7 +22,8 @@ const emptyForm = { name: "", phone: "", email: "", notes: "" };
 export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetProps) {
   const t = useTranslations("clients");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useClientsStore();
+  const createClient = useCreateClient();
+  const updateClient = useUpdateClient();
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -36,19 +37,18 @@ export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetP
   const handleSubmit = () => {
     if (!form.name || !form.phone) { toast.error(tc("requiredField")); return; }
     if (editItem) {
-      updateItem(editItem.id, { name: form.name, phone: form.phone, email: form.email });
-      toast.success(tc("updateSuccess"));
-    } else {
-      addItem({
-        name: form.name, phone: form.phone, email: form.email,
-        status: "active", totalAppointments: 0, totalSpent: 0,
-        lastVisit: new Date().toISOString().split("T")[0],
-        joinDate: new Date().toISOString().split("T")[0],
+      updateClient.mutate({ id: editItem.id, data: { name: form.name, phone: form.phone, email: form.email } }, {
+        onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
       });
-      toast.success(tc("addSuccess"));
+    } else {
+      createClient.mutate({
+        name: form.name, phone: form.phone, email: form.email,
+        status: "active",
+      }, {
+        onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
+      });
     }
-    setForm(emptyForm);
-    onOpenChange(false);
+    return;
   };
 
   return (

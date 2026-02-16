@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { serviceCategories } from "@/lib/mock-data";
-import { useServicesStore } from "@/store/useServicesStore";
+import { useCreateService, useUpdateService } from "@/lib/hooks/use-services";
 import { Service } from "@/types";
 
 interface NewServiceSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: Service | null; }
@@ -17,7 +17,8 @@ const emptyForm = { name: "", category: "", duration: "", price: "", description
 export function NewServiceSheet({ open, onOpenChange, editItem }: NewServiceSheetProps) {
   const t = useTranslations("services");
   const tc = useTranslations("common");
-  const { addItem, updateItem } = useServicesStore();
+  const createService = useCreateService();
+  const updateService = useUpdateService();
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -28,13 +29,15 @@ export function NewServiceSheet({ open, onOpenChange, editItem }: NewServiceShee
   const handleSubmit = () => {
     if (!form.name || !form.category || !form.price) { toast.error(tc("requiredField")); return; }
     if (editItem) {
-      updateItem(editItem.id, { name: form.name, category: form.category, duration: Number(form.duration) || 0, price: Number(form.price) || 0 });
-      toast.success(tc("updateSuccess"));
+      updateService.mutate({ id: editItem.id, data: { name: form.name, category: form.category, duration: Number(form.duration) || 0, price: Number(form.price) || 0 } }, {
+        onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
+      });
     } else {
-      addItem({ name: form.name, category: form.category, duration: Number(form.duration) || 0, price: Number(form.price) || 0, status: "active", bookings: 0 });
-      toast.success(tc("addSuccess"));
+      createService.mutate({ name: form.name, category: form.category, duration: Number(form.duration) || 0, price: Number(form.price) || 0, status: "active" }, {
+        onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
+      });
     }
-    setForm(emptyForm); onOpenChange(false);
+    return;
   };
 
   return (

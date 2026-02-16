@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -14,11 +15,32 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    document.cookie = "auth=true;path=/;max-age=86400";
-    router.push("/");
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError(t("invalidCredentials"));
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch {
+      setError(t("invalidCredentials"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,6 +109,12 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            {error && (
+              <div className="rounded-lg border border-red/20 bg-red/10 px-4 py-3 text-sm text-red">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="text-sm text-foreground">{t("email")}</label>
               <Input
@@ -95,6 +123,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-secondary border-border"
+                required
               />
             </div>
 
@@ -107,6 +136,8 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-secondary border-border pe-10"
+                  required
+                  minLength={6}
                 />
                 <button
                   type="button"
@@ -137,9 +168,14 @@ export default function LoginPage() {
 
             <Button
               type="submit"
+              disabled={loading}
               className="w-full bg-gold text-primary-foreground hover:bg-gold-light"
             >
-              {t("signIn")}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("signIn")
+              )}
             </Button>
           </form>
         </motion.div>
