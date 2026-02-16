@@ -73,11 +73,46 @@ export interface Client {
   name: string;
   phone: string;
   email: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  country?: string;
   status: ClientStatus;
   totalAppointments: number;
   totalSpent: number;
   lastVisit: string;
   joinDate: string;
+}
+
+// Client Detail types
+export type ClientValueTier = "vip" | "regular" | "at-risk" | "new";
+
+export interface ClientKPIs {
+  totalAppointments: number;
+  completedAppointments: number;
+  cancelledAppointments: number;
+  noShowAppointments: number;
+  totalSpent: number;
+  averageSpendPerVisit: number;
+  lastVisitDate: string | null;
+  cancellationRate: number;
+  clientLifetimeDays: number;
+  visitFrequencyDays: number;
+}
+
+export interface ClientAnalytics {
+  favoriteServices: { serviceName: string; count: number }[];
+  preferredEmployees: { employeeName: string; count: number }[];
+  valueTier: ClientValueTier;
+  monthlyVisits: { month: string; count: number }[];
+}
+
+export interface ClientDetailResponse {
+  client: Client & { notes: string | null };
+  kpis: ClientKPIs;
+  analytics: ClientAnalytics;
+  recentAppointments: Appointment[];
+  recentInvoices: Invoice[];
 }
 
 export type EmployeeStatus = "active" | "on-leave" | "inactive";

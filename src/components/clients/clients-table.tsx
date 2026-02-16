@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface ClientsTableProps {
 export function ClientsTable({ data, onEdit, onDelete }: ClientsTableProps) {
   const t = useTranslations("clients");
   const locale = useLocale();
+  const router = useRouter();
 
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
@@ -58,6 +60,7 @@ export function ClientsTable({ data, onEdit, onDelete }: ClientsTableProps) {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>{t("view")}</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit?.(client)}>{t("edit")}</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(client.id)}>{t("delete")}</DropdownMenuItem>

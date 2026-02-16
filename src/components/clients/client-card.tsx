@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ interface ClientCardProps {
 export function ClientCard({ data, onEdit, onDelete }: ClientCardProps) {
   const t = useTranslations("clients");
   const locale = useLocale();
+  const router = useRouter();
 
   return (
     <motion.div
@@ -41,6 +43,7 @@ export function ClientCard({ data, onEdit, onDelete }: ClientCardProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => router.push(`/clients/${data.id}`)}>{t("view")}</DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem>

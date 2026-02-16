@@ -37,6 +37,14 @@ export function useUpdateClient() {
   });
 }
 
+export function useClientDetails(id: string) {
+  return useQuery({
+    queryKey: ["clients", id, "details"],
+    queryFn: () => clientsApi.getDetails(id),
+    enabled: !!id,
+  });
+}
+
 export function useDeleteClient() {
   const queryClient = useQueryClient();
   return useMutation({
