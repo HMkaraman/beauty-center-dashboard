@@ -149,6 +149,10 @@ export async function POST(req: NextRequest) {
         name: validated.name,
         phone: validated.phone,
         email: validated.email,
+        dateOfBirth: validated.dateOfBirth,
+        address: validated.address,
+        city: validated.city,
+        country: validated.country,
         status: validated.status,
         notes: validated.notes,
       })

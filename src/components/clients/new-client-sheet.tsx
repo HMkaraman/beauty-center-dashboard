@@ -17,7 +17,7 @@ interface NewClientSheetProps {
   editItem?: Client | null;
 }
 
-const emptyForm = { name: "", phone: "", email: "", notes: "" };
+const emptyForm = { name: "", phone: "", email: "", dateOfBirth: "", address: "", city: "", country: "", notes: "" };
 
 export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetProps) {
   const t = useTranslations("clients");
@@ -28,7 +28,7 @@ export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetP
 
   useEffect(() => {
     if (editItem) {
-      setForm({ name: editItem.name, phone: editItem.phone, email: editItem.email, notes: "" });
+      setForm({ name: editItem.name, phone: editItem.phone, email: editItem.email, dateOfBirth: editItem.dateOfBirth ?? "", address: editItem.address ?? "", city: editItem.city ?? "", country: editItem.country ?? "", notes: "" });
     } else {
       setForm(emptyForm);
     }
@@ -37,12 +37,13 @@ export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetP
   const handleSubmit = () => {
     if (!form.name || !form.phone) { toast.error(tc("requiredField")); return; }
     if (editItem) {
-      updateClient.mutate({ id: editItem.id, data: { name: form.name, phone: form.phone, email: form.email } }, {
+      updateClient.mutate({ id: editItem.id, data: { name: form.name, phone: form.phone, email: form.email, dateOfBirth: form.dateOfBirth, address: form.address, city: form.city, country: form.country } }, {
         onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
       });
     } else {
       createClient.mutate({
         name: form.name, phone: form.phone, email: form.email,
+        dateOfBirth: form.dateOfBirth, address: form.address, city: form.city, country: form.country,
         status: "active",
       }, {
         onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
@@ -70,6 +71,22 @@ export function NewClientSheet({ open, onOpenChange, editItem }: NewClientSheetP
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("clientEmail")}</label>
             <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="font-english" dir="ltr" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("clientDOB")}</label>
+            <Input type="date" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} className="font-english" dir="ltr" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("clientAddress")}</label>
+            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("clientCity")}</label>
+            <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("clientCountry")}</label>
+            <Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("notes")}</label>
