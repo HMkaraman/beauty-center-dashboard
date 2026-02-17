@@ -27,6 +27,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // Only handle http/https requests
+  if (!url.protocol.startsWith("http")) return;
   // Skip non-GET and API requests from caching
   if (event.request.method !== "GET") return;
   if (url.pathname.startsWith("/api/")) return;
@@ -41,6 +43,8 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() =>
+        caches.match(event.request).then((cached) => cached || new Response("Offline", { status: 503 }))
+      )
   );
 });
