@@ -20,7 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { servicesList, employeesList } from "@/lib/mock-data";
+import { useServices } from "@/lib/hooks/use-services";
+import { useEmployees } from "@/lib/hooks/use-employees";
 import { useCreateAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 
@@ -33,8 +34,8 @@ interface NewAppointmentSheetProps {
 const emptyForm = {
   clientName: "",
   clientPhone: "",
-  service: "",
-  employee: "",
+  serviceId: "",
+  employeeId: "",
   date: "",
   time: "",
   notes: "",
@@ -46,15 +47,23 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
   const createAppointment = useCreateAppointment();
   const updateAppointment = useUpdateAppointment();
 
+  const { data: servicesData } = useServices({ limit: 100 });
+  const { data: employeesData } = useEmployees({ limit: 100 });
+  const services = servicesData?.data ?? [];
+  const employees = employeesData?.data ?? [];
+
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
     if (editItem) {
+      // When editing, try to match existing service/employee names to IDs
+      const matchedService = services.find((s) => s.name === editItem.service);
+      const matchedEmployee = employees.find((e) => e.name === editItem.employee);
       setForm({
         clientName: editItem.clientName,
         clientPhone: editItem.clientPhone,
-        service: editItem.service,
-        employee: editItem.employee,
+        serviceId: matchedService?.id || "",
+        employeeId: matchedEmployee?.id || "",
         date: editItem.date,
         time: editItem.time,
         notes: editItem.notes || "",
@@ -62,22 +71,23 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     } else {
       setForm(emptyForm);
     }
-  }, [editItem, open]);
+  }, [editItem, open, services, employees]);
 
   const handleSubmit = () => {
-    if (!form.clientName || !form.service || !form.date || !form.time) {
+    if (!form.clientName || !form.serviceId || !form.date || !form.time) {
       toast.error(tc("requiredField"));
       return;
     }
 
-    const selectedService = servicesList.find((s) => s.name === form.service);
+    const selectedService = services.find((s) => s.id === form.serviceId);
+    const selectedEmployee = employees.find((e) => e.id === form.employeeId);
 
     if (editItem) {
       updateAppointment.mutate({ id: editItem.id, data: {
         clientName: form.clientName,
         clientPhone: form.clientPhone,
-        service: form.service,
-        employee: form.employee,
+        service: selectedService?.name || editItem.service,
+        employee: selectedEmployee?.name || editItem.employee,
         date: form.date,
         time: form.time,
         notes: form.notes || undefined,
@@ -88,8 +98,8 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
       createAppointment.mutate({
         clientName: form.clientName,
         clientPhone: form.clientPhone,
-        service: form.service,
-        employee: form.employee,
+        service: selectedService?.name || "",
+        employee: selectedEmployee?.name || "",
         date: form.date,
         time: form.time,
         duration: selectedService?.duration || 60,
@@ -132,13 +142,13 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("service")}</label>
-            <Select value={form.service} onValueChange={(v) => setForm({ ...form, service: v })}>
+            <Select value={form.serviceId} onValueChange={(v) => setForm({ ...form, serviceId: v })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
               <SelectContent>
-                {servicesList.map((service) => (
-                  <SelectItem key={service.name} value={service.name}>
+                {services.map((service) => (
+                  <SelectItem key={service.id} value={service.id}>
                     {service.name}
                   </SelectItem>
                 ))}
@@ -148,13 +158,13 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("employee")}</label>
-            <Select value={form.employee} onValueChange={(v) => setForm({ ...form, employee: v })}>
+            <Select value={form.employeeId} onValueChange={(v) => setForm({ ...form, employeeId: v })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectEmployee")} />
               </SelectTrigger>
               <SelectContent>
-                {employeesList.map((emp) => (
-                  <SelectItem key={emp.id} value={emp.name}>
+                {employees.map((emp) => (
+                  <SelectItem key={emp.id} value={emp.id}>
                     {emp.name}
                   </SelectItem>
                 ))}

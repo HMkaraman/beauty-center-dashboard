@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { invoicePaymentMethods } from "@/lib/mock-data";
+import { useServices } from "@/lib/hooks/use-services";
 import { useCreateInvoice, useUpdateInvoice } from "@/lib/hooks/use-invoices";
 import { Invoice } from "@/types";
 
@@ -18,15 +18,25 @@ interface NewInvoiceSheetProps {
   editItem?: Invoice | null;
 }
 
-interface ItemRow { description: string; quantity: string; unitPrice: string; discount: string; }
+interface ItemRow { description: string; quantity: string; unitPrice: string; discount: string; serviceId: string; }
 
-const emptyItem: ItemRow = { description: "", quantity: "1", unitPrice: "", discount: "0" };
+const emptyItem: ItemRow = { description: "", quantity: "1", unitPrice: "", discount: "0", serviceId: "" };
+const CUSTOM_ITEM_VALUE = "__custom__";
 
 export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceSheetProps) {
   const t = useTranslations("invoices");
   const tc = useTranslations("common");
   const createInvoice = useCreateInvoice();
   const updateInvoice = useUpdateInvoice();
+
+  const { data: servicesData } = useServices({ limit: 100 });
+  const services = servicesData?.data ?? [];
+
+  const paymentMethods = [
+    { value: "cash", label: t("paymentCash") },
+    { value: "card", label: t("paymentCard") },
+    { value: "bank_transfer", label: t("paymentBankTransfer") },
+  ];
 
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -41,7 +51,16 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
     if (editItem) {
       setClientName(editItem.clientName);
       setClientPhone(editItem.clientPhone);
-      setItems(editItem.items.map((i) => ({ description: i.description, quantity: String(i.quantity), unitPrice: String(i.unitPrice), discount: String(i.discount) })));
+      setItems(editItem.items.map((i) => {
+        const matchedService = services.find((s) => s.name === i.description);
+        return {
+          description: i.description,
+          quantity: String(i.quantity),
+          unitPrice: String(i.unitPrice),
+          discount: String(i.discount),
+          serviceId: matchedService?.id || CUSTOM_ITEM_VALUE,
+        };
+      }));
       setTaxRate(String(editItem.taxRate));
       setPaymentMethod(editItem.paymentMethod || "cash");
       setStatus(editItem.status === "void" ? "paid" : editItem.status);
@@ -50,7 +69,20 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
     } else {
       setClientName(""); setClientPhone(""); setItems([{ ...emptyItem }]); setTaxRate("0"); setPaymentMethod("cash"); setStatus("paid"); setNotes(""); setDate("");
     }
-  }, [editItem, open]);
+  }, [editItem, open, services]);
+
+  const handleServiceSelect = (idx: number, serviceId: string) => {
+    const n = [...items];
+    if (serviceId === CUSTOM_ITEM_VALUE) {
+      n[idx] = { ...n[idx], serviceId: CUSTOM_ITEM_VALUE, description: "", unitPrice: "" };
+    } else {
+      const service = services.find((s) => s.id === serviceId);
+      if (service) {
+        n[idx] = { ...n[idx], serviceId, description: service.name, unitPrice: String(service.price) };
+      }
+    }
+    setItems(n);
+  };
 
   const calc = useMemo(() => {
     const parsed = items.map((r) => {
@@ -124,11 +156,24 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
             {items.map((item, idx) => (
               <div key={idx} className="space-y-2 rounded-lg border border-border p-3">
                 <div className="flex items-center gap-2">
-                  <Input value={item.description} onChange={(e) => { const n = [...items]; n[idx] = { ...n[idx], description: e.target.value }; setItems(n); }} placeholder={t("description")} className="flex-1" />
+                  <Select value={item.serviceId} onValueChange={(v) => handleServiceSelect(idx, v)}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder={t("selectService")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services.map((service) => (
+                        <SelectItem key={service.id} value={service.id}>{service.name}</SelectItem>
+                      ))}
+                      <SelectItem value={CUSTOM_ITEM_VALUE}>{t("customItem")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {items.length > 1 && (
                     <Button variant="ghost" size="icon-xs" onClick={() => setItems(items.filter((_, i) => i !== idx))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                   )}
                 </div>
+                {item.serviceId === CUSTOM_ITEM_VALUE && (
+                  <Input value={item.description} onChange={(e) => { const n = [...items]; n[idx] = { ...n[idx], description: e.target.value }; setItems(n); }} placeholder={t("description")} />
+                )}
                 <div className="grid grid-cols-3 gap-2">
                   <div><label className="text-xs text-muted-foreground">{t("qty")}</label><Input type="number" min={1} value={item.quantity} onChange={(e) => { const n = [...items]; n[idx] = { ...n[idx], quantity: e.target.value }; setItems(n); }} className="font-english" dir="ltr" /></div>
                   <div><label className="text-xs text-muted-foreground">{t("price")}</label><Input type="number" min={0} value={item.unitPrice} onChange={(e) => { const n = [...items]; n[idx] = { ...n[idx], unitPrice: e.target.value }; setItems(n); }} className="font-english" dir="ltr" /></div>
@@ -161,7 +206,7 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
               <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {invoicePaymentMethods.map((m) => (<SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>))}
+                  {paymentMethods.map((m) => (<SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>

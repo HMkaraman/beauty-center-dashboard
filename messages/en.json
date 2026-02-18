@@ -504,6 +504,11 @@
     "methodCash": "Cash",
     "methodCard": "Card",
     "methodTransfer": "Bank Transfer",
+    "paymentCash": "Cash",
+    "paymentCard": "Card",
+    "paymentBankTransfer": "Bank Transfer",
+    "customItem": "Custom Item",
+    "selectService": "Select Service",
     "save": "Save",
     "close": "Close"
   },

@@ -504,6 +504,11 @@
     "methodCash": "نقداً",
     "methodCard": "بطاقة",
     "methodTransfer": "تحويل بنكي",
+    "paymentCash": "نقداً",
+    "paymentCard": "بطاقة",
+    "paymentBankTransfer": "تحويل بنكي",
+    "customItem": "عنصر مخصص",
+    "selectService": "اختر الخدمة",
     "save": "حفظ",
     "close": "إغلاق"
   },

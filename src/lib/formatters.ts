@@ -1,8 +1,8 @@
-export function formatCurrency(value: number, locale: string = "ar"): string {
+export function formatCurrency(value: number, locale: string = "ar", currency: string = "SAR"): string {
   const intlLocale = locale === "ar" ? "ar-SA" : "en-US";
   return new Intl.NumberFormat(intlLocale, {
     style: "currency",
-    currency: "SAR",
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
