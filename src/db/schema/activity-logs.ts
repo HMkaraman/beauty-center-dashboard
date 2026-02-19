@@ -47,7 +47,17 @@ export const activityLogAttachments = pgTable("activity_log_attachments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const activityLogRelations = pgTable("activity_log_relations", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  activityLogId: text("activity_log_id").notNull().references(() => activityLogs.id, { onDelete: "cascade" }),
+  entityType: activityEntityTypeEnum("entity_type").notNull(),
+  entityId: text("entity_id").notNull(),
+});
+
 export type ActivityLogRecord = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
 export type ActivityLogAttachmentRecord = typeof activityLogAttachments.$inferSelect;
 export type NewActivityLogAttachment = typeof activityLogAttachments.$inferInsert;
+export type ActivityLogRelationRecord = typeof activityLogRelations.$inferSelect;
+export type NewActivityLogRelation = typeof activityLogRelations.$inferInsert;

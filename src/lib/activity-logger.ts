@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { activityLogs, activityLogAttachments } from "@/db/schema";
+import { activityLogs, activityLogAttachments, activityLogRelations } from "@/db/schema";
 import type { AuthenticatedSession } from "@/lib/api-utils";
 
 export type ActivityEntityType =
@@ -34,6 +34,7 @@ interface LogActivityParams {
   content?: string;
   changes?: ChangesMap;
   attachments?: { url: string; filename?: string; mimeType?: string; fileSize?: number }[];
+  relatedEntities?: Array<{ entityType: ActivityEntityType; entityId: string }>;
 }
 
 const SKIP_FIELDS = new Set([
@@ -71,6 +72,37 @@ export function computeChanges(
   return Object.keys(changes).length > 0 ? changes : null;
 }
 
+export function buildCreateChanges(
+  record: Record<string, unknown>
+): ChangesMap {
+  const changes: ChangesMap = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (SKIP_FIELDS.has(key)) continue;
+    if (value == null || value === "") continue;
+    changes[key] = { old: null, new: value };
+  }
+  return changes;
+}
+
+const RELATED_ENTITY_MAP: Record<string, ActivityEntityType> = {
+  clientId: "client",
+  employeeId: "employee",
+  doctorId: "doctor",
+  serviceId: "service",
+};
+
+export function buildRelatedEntities(
+  refs: Record<string, string | null | undefined>
+): Array<{ entityType: ActivityEntityType; entityId: string }> {
+  const result: Array<{ entityType: ActivityEntityType; entityId: string }> = [];
+  for (const [key, val] of Object.entries(refs)) {
+    if (val && RELATED_ENTITY_MAP[key]) {
+      result.push({ entityType: RELATED_ENTITY_MAP[key], entityId: val });
+    }
+  }
+  return result;
+}
+
 export async function logActivity(params: LogActivityParams): Promise<void> {
   try {
     const {
@@ -83,6 +115,7 @@ export async function logActivity(params: LogActivityParams): Promise<void> {
       newData,
       content,
       attachments,
+      relatedEntities,
     } = params;
 
     let changes = params.changes ?? null;
@@ -119,6 +152,18 @@ export async function logActivity(params: LogActivityParams): Promise<void> {
           filename: a.filename,
           mimeType: a.mimeType,
           fileSize: a.fileSize,
+        }))
+      );
+    }
+
+    // Insert related entity links
+    if (relatedEntities && relatedEntities.length > 0 && log) {
+      await db.insert(activityLogRelations).values(
+        relatedEntities.map((rel) => ({
+          tenantId: session.user.tenantId,
+          activityLogId: log.id,
+          entityType: rel.entityType,
+          entityId: rel.entityId,
         }))
       );
     }

@@ -12,7 +12,7 @@ import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
 import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
-import { logActivity } from "@/lib/activity-logger";
+import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -175,6 +175,24 @@ export async function POST(req: NextRequest) {
       entityId: created.id,
       action: "create",
       entityLabel: `${created.clientName} - ${created.service}`,
+      changes: buildCreateChanges({
+        clientName: created.clientName,
+        clientPhone: created.clientPhone,
+        service: created.service,
+        employee: created.employee,
+        doctor: created.doctor,
+        date: created.date,
+        time: created.time,
+        duration: created.duration,
+        status: created.status,
+        price: created.price,
+        notes: created.notes,
+      }),
+      relatedEntities: buildRelatedEntities({
+        clientId: created.clientId,
+        employeeId: created.employeeId,
+        doctorId: created.doctorId,
+      }),
     });
 
     return success(

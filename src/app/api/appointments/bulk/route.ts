@@ -3,6 +3,7 @@ import { getAuthSession, unauthorized, badRequest, success, serverError } from "
 import { db } from "@/db/db";
 import { appointments } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
+import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
 
 const VALID_STATUSES = ["confirmed", "pending", "cancelled", "completed", "no-show"];
 
@@ -14,7 +15,38 @@ export async function PATCH(req: NextRequest) {
     const { ids, status } = body;
     if (!Array.isArray(ids) || ids.length === 0) return badRequest("ids must be a non-empty array");
     if (!status || !VALID_STATUSES.includes(status)) return badRequest(`status must be one of: ${VALID_STATUSES.join(", ")}`);
-    const updated = await db.update(appointments).set({ status }).where(and(eq(appointments.tenantId, session.user.tenantId), inArray(appointments.id, ids))).returning({ id: appointments.id });
+
+    // Fetch existing appointments before update for logging
+    const existing = await db
+      .select()
+      .from(appointments)
+      .where(and(eq(appointments.tenantId, session.user.tenantId), inArray(appointments.id, ids)));
+
+    const updated = await db
+      .update(appointments)
+      .set({ status })
+      .where(and(eq(appointments.tenantId, session.user.tenantId), inArray(appointments.id, ids)))
+      .returning({ id: appointments.id });
+
+    // Log activity for each affected appointment
+    for (const appt of existing) {
+      if (appt.status !== status) {
+        logActivity({
+          session,
+          entityType: "appointment",
+          entityId: appt.id,
+          action: "update",
+          entityLabel: `${appt.clientName} - ${appt.service}`,
+          changes: { status: { old: appt.status, new: status } },
+          relatedEntities: buildRelatedEntities({
+            clientId: appt.clientId,
+            employeeId: appt.employeeId,
+            doctorId: appt.doctorId,
+          }),
+        });
+      }
+    }
+
     return success({ updated: updated.length });
   } catch (error) {
     console.error("PATCH /api/appointments/bulk error:", error);
@@ -34,10 +66,32 @@ export async function DELETE(req: NextRequest) {
       return badRequest("ids must be a non-empty array");
     }
 
+    // Fetch existing appointments before deletion for logging
+    const existing = await db
+      .select()
+      .from(appointments)
+      .where(and(eq(appointments.tenantId, session.user.tenantId), inArray(appointments.id, ids)));
+
     const deleted = await db
       .delete(appointments)
       .where(and(eq(appointments.tenantId, session.user.tenantId), inArray(appointments.id, ids)))
       .returning({ id: appointments.id });
+
+    // Log activity for each deleted appointment
+    for (const appt of existing) {
+      logActivity({
+        session,
+        entityType: "appointment",
+        entityId: appt.id,
+        action: "delete",
+        entityLabel: `${appt.clientName} - ${appt.service}`,
+        relatedEntities: buildRelatedEntities({
+          clientId: appt.clientId,
+          employeeId: appt.employeeId,
+          doctorId: appt.doctorId,
+        }),
+      });
+    }
 
     return success({ deleted: deleted.length });
   } catch (error) {

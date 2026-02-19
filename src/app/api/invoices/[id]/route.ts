@@ -16,7 +16,7 @@ import {
   createReversalTransaction,
   calculateEmployeeCommission,
 } from "@/lib/business-logic/finance";
-import { logActivity } from "@/lib/activity-logger";
+import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -171,6 +171,26 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       });
     }
 
+    // Build related entities for cross-entity visibility
+    const invoiceRelatedRefs: Record<string, string | null | undefined> = {
+      clientId: updated.clientId,
+    };
+    if (updated.appointmentId) {
+      const [linkedAppt] = await db
+        .select({ employeeId: appointments.employeeId, doctorId: appointments.doctorId })
+        .from(appointments)
+        .where(eq(appointments.id, updated.appointmentId));
+      if (linkedAppt) {
+        invoiceRelatedRefs.employeeId = linkedAppt.employeeId;
+        invoiceRelatedRefs.doctorId = linkedAppt.doctorId;
+      }
+    }
+    const invoiceRelated = buildRelatedEntities(invoiceRelatedRefs);
+    // If client changed, also include the old client
+    if (existing.clientId && existing.clientId !== updated.clientId) {
+      invoiceRelated.push({ entityType: "client", entityId: existing.clientId });
+    }
+
     logActivity({
       session,
       entityType: "invoice",
@@ -179,6 +199,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       entityLabel: `${updated.invoiceNumber} - ${updated.clientName}`,
       oldRecord: existing as unknown as Record<string, unknown>,
       newData: validated as unknown as Record<string, unknown>,
+      relatedEntities: invoiceRelated,
     });
 
     const items = await db
@@ -233,12 +254,28 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
       .delete(invoices)
       .where(and(eq(invoices.id, id), eq(invoices.tenantId, tenantId)));
 
+    // Build related entities for cross-entity visibility
+    const deleteRelatedRefs: Record<string, string | null | undefined> = {
+      clientId: existing.clientId,
+    };
+    if (existing.appointmentId) {
+      const [linkedAppt] = await db
+        .select({ employeeId: appointments.employeeId, doctorId: appointments.doctorId })
+        .from(appointments)
+        .where(eq(appointments.id, existing.appointmentId));
+      if (linkedAppt) {
+        deleteRelatedRefs.employeeId = linkedAppt.employeeId;
+        deleteRelatedRefs.doctorId = linkedAppt.doctorId;
+      }
+    }
+
     logActivity({
       session,
       entityType: "invoice",
       entityId: id,
       action: "delete",
       entityLabel: `${existing.invoiceNumber} - ${existing.clientName}`,
+      relatedEntities: buildRelatedEntities(deleteRelatedRefs),
     });
 
     return success({ message: "Invoice deleted successfully" });

@@ -4,10 +4,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Plus, Pencil, Trash2, MessageSquare, Play, FileText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TimelineEntryChanges } from "./timeline-entry-changes";
-import type { ActivityLog } from "@/types";
+import type { ActivityLog, ActivityEntityType } from "@/types";
 
 interface TimelineEntryProps {
   entry: ActivityLog;
+  parentEntityType?: ActivityEntityType;
 }
 
 const ACTION_ICONS = {
@@ -24,12 +25,23 @@ const ACTION_COLORS = {
   note: "bg-amber-500/15 text-amber-600",
 } as const;
 
-export function TimelineEntry({ entry }: TimelineEntryProps) {
+const ENTITY_TYPE_BADGE_COLORS: Record<string, string> = {
+  appointment: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+  invoice: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+  expense: "bg-orange-500/15 text-orange-700 dark:text-orange-400",
+  client: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
+  employee: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400",
+  doctor: "bg-pink-500/15 text-pink-700 dark:text-pink-400",
+  service: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+};
+
+export function TimelineEntry({ entry, parentEntityType }: TimelineEntryProps) {
   const t = useTranslations("activityLog");
   const locale = useLocale();
 
   const Icon = ACTION_ICONS[entry.action];
   const colorClass = ACTION_COLORS[entry.action];
+  const isCrossEntity = parentEntityType && entry.entityType !== parentEntityType;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -54,6 +66,11 @@ export function TimelineEntry({ entry }: TimelineEntryProps) {
     }
   };
 
+  const getEntityTypeLabel = (type: string) => {
+    const key = `entityType_${type}` as Parameters<typeof t>[0];
+    return t.has(key) ? t(key) : type;
+  };
+
   return (
     <div className="flex gap-3">
       {/* Avatar / Icon */}
@@ -73,10 +90,22 @@ export function TimelineEntry({ entry }: TimelineEntryProps) {
           <span className="text-xs text-muted-foreground">
             {getActionText()}
           </span>
+          {isCrossEntity && (
+            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${ENTITY_TYPE_BADGE_COLORS[entry.entityType] || "bg-secondary text-secondary-foreground"}`}>
+              {getEntityTypeLabel(entry.entityType)}
+            </span>
+          )}
           <span className="text-xs font-english text-muted-foreground/60">
             {formatDate(entry.createdAt)}
           </span>
         </div>
+
+        {/* Entity label for cross-entity entries */}
+        {isCrossEntity && entry.entityLabel && (
+          <div className="mt-0.5 text-xs font-medium text-muted-foreground">
+            {entry.entityLabel}
+          </div>
+        )}
 
         {/* Note content */}
         {entry.action === "note" && entry.content && (
@@ -86,7 +115,7 @@ export function TimelineEntry({ entry }: TimelineEntryProps) {
         )}
 
         {/* Change diffs */}
-        {entry.action === "update" && entry.changes && (
+        {(entry.action === "update" || entry.action === "create") && entry.changes && (
           <TimelineEntryChanges changes={entry.changes} />
         )}
 

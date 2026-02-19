@@ -11,7 +11,7 @@ import { db } from "@/db/db";
 import { expenses } from "@/db/schema";
 import { expenseSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
-import { logActivity } from "@/lib/activity-logger";
+import { logActivity, buildCreateChanges } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -103,6 +103,14 @@ export async function POST(req: NextRequest) {
       entityId: newExpense.id,
       action: "create",
       entityLabel: `${validated.description} - ${validated.category}`,
+      changes: buildCreateChanges({
+        description: validated.description,
+        category: validated.category,
+        amount: validated.amount,
+        date: validated.date,
+        paymentMethod: validated.paymentMethod,
+        status: validated.status,
+      }),
     });
 
     return success(

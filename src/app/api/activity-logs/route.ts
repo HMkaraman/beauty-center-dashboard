@@ -7,9 +7,9 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { activityLogs, activityLogAttachments } from "@/db/schema";
+import { activityLogs, activityLogAttachments, activityLogRelations } from "@/db/schema";
 import { activityNoteSchema } from "@/lib/validations";
-import { eq, and, desc, count, inArray } from "drizzle-orm";
+import { eq, and, desc, count, inArray, or } from "drizzle-orm";
 import { activityEntityTypeEnum } from "@/db/schema/activity-logs";
 
 export async function GET(req: NextRequest) {
@@ -34,10 +34,30 @@ export async function GET(req: NextRequest) {
       return badRequest("Invalid entityType");
     }
 
+    const castedEntityType = entityType as (typeof activityEntityTypeEnum.enumValues)[number];
+
+    // Find IDs of activity logs related to this entity through the relations table
+    const relatedLogIds = db
+      .select({ id: activityLogRelations.activityLogId })
+      .from(activityLogRelations)
+      .where(
+        and(
+          eq(activityLogRelations.tenantId, tenantId),
+          eq(activityLogRelations.entityType, castedEntityType),
+          eq(activityLogRelations.entityId, entityId),
+        )
+      );
+
+    // Combined where: direct logs OR related logs
     const whereClause = and(
       eq(activityLogs.tenantId, tenantId),
-      eq(activityLogs.entityType, entityType as (typeof activityEntityTypeEnum.enumValues)[number]),
-      eq(activityLogs.entityId, entityId),
+      or(
+        and(
+          eq(activityLogs.entityType, castedEntityType),
+          eq(activityLogs.entityId, entityId),
+        ),
+        inArray(activityLogs.id, relatedLogIds),
+      ),
     );
 
     const [totalResult] = await db

@@ -13,7 +13,7 @@ import { appointmentSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { deductInventoryForService } from "@/lib/business-logic/inventory";
 import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
-import { logActivity } from "@/lib/activity-logger";
+import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -175,6 +175,22 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Build related entities: include current + old (if changed) so logs appear on both timelines
+    const relatedEntities = buildRelatedEntities({
+      clientId: updated.clientId,
+      employeeId: updated.employeeId,
+      doctorId: updated.doctorId,
+    });
+    if (existing.clientId && existing.clientId !== updated.clientId) {
+      relatedEntities.push({ entityType: "client", entityId: existing.clientId });
+    }
+    if (existing.employeeId && existing.employeeId !== updated.employeeId) {
+      relatedEntities.push({ entityType: "employee", entityId: existing.employeeId });
+    }
+    if (existing.doctorId && existing.doctorId !== updated.doctorId) {
+      relatedEntities.push({ entityType: "doctor", entityId: existing.doctorId });
+    }
+
     logActivity({
       session,
       entityType: "appointment",
@@ -183,6 +199,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       entityLabel: `${updated.clientName} - ${updated.service}`,
       oldRecord: existing as unknown as Record<string, unknown>,
       newData: validated as unknown as Record<string, unknown>,
+      relatedEntities,
     });
 
     return success({
@@ -217,6 +234,11 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       entityId: id,
       action: "delete",
       entityLabel: `${deleted.clientName} - ${deleted.service}`,
+      relatedEntities: buildRelatedEntities({
+        clientId: deleted.clientId,
+        employeeId: deleted.employeeId,
+        doctorId: deleted.doctorId,
+      }),
     });
 
     return success({ message: "Appointment deleted successfully" });

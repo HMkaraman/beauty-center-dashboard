@@ -54,7 +54,7 @@ export function ActivityTimeline({ entityType, entityId, title }: ActivityTimeli
       ) : (
         <div className="space-y-0">
           {logs.map((entry) => (
-            <TimelineEntry key={entry.id} entry={entry} />
+            <TimelineEntry key={entry.id} entry={entry} parentEntityType={entityType} />
           ))}
         </div>
       )}

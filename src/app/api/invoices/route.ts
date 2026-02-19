@@ -15,7 +15,7 @@ import {
   createIncomeTransaction,
   calculateEmployeeCommission,
 } from "@/lib/business-logic/finance";
-import { logActivity } from "@/lib/activity-logger";
+import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -196,12 +196,36 @@ export async function POST(req: NextRequest) {
       .from(invoiceItems)
       .where(eq(invoiceItems.invoiceId, newInvoice.id));
 
+    // Build related entities for cross-entity visibility
+    const invoiceRelatedRefs: Record<string, string | null | undefined> = {
+      clientId: validated.clientId,
+    };
+    if (validated.appointmentId) {
+      const [linkedAppt] = await db
+        .select({ employeeId: appointments.employeeId, doctorId: appointments.doctorId })
+        .from(appointments)
+        .where(eq(appointments.id, validated.appointmentId));
+      if (linkedAppt) {
+        invoiceRelatedRefs.employeeId = linkedAppt.employeeId;
+        invoiceRelatedRefs.doctorId = linkedAppt.doctorId;
+      }
+    }
+
     logActivity({
       session,
       entityType: "invoice",
       entityId: newInvoice.id,
       action: "create",
       entityLabel: `${invoiceNumber} - ${validated.clientName}`,
+      changes: buildCreateChanges({
+        invoiceNumber,
+        clientName: validated.clientName,
+        date: validated.date,
+        total: validated.total,
+        status: validated.status,
+        paymentMethod: validated.paymentMethod,
+      }),
+      relatedEntities: buildRelatedEntities(invoiceRelatedRefs),
     });
 
     return success(
