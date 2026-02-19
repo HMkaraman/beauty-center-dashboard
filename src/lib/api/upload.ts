@@ -1,7 +1,7 @@
 export async function uploadFileApi(
   file: File,
   folder?: string
-): Promise<{ url: string; filename: string }> {
+): Promise<{ url: string; filename: string; mimeType: string }> {
   const formData = new FormData();
   formData.append("file", file);
   if (folder) formData.append("folder", folder);

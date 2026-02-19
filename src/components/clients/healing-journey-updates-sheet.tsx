@@ -243,7 +243,7 @@ export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journ
           {
             url: result.url,
             filename: file.name,
-            mimeType: file.type,
+            mimeType: result.mimeType,
             fileSize: file.size,
             label: attachmentLabel,
           },
