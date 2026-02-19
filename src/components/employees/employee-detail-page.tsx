@@ -20,6 +20,7 @@ import { EmployeeAppointmentCard } from "./employee-appointment-card";
 import { EmployeeCommissionCard } from "./employee-commission-card";
 import { useEmployeeDetails } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/formatters";
+import { ActivityTimeline } from "@/components/activity/activity-timeline";
 
 interface EmployeeDetailPageProps {
   employeeId: string;
@@ -204,6 +205,9 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
           <TabsTrigger value="commissions">
             {t("tabCommissions")} ({recentCommissions.length})
           </TabsTrigger>
+          <TabsTrigger value="activity">
+            {t("tabActivity")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="appointments">
@@ -235,6 +239,12 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
                 <EmployeeCommissionCard key={comm.id} data={comm} />
               ))
             )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <ActivityTimeline entityType="employee" entityId={employeeId} />
           </div>
         </TabsContent>
       </Tabs>

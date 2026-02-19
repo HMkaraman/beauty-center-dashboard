@@ -34,3 +34,4 @@ export {
   type JourneyEntryFormData,
   type JourneyAttachmentFormData,
 } from "./healing-journeys";
+export { activityNoteSchema, type ActivityNoteFormData } from "./activity-logs";

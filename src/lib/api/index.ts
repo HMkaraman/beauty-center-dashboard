@@ -24,3 +24,4 @@ export type { AdminStats, AdminTenant, AdminTenantsResponse } from "./admin";
 export type { Notification, SendNotificationData } from "./notifications";
 export { apiKeysApi } from "./api-keys";
 export type { ApiKeyInfo, ApiKeyCreated } from "./api-keys";
+export { activityLogsApi } from "./activity-logs";

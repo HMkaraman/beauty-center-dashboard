@@ -19,6 +19,7 @@ interface MarketingTableProps {
   data: Campaign[];
   onEdit?: (item: Campaign) => void;
   onDelete?: (id: string) => void;
+  onActivity?: (item: Campaign) => void;
   selectedIds?: string[];
   onToggle?: (id: string) => void;
   onToggleAll?: () => void;
@@ -26,7 +27,7 @@ interface MarketingTableProps {
   isSomeSelected?: boolean;
 }
 
-export function MarketingTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: MarketingTableProps) {
+export function MarketingTable({ data, onEdit, onDelete, onActivity, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: MarketingTableProps) {
   const t = useTranslations("marketing");
   const locale = useLocale();
 
@@ -68,6 +69,7 @@ export function MarketingTable({ data, onEdit, onDelete, selectedIds, onToggle, 
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit?.(campaign)}>{t("edit")}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onActivity?.(campaign)}>{t("activityLog")}</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(campaign.id)}>{t("delete")}</DropdownMenuItem>
                   </DropdownMenuContent>

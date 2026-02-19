@@ -23,6 +23,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { useTransactions, useDeleteTransaction, useBulkDeleteTransactions } from "@/lib/hooks/use-finance";
+import { ActivitySheet } from "@/components/activity/activity-sheet";
 import { Transaction } from "@/types";
 
 export function FinanceTransactionsTab() {
@@ -37,6 +38,7 @@ export function FinanceTransactionsTab() {
   const [editItem, setEditItem] = useState<Transaction | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [activityItem, setActivityItem] = useState<Transaction | null>(null);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -108,6 +110,7 @@ export function FinanceTransactionsTab() {
             data={filtered}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onActivity={(item) => setActivityItem(item)}
             selectedIds={selectedIds}
             onToggle={toggle}
             onToggleAll={toggleAll}
@@ -163,6 +166,15 @@ export function FinanceTransactionsTab() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {activityItem && (
+        <ActivitySheet
+          open={!!activityItem}
+          onOpenChange={(open) => !open && setActivityItem(null)}
+          entityType="transaction"
+          entityId={activityItem.id}
+          entityLabel={`${activityItem.type} - ${activityItem.description}`}
+        />
+      )}
     </div>
   );
 }

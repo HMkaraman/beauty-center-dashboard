@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { inventoryItems } from "@/db/schema";
 import { inventoryItemSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -76,6 +77,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .where(and(eq(inventoryItems.id, id), eq(inventoryItems.tenantId, tenantId)))
       .returning();
 
+    logActivity({
+      session,
+      entityType: "inventory_item",
+      entityId: id,
+      action: "update",
+      entityLabel: `${updated.name} (${updated.sku})`,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
+
     return success({
       ...updated,
       unitPrice: parseFloat(updated.unitPrice),
@@ -104,6 +115,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     await db
       .delete(inventoryItems)
       .where(and(eq(inventoryItems.id, id), eq(inventoryItems.tenantId, tenantId)));
+
+    logActivity({
+      session,
+      entityType: "inventory_item",
+      entityId: id,
+      action: "delete",
+      entityLabel: `${existing.name} (${existing.sku})`,
+    });
 
     return success({ message: "Inventory item deleted successfully" });
   } catch (error) {

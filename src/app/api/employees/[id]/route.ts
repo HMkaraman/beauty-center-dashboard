@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { employees } from "@/db/schema";
 import { employeeSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -54,6 +55,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const validated = result.data;
 
+    // Fetch existing record for change tracking
+    const [existing] = await db
+      .select()
+      .from(employees)
+      .where(and(eq(employees.id, id), eq(employees.tenantId, session.user.tenantId)));
+
+    if (!existing) return notFound("Employee not found");
+
     const updateData: Record<string, unknown> = {
       ...validated,
       updatedAt: new Date(),
@@ -73,6 +82,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .returning();
 
     if (!updated) return notFound("Employee not found");
+
+    logActivity({
+      session,
+      entityType: "employee",
+      entityId: id,
+      action: "update",
+      entityLabel: updated.name,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
 
     return success({
       ...updated,
@@ -98,6 +117,14 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       .returning();
 
     if (!deleted) return notFound("Employee not found");
+
+    logActivity({
+      session,
+      entityType: "employee",
+      entityId: id,
+      action: "delete",
+      entityLabel: deleted.name,
+    });
 
     return success({ message: "Employee deleted successfully" });
   } catch (error) {

@@ -8,9 +8,9 @@ import { ExpenseStatusBadge } from "./expense-status-badge";
 import { formatCurrency } from "@/lib/formatters";
 import { Expense } from "@/types";
 
-interface ExpensesTableProps { data: Expense[]; onEdit?: (item: Expense) => void; onDelete?: (id: string) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
+interface ExpensesTableProps { data: Expense[]; onEdit?: (item: Expense) => void; onDelete?: (id: string) => void; onActivity?: (item: Expense) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
-export function ExpensesTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: ExpensesTableProps) {
+export function ExpensesTable({ data, onEdit, onDelete, onActivity, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: ExpensesTableProps) {
   const t = useTranslations("expenses");
   const locale = useLocale();
   return (
@@ -35,7 +35,7 @@ export function ExpensesTable({ data, onEdit, onDelete, selectedIds, onToggle, o
           <td className="px-4 py-3 text-muted-foreground">{expense.paymentMethod}</td>
           <td className="px-4 py-3"><ExpenseStatusBadge status={expense.status} /></td>
           <td className="px-4 py-3"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(expense)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(expense.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
+            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(expense)}>{t("edit")}</DropdownMenuItem><DropdownMenuItem onClick={() => onActivity?.(expense)}>{t("activityLog")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(expense.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
         </tr>
       ))}</tbody>
     </table></div>

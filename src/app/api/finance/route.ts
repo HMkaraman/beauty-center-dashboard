@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { transactions } from "@/db/schema";
 import { transactionSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -94,6 +95,14 @@ export async function POST(req: NextRequest) {
         amount: String(validated.amount),
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "transaction",
+      entityId: newTransaction.id,
+      action: "create",
+      entityLabel: `${validated.type} - ${validated.description}`,
+    });
 
     return success(
       {

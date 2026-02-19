@@ -31,6 +31,7 @@ import {
   marketingReachTrendData,
 } from "@/lib/mock-data";
 import { useCampaigns, useDeleteCampaign, useBulkDeleteCampaigns, useBulkUpdateCampaignStatus } from "@/lib/hooks/use-marketing";
+import { ActivitySheet } from "@/components/activity/activity-sheet";
 import { Campaign } from "@/types";
 
 export function MarketingPageContent() {
@@ -48,6 +49,7 @@ export function MarketingPageContent() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
+  const [activityItem, setActivityItem] = useState<Campaign | null>(null);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -121,7 +123,7 @@ export function MarketingPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <MarketingTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
+            <MarketingTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onActivity={(item) => setActivityItem(item)} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
             <div className="space-y-3 md:hidden">
               {filtered.map((campaign) => (
                 <CampaignCard key={campaign.id} data={campaign} onEdit={handleEdit} onDelete={handleDelete} />
@@ -181,6 +183,15 @@ export function MarketingPageContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {activityItem && (
+        <ActivitySheet
+          open={!!activityItem}
+          onOpenChange={(open) => !open && setActivityItem(null)}
+          entityType="campaign"
+          entityId={activityItem.id}
+          entityLabel={activityItem.name}
+        />
+      )}
     </div>
   );
 }

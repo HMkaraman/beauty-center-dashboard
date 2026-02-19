@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { services } from "@/db/schema";
 import { serviceSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -90,6 +91,14 @@ export async function POST(req: NextRequest) {
         description: validated.description,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "service",
+      entityId: created.id,
+      action: "create",
+      entityLabel: created.name,
+    });
 
     return success(
       {

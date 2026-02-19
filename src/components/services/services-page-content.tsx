@@ -18,6 +18,7 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { servicesKpiData, servicesByCategoryData, servicesBookingsTrendData } from "@/lib/mock-data";
 import { useServices, useDeleteService, useBulkDeleteServices, useBulkUpdateServiceStatus } from "@/lib/hooks/use-services";
+import { ActivitySheet } from "@/components/activity/activity-sheet";
 import { Service } from "@/types";
 
 export function ServicesPageContent() {
@@ -35,6 +36,7 @@ export function ServicesPageContent() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
+  const [activityItem, setActivityItem] = useState<Service | null>(null);
 
   const filtered = services;
   const ids = useMemo(() => filtered.map((s) => s.id), [filtered]);
@@ -58,7 +60,7 @@ export function ServicesPageContent() {
         </div>
         <div className="relative"><Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tc("searchPlaceholder")} className="ps-9" /></div>
         {filtered.length === 0 ? (<p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>) : (
-          <><ServicesTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
+          <><ServicesTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onActivity={(item) => setActivityItem(item)} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
           <div className="space-y-3 md:hidden">{filtered.map((service) => (<ServiceCard key={service.id} data={service} onEdit={handleEdit} onDelete={handleDelete} />))}</div></>
         )}
       </div>
@@ -83,6 +85,15 @@ export function ServicesPageContent() {
           <AlertDialogFooter><AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel><AlertDialogAction onClick={confirmBulkStatus}>{tc("bulkStatusChange")}</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {activityItem && (
+        <ActivitySheet
+          open={!!activityItem}
+          onOpenChange={(open) => !open && setActivityItem(null)}
+          entityType="service"
+          entityId={activityItem.id}
+          entityLabel={activityItem.name}
+        />
+      )}
     </div>
   );
 }

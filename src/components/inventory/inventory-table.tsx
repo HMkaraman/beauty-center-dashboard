@@ -9,9 +9,9 @@ import { InventoryStatusBadge } from "./inventory-status-badge";
 import { formatCurrency } from "@/lib/formatters";
 import { InventoryItem } from "@/types";
 
-interface InventoryTableProps { data: InventoryItem[]; onEdit?: (item: InventoryItem) => void; onDelete?: (id: string) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
+interface InventoryTableProps { data: InventoryItem[]; onEdit?: (item: InventoryItem) => void; onDelete?: (id: string) => void; onActivity?: (item: InventoryItem) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
-export function InventoryTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: InventoryTableProps) {
+export function InventoryTable({ data, onEdit, onDelete, onActivity, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: InventoryTableProps) {
   const t = useTranslations("inventory");
   const locale = useLocale();
   return (
@@ -38,7 +38,7 @@ export function InventoryTable({ data, onEdit, onDelete, selectedIds, onToggle, 
           <td className="px-4 py-3 font-english text-foreground">{formatCurrency(item.totalValue, locale)}</td>
           <td className="px-4 py-3"><InventoryStatusBadge status={item.status} /></td>
           <td className="px-4 py-3"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(item)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(item.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
+            <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(item)}>{t("edit")}</DropdownMenuItem><DropdownMenuItem onClick={() => onActivity?.(item)}>{t("activityLog")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(item.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
         </tr>
       ))}</tbody>
     </table></div>

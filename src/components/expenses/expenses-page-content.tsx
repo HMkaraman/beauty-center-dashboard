@@ -17,6 +17,7 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { expensesKpiData, expensesByCategoryData, expensesMonthlyTrendData } from "@/lib/mock-data";
 import { useExpenses, useDeleteExpense, useBulkDeleteExpenses, useBulkUpdateExpenseStatus } from "@/lib/hooks/use-expenses";
+import { ActivitySheet } from "@/components/activity/activity-sheet";
 import { Expense } from "@/types";
 
 export function ExpensesPageContent() {
@@ -33,6 +34,7 @@ export function ExpensesPageContent() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
+  const [activityItem, setActivityItem] = useState<Expense | null>(null);
   const filtered = items.filter((item) => { if (!searchQuery) return true; const q = searchQuery.toLowerCase(); return item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q); });
   const ids = useMemo(() => filtered.map((e) => e.id), [filtered]);
   const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
@@ -50,7 +52,7 @@ export function ExpensesPageContent() {
         <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-foreground">{t("expensesList")}</h2><Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm"><DynamicIcon name="Plus" className="h-4 w-4" />{t("newExpense")}</Button></div>
         <div className="relative"><Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tc("searchPlaceholder")} className="ps-9" /></div>
         {filtered.length === 0 ? (<p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>) : (
-          <><ExpensesTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} /><div className="space-y-3 md:hidden">{filtered.map((expense) => (<ExpenseCard key={expense.id} data={expense} onEdit={handleEdit} onDelete={handleDelete} />))}</div></>
+          <><ExpensesTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onActivity={(item) => setActivityItem(item)} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} /><div className="space-y-3 md:hidden">{filtered.map((expense) => (<ExpenseCard key={expense.id} data={expense} onEdit={handleEdit} onDelete={handleDelete} />))}</div></>
         )}
       </div>
       <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[
@@ -70,6 +72,15 @@ export function ExpensesPageContent() {
           <AlertDialogFooter><AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel><AlertDialogAction onClick={confirmBulkStatus}>{tc("bulkStatusChange")}</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {activityItem && (
+        <ActivitySheet
+          open={!!activityItem}
+          onOpenChange={(open) => !open && setActivityItem(null)}
+          entityType="expense"
+          entityId={activityItem.id}
+          entityLabel={`${activityItem.description} - ${activityItem.category}`}
+        />
+      )}
     </div>
   );
 }

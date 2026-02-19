@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { campaigns } from "@/db/schema";
 import { campaignSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -89,6 +90,14 @@ export async function POST(req: NextRequest) {
         description: validated.description,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "campaign",
+      entityId: newCampaign.id,
+      action: "create",
+      entityLabel: newCampaign.name,
+    });
 
     return success(
       {

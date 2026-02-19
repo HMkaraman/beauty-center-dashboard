@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { inventoryItems } from "@/db/schema";
 import { inventoryItemSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -88,6 +89,14 @@ export async function POST(req: NextRequest) {
         reorderLevel: validated.reorderLevel,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "inventory_item",
+      entityId: newItem.id,
+      action: "create",
+      entityLabel: `${newItem.name} (${newItem.sku})`,
+    });
 
     return success(
       {

@@ -16,6 +16,7 @@ import {
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { NewAppointmentSheet } from "./new-appointment-sheet";
 import { CheckoutSheet } from "@/components/invoices/checkout-sheet";
+import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { useAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { formatCurrency } from "@/lib/formatters";
 import type { Appointment, AppointmentStatus } from "@/types";
@@ -157,6 +158,11 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Activity Timeline */}
+      <div className="rounded-lg border border-border bg-card p-6">
+        <ActivityTimeline entityType="appointment" entityId={appointmentId} />
       </div>
 
       <NewAppointmentSheet

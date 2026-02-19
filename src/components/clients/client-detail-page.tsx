@@ -18,6 +18,7 @@ import { ClientAppointmentCard } from "./client-appointment-card";
 import { ClientInvoiceCard } from "./client-invoice-card";
 import { ClientHealingJourneysTable } from "./client-healing-journeys-table";
 import { ClientHealingJourneyCard } from "./client-healing-journey-card";
+import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { NewHealingJourneySheet } from "./new-healing-journey-sheet";
 import { HealingJourneyUpdatesSheet } from "./healing-journey-updates-sheet";
 import { useClientDetails, useHealingJourneys, useDeleteHealingJourney } from "@/lib/hooks";
@@ -211,6 +212,9 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
           <TabsTrigger value="healingJourneys">
             {t("tabHealingJourneys")} ({healingJourneys?.length ?? 0})
           </TabsTrigger>
+          <TabsTrigger value="activity">
+            {t("tabActivity")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="appointments">
@@ -275,6 +279,12 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
                 />
               ))
             )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <ActivityTimeline entityType="client" entityId={clientId} />
           </div>
         </TabsContent>
       </Tabs>

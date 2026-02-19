@@ -17,6 +17,7 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { inventoryKpiData, inventoryByCategoryData, inventoryStockTrendData } from "@/lib/mock-data";
 import { useInventoryItems, useDeleteInventoryItem, useBulkDeleteInventoryItems } from "@/lib/hooks/use-inventory";
+import { ActivitySheet } from "@/components/activity/activity-sheet";
 import { InventoryItem } from "@/types";
 
 export function InventoryPageContent() {
@@ -30,6 +31,7 @@ export function InventoryPageContent() {
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [activityItem, setActivityItem] = useState<InventoryItem | null>(null);
   const filtered = items.filter((item) => { if (!searchQuery) return true; const q = searchQuery.toLowerCase(); return item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q) || item.category.toLowerCase().includes(q); });
   const ids = useMemo(() => filtered.map((i) => i.id), [filtered]);
   const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
@@ -45,7 +47,7 @@ export function InventoryPageContent() {
         <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-foreground">{t("itemsList")}</h2><Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm"><DynamicIcon name="Plus" className="h-4 w-4" />{t("newItem")}</Button></div>
         <div className="relative"><Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tc("searchPlaceholder")} className="ps-9" /></div>
         {filtered.length === 0 ? (<p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>) : (
-          <><InventoryTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} /><div className="space-y-3 md:hidden">{filtered.map((item) => (<InventoryItemCard key={item.id} data={item} onEdit={handleEdit} onDelete={handleDelete} />))}</div></>
+          <><InventoryTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onActivity={(item) => setActivityItem(item)} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} /><div className="space-y-3 md:hidden">{filtered.map((item) => (<InventoryItemCard key={item.id} data={item} onEdit={handleEdit} onDelete={handleDelete} />))}</div></>
         )}
       </div>
       <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[{ id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) }]} />
@@ -56,6 +58,15 @@ export function InventoryPageContent() {
           <AlertDialogFooter><AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel><AlertDialogAction onClick={confirmBulkDelete}>{tc("confirmDelete")}</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {activityItem && (
+        <ActivitySheet
+          open={!!activityItem}
+          onOpenChange={(open) => !open && setActivityItem(null)}
+          entityType="inventory_item"
+          entityId={activityItem.id}
+          entityLabel={`${activityItem.name} (${activityItem.sku})`}
+        />
+      )}
     </div>
   );
 }

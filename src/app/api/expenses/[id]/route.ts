@@ -12,6 +12,7 @@ import { expenses, transactions } from "@/db/schema";
 import { expenseSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { createExpenseTransaction } from "@/lib/business-logic/finance";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -92,6 +93,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       });
     }
 
+    logActivity({
+      session,
+      entityType: "expense",
+      entityId: id,
+      action: "update",
+      entityLabel: `${updated.description} - ${updated.category}`,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
+
     return success({
       ...updated,
       amount: parseFloat(updated.amount),
@@ -128,6 +139,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     await db
       .delete(expenses)
       .where(and(eq(expenses.id, id), eq(expenses.tenantId, tenantId)));
+
+    logActivity({
+      session,
+      entityType: "expense",
+      entityId: id,
+      action: "delete",
+      entityLabel: `${existing.description} - ${existing.category}`,
+    });
 
     return success({ message: "Expense deleted successfully" });
   } catch (error) {

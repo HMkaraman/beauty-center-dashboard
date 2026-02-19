@@ -15,6 +15,7 @@ import {
   createIncomeTransaction,
   calculateEmployeeCommission,
 } from "@/lib/business-logic/finance";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -194,6 +195,14 @@ export async function POST(req: NextRequest) {
       .select()
       .from(invoiceItems)
       .where(eq(invoiceItems.invoiceId, newInvoice.id));
+
+    logActivity({
+      session,
+      entityType: "invoice",
+      entityId: newInvoice.id,
+      action: "create",
+      entityLabel: `${invoiceNumber} - ${validated.clientName}`,
+    });
 
     return success(
       {

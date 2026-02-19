@@ -16,6 +16,7 @@ import {
   createReversalTransaction,
   calculateEmployeeCommission,
 } from "@/lib/business-logic/finance";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -170,6 +171,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       });
     }
 
+    logActivity({
+      session,
+      entityType: "invoice",
+      entityId: id,
+      action: "update",
+      entityLabel: `${updated.invoiceNumber} - ${updated.clientName}`,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
+
     const items = await db
       .select()
       .from(invoiceItems)
@@ -221,6 +232,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     await db
       .delete(invoices)
       .where(and(eq(invoices.id, id), eq(invoices.tenantId, tenantId)));
+
+    logActivity({
+      session,
+      entityType: "invoice",
+      entityId: id,
+      action: "delete",
+      entityLabel: `${existing.invoiceNumber} - ${existing.clientName}`,
+    });
 
     return success({ message: "Invoice deleted successfully" });
   } catch (error) {

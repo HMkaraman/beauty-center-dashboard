@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { doctors } from "@/db/schema";
 import { doctorSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -100,6 +101,14 @@ export async function POST(req: NextRequest) {
         notes: validated.notes,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "doctor",
+      entityId: created.id,
+      action: "create",
+      entityLabel: `${created.name} - ${created.specialty}`,
+    });
 
     return success(
       {

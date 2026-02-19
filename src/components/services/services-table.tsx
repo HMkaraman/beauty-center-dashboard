@@ -10,9 +10,9 @@ import { ServiceStatusBadge } from "./service-status-badge";
 import { formatCurrency } from "@/lib/formatters";
 import { Service } from "@/types";
 
-interface ServicesTableProps { data: Service[]; onEdit?: (item: Service) => void; onDelete?: (id: string) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
+interface ServicesTableProps { data: Service[]; onEdit?: (item: Service) => void; onDelete?: (id: string) => void; onActivity?: (item: Service) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
-export function ServicesTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: ServicesTableProps) {
+export function ServicesTable({ data, onEdit, onDelete, onActivity, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: ServicesTableProps) {
   const t = useTranslations("services");
   const locale = useLocale();
   return (
@@ -39,7 +39,7 @@ export function ServicesTable({ data, onEdit, onDelete, selectedIds, onToggle, o
             <td className="px-4 py-3 font-english text-muted-foreground">{service.bookings}</td>
             <td className="px-4 py-3">
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(service)}>{t("edit")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(service.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
+                <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(service)}>{t("edit")}</DropdownMenuItem><DropdownMenuItem onClick={() => onActivity?.(service)}>{t("activityLog")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(service.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent>
               </DropdownMenu>
             </td>
           </tr>

@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { transactions } from "@/db/schema";
 import { transactionSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -75,6 +76,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .where(and(eq(transactions.id, id), eq(transactions.tenantId, tenantId)))
       .returning();
 
+    logActivity({
+      session,
+      entityType: "transaction",
+      entityId: id,
+      action: "update",
+      entityLabel: `${updated.type} - ${updated.description}`,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
+
     return success({
       ...updated,
       amount: parseFloat(updated.amount),
@@ -103,6 +114,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     await db
       .delete(transactions)
       .where(and(eq(transactions.id, id), eq(transactions.tenantId, tenantId)));
+
+    logActivity({
+      session,
+      entityType: "transaction",
+      entityId: id,
+      action: "delete",
+      entityLabel: `${existing.type} - ${existing.description}`,
+    });
 
     return success({ message: "Transaction deleted successfully" });
   } catch (error) {

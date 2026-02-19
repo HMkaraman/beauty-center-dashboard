@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { employees, appointments, invoices } from "@/db/schema";
 import { employeeSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -155,6 +156,14 @@ export async function POST(req: NextRequest) {
         notes: validated.notes,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "employee",
+      entityId: created.id,
+      action: "create",
+      entityLabel: created.name,
+    });
 
     return success(
       {

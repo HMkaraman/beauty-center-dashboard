@@ -11,6 +11,7 @@ import { db } from "@/db/db";
 import { services } from "@/db/schema";
 import { serviceSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
+import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -53,6 +54,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const validated = result.data;
 
+    // Fetch existing record for change tracking
+    const [existing] = await db
+      .select()
+      .from(services)
+      .where(and(eq(services.id, id), eq(services.tenantId, session.user.tenantId)));
+
+    if (!existing) return notFound("Service not found");
+
     const updateData: Record<string, unknown> = {
       ...validated,
       updatedAt: new Date(),
@@ -69,6 +78,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .returning();
 
     if (!updated) return notFound("Service not found");
+
+    logActivity({
+      session,
+      entityType: "service",
+      entityId: id,
+      action: "update",
+      entityLabel: updated.name,
+      oldRecord: existing as unknown as Record<string, unknown>,
+      newData: validated as unknown as Record<string, unknown>,
+    });
 
     return success({
       ...updated,
@@ -93,6 +112,14 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       .returning();
 
     if (!deleted) return notFound("Service not found");
+
+    logActivity({
+      session,
+      entityType: "service",
+      entityId: id,
+      action: "delete",
+      entityLabel: deleted.name,
+    });
 
     return success({ message: "Service deleted successfully" });
   } catch (error) {
