@@ -721,6 +721,22 @@
   },
   "settings": {
     "title": "Settings",
+    "nav": {
+      "general": "General",
+      "generalDesc": "Center name, language & info",
+      "financial": "Financial",
+      "financialDesc": "Currency, tax & exchange rates",
+      "schedule": "Schedule",
+      "scheduleDesc": "Working hours & days off",
+      "sections": "Sections",
+      "sectionsDesc": "Manage center sections",
+      "notifications": "Notifications",
+      "notificationsDesc": "Email & SMS preferences",
+      "team": "Team & Access",
+      "teamDesc": "Roles, users & permissions",
+      "appearance": "Appearance",
+      "appearanceDesc": "Theme & display options"
+    },
     "generalSettings": "General Settings",
     "centerNameAr": "Center Name (Arabic)",
     "centerNameEn": "Center Name (English)",

@@ -48,6 +48,10 @@ import {
   FileText,
   Download,
   Share2,
+  Palette,
+  Shield,
+  LayoutGrid,
+  MonitorSmartphone,
   type LucideProps,
 } from "lucide-react";
 
@@ -101,6 +105,10 @@ const iconMap: Record<string, React.ComponentType<LucideProps>> = {
   FileText,
   Download,
   Share2,
+  Palette,
+  Shield,
+  LayoutGrid,
+  MonitorSmartphone,
 };
 
 interface DynamicIconProps extends LucideProps {

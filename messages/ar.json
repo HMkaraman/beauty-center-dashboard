@@ -721,6 +721,22 @@
   },
   "settings": {
     "title": "الإعدادات",
+    "nav": {
+      "general": "عام",
+      "generalDesc": "اسم المركز، اللغة والمعلومات",
+      "financial": "المالية",
+      "financialDesc": "العملة، الضريبة وأسعار الصرف",
+      "schedule": "الجدول",
+      "scheduleDesc": "ساعات العمل وأيام الإجازة",
+      "sections": "الأقسام",
+      "sectionsDesc": "إدارة أقسام المركز",
+      "notifications": "الإشعارات",
+      "notificationsDesc": "تفضيلات البريد والرسائل",
+      "team": "الفريق والصلاحيات",
+      "teamDesc": "الأدوار والمستخدمون والصلاحيات",
+      "appearance": "المظهر",
+      "appearanceDesc": "السمة وخيارات العرض"
+    },
     "generalSettings": "الإعدادات العامة",
     "centerNameAr": "اسم المركز (عربي)",
     "centerNameEn": "اسم المركز (إنجليزي)",

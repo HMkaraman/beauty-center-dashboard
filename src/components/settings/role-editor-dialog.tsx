@@ -278,10 +278,17 @@ export function RoleEditorDialog({
 
                 return (
                   <div key={category}>
-                    <button
-                      type="button"
-                      className="flex items-center justify-between w-full px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="flex items-center justify-between w-full px-3 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer select-none"
                       onClick={() => toggleCategory(category)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleCategory(category);
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-2">
                         <Checkbox
@@ -307,7 +314,7 @@ export function RoleEditorDialog({
                       ) : (
                         <ChevronLeft className="h-4 w-4 text-muted-foreground" />
                       )}
-                    </button>
+                    </div>
                     {isExpanded && (
                       <div className="px-3 pb-3 space-y-2">
                         {perms.map((perm) => (
