@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { doctorSpecialties } from "@/lib/mock-data";
 import { useCreateDoctor, useUpdateDoctor } from "@/lib/hooks/use-doctors";
+import { useSections, useSetSectionDoctors } from "@/lib/hooks/use-sections";
 import { Doctor } from "@/types";
 
 interface NewDoctorSheetProps { open: boolean; onOpenChange: (open: boolean) => void; editItem?: Doctor | null; }
@@ -23,9 +24,14 @@ const emptyForm = {
 export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetProps) {
   const t = useTranslations("doctors");
   const tc = useTranslations("common");
+  const ts = useTranslations("sections");
   const createDoctor = useCreateDoctor();
   const updateDoctor = useUpdateDoctor();
+  const { data: sectionsData } = useSections({ limit: 100 });
+  const allSections = sectionsData?.data ?? [];
+  const setSectionDoctors = useSetSectionDoctors();
   const [form, setForm] = useState(emptyForm);
+  const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (editItem) {
@@ -40,8 +46,13 @@ export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetP
         commissionRate: editItem.commissionRate != null ? String(editItem.commissionRate) : "",
         notes: editItem.notes || "",
       });
-    } else { setForm(emptyForm); }
-  }, [editItem, open]);
+      const docSections = allSections.filter((s) => s.doctorIds?.includes(editItem.id)).map((s) => s.id);
+      setSelectedSectionIds(docSections);
+    } else {
+      setForm(emptyForm);
+      setSelectedSectionIds([]);
+    }
+  }, [editItem, open, allSections]);
 
   const handleSubmit = () => {
     if (!form.name || !form.specialty) { toast.error(tc("requiredField")); return; }
@@ -58,13 +69,32 @@ export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetP
       notes: form.notes || undefined,
     };
 
+    const updateSectionAssignments = (doctorId: string) => {
+      for (const section of allSections) {
+        const currentlyAssigned = section.doctorIds?.includes(doctorId) ?? false;
+        const shouldBeAssigned = selectedSectionIds.includes(section.id);
+        if (currentlyAssigned !== shouldBeAssigned) {
+          const newIds = shouldBeAssigned
+            ? [...(section.doctorIds ?? []), doctorId]
+            : (section.doctorIds ?? []).filter((id) => id !== doctorId);
+          setSectionDoctors.mutate({ id: section.id, doctorIds: newIds });
+        }
+      }
+    };
+
     if (editItem) {
       updateDoctor.mutate({ id: editItem.id, data: payload }, {
-        onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
+        onSuccess: () => {
+          updateSectionAssignments(editItem.id);
+          toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false);
+        },
       });
     } else {
       createDoctor.mutate({ ...payload, status: "active" } as Record<string, unknown>, {
-        onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
+        onSuccess: (created: { id: string }) => {
+          updateSectionAssignments(created.id);
+          toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false);
+        },
       });
     }
   };
@@ -96,6 +126,42 @@ export function NewDoctorSheet({ open, onOpenChange, editItem }: NewDoctorSheetP
             <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("certificates")}</label><Input value={form.certificates} onChange={(e) => setForm({ ...form, certificates: e.target.value })} /></div>
             <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("yearsOfExperience")}</label><Input type="number" value={form.yearsOfExperience} onChange={(e) => setForm({ ...form, yearsOfExperience: e.target.value })} className="font-english" dir="ltr" /></div>
           </div>
+
+          {/* Sections Assignment */}
+          {allSections.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground border-b border-border pb-2">{ts("title")}</h3>
+              <div className="flex flex-wrap gap-2">
+                {allSections.map((section) => {
+                  const isSelected = selectedSectionIds.includes(section.id);
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedSectionIds(
+                          isSelected
+                            ? selectedSectionIds.filter((id) => id !== section.id)
+                            : [...selectedSectionIds, section.id]
+                        )
+                      }
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary"
+                      }`}
+                    >
+                      <div
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: section.color || "#6B7280" }}
+                      />
+                      {section.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Compensation Section */}
           <div className="space-y-3">

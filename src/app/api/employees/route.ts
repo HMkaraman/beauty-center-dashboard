@@ -8,7 +8,7 @@ import {
   getPaginationParams,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { employees, appointments, invoices } from "@/db/schema";
+import { employees, appointments, invoices, employeeSections } from "@/db/schema";
 import { employeeSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
@@ -20,6 +20,8 @@ export async function GET(req: NextRequest) {
 
     const { page, limit, offset, search } = getPaginationParams(req);
     const tenantId = session.user.tenantId;
+    const url = new URL(req.url);
+    const sectionId = url.searchParams.get("sectionId");
 
     const conditions = [eq(employees.tenantId, tenantId)];
 
@@ -27,6 +29,22 @@ export async function GET(req: NextRequest) {
       conditions.push(
         sql`(${ilike(employees.name, `%${search}%`)} OR ${ilike(employees.role, `%${search}%`)})`
       );
+    }
+
+    // Filter by section via junction table
+    if (sectionId) {
+      const sectionEmployees = await db
+        .select({ employeeId: employeeSections.employeeId })
+        .from(employeeSections)
+        .where(eq(employeeSections.sectionId, sectionId));
+      const sectionEmployeeIds = sectionEmployees.map((r) => r.employeeId);
+      if (sectionEmployeeIds.length === 0) {
+        return success({
+          data: [],
+          pagination: { page, limit, total: 0, totalPages: 0 },
+        });
+      }
+      conditions.push(inArray(employees.id, sectionEmployeeIds));
     }
 
     const whereClause = and(...conditions);

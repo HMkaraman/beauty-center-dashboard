@@ -1,5 +1,6 @@
 import { integer, numeric, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { tenants } from "./tenants";
+import { sections } from "./sections";
 
 export const serviceStatusEnum = pgEnum("service_status", ["active", "inactive"]);
 
@@ -8,6 +9,8 @@ export const serviceCategories = pgTable("service_categories", {
   tenantId: text("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
   nameEn: varchar("name_en", { length: 255 }),
+  sectionId: text("section_id").references(() => sections.id, { onDelete: "set null" }),
+  sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

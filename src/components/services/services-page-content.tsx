@@ -12,6 +12,7 @@ import { ServicesBookingsChart } from "./services-bookings-chart";
 import { ServicesTable } from "./services-table";
 import { ServiceCard } from "./service-card";
 import { NewServiceSheet } from "./new-service-sheet";
+import { CategoriesPanel } from "./categories-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
@@ -53,6 +54,7 @@ export function ServicesPageContent() {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{servicesKpiData.map((kpi) => (<KPICard key={kpi.id} data={kpi} />))}</div>
       <div className="grid gap-4 lg:grid-cols-2"><ServicesCategoryChart data={servicesByCategoryData} /><ServicesBookingsChart data={servicesBookingsTrendData} /></div>
+      <CategoriesPanel />
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">{t("servicesList")}</h2>

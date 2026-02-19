@@ -8,9 +8,9 @@ import {
   getPaginationParams,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { doctors } from "@/db/schema";
+import { doctors, doctorSections } from "@/db/schema";
 import { doctorSchema } from "@/lib/validations";
-import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
@@ -20,6 +20,8 @@ export async function GET(req: NextRequest) {
 
     const { page, limit, offset, search } = getPaginationParams(req);
     const tenantId = session.user.tenantId;
+    const url = new URL(req.url);
+    const sectionId = url.searchParams.get("sectionId");
 
     const conditions = [eq(doctors.tenantId, tenantId)];
 
@@ -27,6 +29,22 @@ export async function GET(req: NextRequest) {
       conditions.push(
         sql`(${ilike(doctors.name, `%${search}%`)} OR ${ilike(doctors.specialty, `%${search}%`)})`
       );
+    }
+
+    // Filter by section via junction table
+    if (sectionId) {
+      const sectionDoctors = await db
+        .select({ doctorId: doctorSections.doctorId })
+        .from(doctorSections)
+        .where(eq(doctorSections.sectionId, sectionId));
+      const sectionDoctorIds = sectionDoctors.map((r) => r.doctorId);
+      if (sectionDoctorIds.length === 0) {
+        return success({
+          data: [],
+          pagination: { page, limit, total: 0, totalPages: 0 },
+        });
+      }
+      conditions.push(inArray(doctors.id, sectionDoctorIds));
     }
 
     const whereClause = and(...conditions);

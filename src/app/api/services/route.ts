@@ -8,7 +8,7 @@ import {
   getPaginationParams,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { services } from "@/db/schema";
+import { services, serviceCategories } from "@/db/schema";
 import { serviceSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
@@ -79,12 +79,26 @@ export async function POST(req: NextRequest) {
 
     const validated = result.data;
 
+    // If categoryId provided, resolve category name from DB
+    let categoryName = validated.category;
+    if (validated.categoryId) {
+      const [cat] = await db
+        .select()
+        .from(serviceCategories)
+        .where(eq(serviceCategories.id, validated.categoryId));
+      if (cat) {
+        categoryName = cat.name;
+      }
+    }
+
     const [created] = await db
       .insert(services)
       .values({
         tenantId: session.user.tenantId,
         name: validated.name,
-        category: validated.category,
+        nameEn: validated.nameEn,
+        categoryId: validated.categoryId,
+        category: categoryName,
         duration: validated.duration,
         price: String(validated.price),
         status: validated.status,

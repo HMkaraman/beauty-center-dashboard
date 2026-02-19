@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
     const tenantId = session.user.tenantId;
     const url = new URL(req.url);
     const status = url.searchParams.get("status");
+    const date = url.searchParams.get("date");
 
     const conditions = [eq(appointments.tenantId, tenantId)];
 
@@ -39,6 +40,10 @@ export async function GET(req: NextRequest) {
           status as "confirmed" | "pending" | "cancelled" | "completed" | "no-show"
         )
       );
+    }
+
+    if (date) {
+      conditions.push(eq(appointments.date, date));
     }
 
     const whereClause = and(...conditions);

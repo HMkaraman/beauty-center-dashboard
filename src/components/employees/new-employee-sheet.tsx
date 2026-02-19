@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { employeeRoles } from "@/lib/mock-data";
 import { useCreateEmployee, useUpdateEmployee } from "@/lib/hooks/use-employees";
+import { useSections, useSetSectionEmployees } from "@/lib/hooks/use-sections";
 import { Employee } from "@/types";
 
 interface NewEmployeeSheetProps {
@@ -27,9 +28,14 @@ const emptyForm = {
 export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSheetProps) {
   const t = useTranslations("employees");
   const tc = useTranslations("common");
+  const ts = useTranslations("sections");
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
+  const { data: sectionsData } = useSections({ limit: 100 });
+  const allSections = sectionsData?.data ?? [];
+  const setSectionEmployees = useSetSectionEmployees();
   const [form, setForm] = useState(emptyForm);
+  const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (editItem) {
@@ -43,8 +49,14 @@ export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSh
         commissionRate: (editItem as Employee & { commissionRate?: number }).commissionRate != null ? String((editItem as Employee & { commissionRate?: number }).commissionRate) : "",
         notes: editItem.notes || "",
       });
-    } else { setForm(emptyForm); }
-  }, [editItem, open]);
+      // Find sections this employee belongs to
+      const empSections = allSections.filter((s) => s.employeeIds?.includes(editItem.id)).map((s) => s.id);
+      setSelectedSectionIds(empSections);
+    } else {
+      setForm(emptyForm);
+      setSelectedSectionIds([]);
+    }
+  }, [editItem, open, allSections]);
 
   const handleSubmit = () => {
     if (!form.name || !form.role) { toast.error(tc("requiredField")); return; }
@@ -60,13 +72,33 @@ export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSh
       notes: form.notes || undefined,
     };
 
+    const updateSectionAssignments = (employeeId: string) => {
+      // For each section, update its employee list
+      for (const section of allSections) {
+        const currentlyAssigned = section.employeeIds?.includes(employeeId) ?? false;
+        const shouldBeAssigned = selectedSectionIds.includes(section.id);
+        if (currentlyAssigned !== shouldBeAssigned) {
+          const newIds = shouldBeAssigned
+            ? [...(section.employeeIds ?? []), employeeId]
+            : (section.employeeIds ?? []).filter((id) => id !== employeeId);
+          setSectionEmployees.mutate({ id: section.id, employeeIds: newIds });
+        }
+      }
+    };
+
     if (editItem) {
       updateEmployee.mutate({ id: editItem.id, data: payload }, {
-        onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); },
+        onSuccess: () => {
+          updateSectionAssignments(editItem.id);
+          toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false);
+        },
       });
     } else {
       createEmployee.mutate({ ...payload, status: "active" } as Record<string, unknown>, {
-        onSuccess: () => { toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false); },
+        onSuccess: (created: { id: string }) => {
+          updateSectionAssignments(created.id);
+          toast.success(tc("addSuccess")); setForm(emptyForm); onOpenChange(false);
+        },
       });
     }
   };
@@ -101,6 +133,42 @@ export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSh
             <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("specialties")}</label><Input value={form.specialties} onChange={(e) => setForm({ ...form, specialties: e.target.value })} /></div>
             <div className="space-y-2"><label className="text-sm font-medium text-foreground">{t("hireDate")}</label><Input type="date" value={form.hireDate} onChange={(e) => setForm({ ...form, hireDate: e.target.value })} className="font-english" /></div>
           </div>
+
+          {/* Sections Assignment */}
+          {allSections.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground border-b border-border pb-2">{ts("title")}</h3>
+              <div className="flex flex-wrap gap-2">
+                {allSections.map((section) => {
+                  const isSelected = selectedSectionIds.includes(section.id);
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedSectionIds(
+                          isSelected
+                            ? selectedSectionIds.filter((id) => id !== section.id)
+                            : [...selectedSectionIds, section.id]
+                        )
+                      }
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary"
+                      }`}
+                    >
+                      <div
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: section.color || "#6B7280" }}
+                      />
+                      {section.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Compensation Section */}
           <div className="space-y-3">

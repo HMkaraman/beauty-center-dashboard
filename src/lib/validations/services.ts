@@ -2,7 +2,9 @@ import { z } from "zod";
 
 export const serviceSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  nameEn: z.string().optional(),
   category: z.string().min(1, "Category is required"),
+  categoryId: z.string().optional(),
   duration: z.number().positive("Duration must be a positive number"),
   price: z.number().nonnegative("Price must be zero or greater"),
   status: z.enum(["active", "inactive"]),

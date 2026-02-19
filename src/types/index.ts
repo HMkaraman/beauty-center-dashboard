@@ -177,12 +177,43 @@ export interface EmployeeDetailResponse {
   recentCommissions: EmployeeCommission[];
 }
 
+// Sections
+export type SectionStatus = "active" | "inactive";
+
+export interface Section {
+  id: string;
+  name: string;
+  nameEn?: string;
+  description?: string;
+  color?: string;
+  status: SectionStatus;
+  sortOrder: number;
+  employeeCount?: number;
+  doctorCount?: number;
+  employeeIds?: string[];
+  doctorIds?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Service Categories
+export interface ServiceCategory {
+  id: string;
+  name: string;
+  nameEn?: string;
+  sectionId?: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
 // Services
 export type ServiceStatus = "active" | "inactive";
 
 export interface Service {
   id: string;
   name: string;
+  nameEn?: string;
+  categoryId?: string;
   category: string;
   duration: number;
   price: number;

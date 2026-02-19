@@ -1032,6 +1032,37 @@
     "status_draft": "Draft",
     "status_paused": "Paused",
     "status_income": "Income",
-    "status_expense": "Expense"
+    "status_expense": "Expense",
+    "status_waiting": "Waiting",
+    "status_in-progress": "In Progress"
+  },
+  "sections": {
+    "title": "Sections",
+    "newSection": "New Section",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "description": "Description",
+    "color": "Color",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "save": "Save",
+    "close": "Close",
+    "noSections": "No sections yet. Add your first section.",
+    "assignEmployees": "Assign Employees",
+    "assignDoctors": "Assign Doctors",
+    "noEmployeesAvailable": "No employees available",
+    "noDoctorsAvailable": "No doctors available"
+  },
+  "serviceCategories": {
+    "title": "Service Categories",
+    "newCategory": "New Category",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "section": "Section",
+    "selectSection": "Select section",
+    "noSection": "No section",
+    "noCategories": "No categories yet. Add your first category.",
+    "uncategorized": "Uncategorized"
   }
 }

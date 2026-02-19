@@ -7,6 +7,7 @@ import { WorkingHoursCard } from "./working-hours-card";
 import { NotificationsCard } from "./notifications-card";
 import { UsersPermissionsCard } from "./users-permissions-card";
 import { AppearanceCard } from "./appearance-card";
+import { SectionsSettingsCard } from "./sections-settings-card";
 
 export function SettingsPageContent() {
   const t = useTranslations("settings");
@@ -15,6 +16,7 @@ export function SettingsPageContent() {
     <div className="space-y-6">
       <GeneralSettingsCard />
       <BusinessInfoCard />
+      <SectionsSettingsCard />
       <WorkingHoursCard />
       <NotificationsCard />
       <UsersPermissionsCard />

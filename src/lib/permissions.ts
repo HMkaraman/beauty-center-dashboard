@@ -37,6 +37,9 @@ export type Permission =
   | "users:read"
   | "users:write"
   | "users:delete"
+  | "sections:read"
+  | "sections:write"
+  | "sections:delete"
   | "admin:access";
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
@@ -72,6 +75,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "marketing:read",
     "marketing:write",
     "marketing:delete",
+    "sections:read",
+    "sections:write",
+    "sections:delete",
     "settings:read",
     "settings:write",
     "users:read",
@@ -111,6 +117,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "marketing:read",
     "marketing:write",
     "marketing:delete",
+    "sections:read",
+    "sections:write",
+    "sections:delete",
     "settings:read",
     "settings:write",
     "users:read",
@@ -146,6 +155,8 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "marketing:read",
     "marketing:write",
     "marketing:delete",
+    "sections:read",
+    "sections:write",
     "settings:read",
     "users:read",
   ],
@@ -160,6 +171,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "inventory:read",
     "invoices:read",
     "marketing:read",
+    "sections:read",
     "settings:read",
   ],
   receptionist: [
@@ -170,6 +182,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "services:read",
     "invoices:read",
     "invoices:write",
+    "sections:read",
   ],
 };
 

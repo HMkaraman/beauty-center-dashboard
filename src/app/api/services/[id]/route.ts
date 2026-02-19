@@ -8,7 +8,7 @@ import {
   serverError,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { services } from "@/db/schema";
+import { services, serviceCategories } from "@/db/schema";
 import { serviceSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
@@ -61,6 +61,17 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       .where(and(eq(services.id, id), eq(services.tenantId, session.user.tenantId)));
 
     if (!existing) return notFound("Service not found");
+
+    // If categoryId is provided, resolve category name from DB
+    if (validated.categoryId) {
+      const [cat] = await db
+        .select()
+        .from(serviceCategories)
+        .where(eq(serviceCategories.id, validated.categoryId));
+      if (cat) {
+        validated.category = cat.name;
+      }
+    }
 
     const updateData: Record<string, unknown> = {
       ...validated,

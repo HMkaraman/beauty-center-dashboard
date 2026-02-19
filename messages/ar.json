@@ -1032,6 +1032,37 @@
     "status_draft": "مسودة",
     "status_paused": "متوقف",
     "status_income": "دخل",
-    "status_expense": "مصروف"
+    "status_expense": "مصروف",
+    "status_waiting": "في الانتظار",
+    "status_in-progress": "جاري التنفيذ"
+  },
+  "sections": {
+    "title": "الأقسام",
+    "newSection": "قسم جديد",
+    "nameAr": "الاسم (عربي)",
+    "nameEn": "الاسم (إنجليزي)",
+    "description": "الوصف",
+    "color": "اللون",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "save": "حفظ",
+    "close": "إغلاق",
+    "noSections": "لا توجد أقسام بعد. أضف أول قسم.",
+    "assignEmployees": "تعيين الموظفين",
+    "assignDoctors": "تعيين الأطباء",
+    "noEmployeesAvailable": "لا يوجد موظفون متاحون",
+    "noDoctorsAvailable": "لا يوجد أطباء متاحون"
+  },
+  "serviceCategories": {
+    "title": "فئات الخدمات",
+    "newCategory": "فئة جديدة",
+    "nameAr": "الاسم (عربي)",
+    "nameEn": "الاسم (إنجليزي)",
+    "section": "القسم",
+    "selectSection": "اختر القسم",
+    "noSection": "بدون قسم",
+    "noCategories": "لا توجد فئات بعد. أضف أول فئة.",
+    "uncategorized": "غير مصنفة"
   }
 }

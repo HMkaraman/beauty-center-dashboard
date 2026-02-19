@@ -20,3 +20,4 @@ export * from "./notifications";
 export * from "./api-keys";
 export * from "./healing-journeys";
 export * from "./activity-logs";
+export * from "./sections";
