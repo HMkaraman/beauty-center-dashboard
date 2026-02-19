@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -9,18 +10,32 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { formatCurrency } from "@/lib/formatters";
-import { Appointment } from "@/types";
+import { Appointment, AppointmentStatus } from "@/types";
+
+const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "cancelled", "completed", "no-show"];
+
+const STATUS_KEYS: Record<AppointmentStatus, string> = {
+  confirmed: "statusConfirmed",
+  pending: "statusPending",
+  cancelled: "statusCancelled",
+  completed: "statusCompleted",
+  "no-show": "statusNoShow",
+};
 
 interface AppointmentsTableProps {
   data: Appointment[];
   onEdit?: (item: Appointment) => void;
   onDelete?: (id: string) => void;
   onCheckout?: (item: Appointment) => void;
+  onStatusChange?: (id: string, status: AppointmentStatus) => void;
   selectedIds?: string[];
   onToggle?: (id: string) => void;
   onToggleAll?: () => void;
@@ -28,9 +43,10 @@ interface AppointmentsTableProps {
   isSomeSelected?: boolean;
 }
 
-export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: AppointmentsTableProps) {
+export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatusChange, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: AppointmentsTableProps) {
   const t = useTranslations("appointments");
   const locale = useLocale();
+  const router = useRouter();
 
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
@@ -81,10 +97,23 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, selected
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => router.push(`/appointments/${appointment.id}`)}>{t("view")}</DropdownMenuItem>
                     {(appointment.status === "confirmed" || appointment.status === "pending") && (
                       <DropdownMenuItem onClick={() => onCheckout?.(appointment)}>{t("checkout")}</DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={() => onEdit?.(appointment)}>{t("edit")}</DropdownMenuItem>
+                    {onStatusChange && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {STATUSES.filter((s) => s !== appointment.status).map((status) => (
+                            <DropdownMenuItem key={status} onClick={() => onStatusChange(appointment.id, status)}>
+                              {t(STATUS_KEYS[status] as "statusConfirmed")}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(appointment.id)}>{t("delete")}</DropdownMenuItem>
                   </DropdownMenuContent>

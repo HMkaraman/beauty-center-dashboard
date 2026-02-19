@@ -23,12 +23,19 @@ export function ClientCombobox({ value, onChange }: ClientComboboxProps) {
   const t = useTranslations("appointments");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Debounce search query by 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const { data: clientsData, isLoading } = useClients({
-    search: search.length >= 1 ? search : undefined,
+    search: debouncedSearch.length >= 1 ? debouncedSearch : undefined,
     limit: 10,
   });
   const clients = clientsData?.data ?? [];

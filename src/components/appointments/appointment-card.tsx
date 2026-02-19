@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,22 +11,37 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { formatCurrency } from "@/lib/formatters";
-import { Appointment } from "@/types";
+import { Appointment, AppointmentStatus } from "@/types";
+
+const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "cancelled", "completed", "no-show"];
+
+const STATUS_KEYS: Record<AppointmentStatus, string> = {
+  confirmed: "statusConfirmed",
+  pending: "statusPending",
+  cancelled: "statusCancelled",
+  completed: "statusCompleted",
+  "no-show": "statusNoShow",
+};
 
 interface AppointmentCardProps {
   data: Appointment;
   onEdit?: (item: Appointment) => void;
   onDelete?: (id: string) => void;
   onCheckout?: (item: Appointment) => void;
+  onStatusChange?: (id: string, status: AppointmentStatus) => void;
 }
 
-export function AppointmentCard({ data, onEdit, onDelete, onCheckout }: AppointmentCardProps) {
+export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusChange }: AppointmentCardProps) {
   const t = useTranslations("appointments");
   const locale = useLocale();
+  const router = useRouter();
 
   return (
     <motion.div
@@ -52,10 +68,23 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout }: Appointm
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => router.push(`/appointments/${data.id}`)}>{t("view")}</DropdownMenuItem>
               {(data.status === "confirmed" || data.status === "pending") && (
                 <DropdownMenuItem onClick={() => onCheckout?.(data)}>{t("checkout")}</DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
+              {onStatusChange && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {STATUSES.filter((s) => s !== data.status).map((status) => (
+                      <DropdownMenuItem key={status} onClick={() => onStatusChange(data.id, status)}>
+                        {t(STATUS_KEYS[status] as "statusConfirmed")}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(data.id)}>{t("delete")}</DropdownMenuItem>
             </DropdownMenuContent>

@@ -32,7 +32,7 @@ import {
   appointmentsTrendData,
 } from "@/lib/mock-data";
 import { useAppointments, useDeleteAppointment, useUpdateAppointment, useBulkDeleteAppointments, useBulkUpdateAppointmentStatus } from "@/lib/hooks/use-appointments";
-import { Appointment } from "@/types";
+import { Appointment, AppointmentStatus } from "@/types";
 
 export function AppointmentsPageContent() {
   const t = useTranslations("appointments");
@@ -79,6 +79,13 @@ export function AppointmentsPageContent() {
     if (checkoutItem) {
       updateAppointment.mutate({ id: checkoutItem.id, data: { status: "completed" } });
     }
+  };
+
+  const handleStatusChange = (id: string, status: AppointmentStatus) => {
+    updateAppointment.mutate(
+      { id, data: { status } },
+      { onSuccess: () => { toast.success(tc("updateSuccess")); } }
+    );
   };
 
   const handleDelete = (id: string) => {
@@ -132,10 +139,10 @@ export function AppointmentsPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
+            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} onStatusChange={handleStatusChange} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
             <div className="space-y-3 md:hidden">
               {filtered.map((appointment) => (
-                <AppointmentCard key={appointment.id} data={appointment} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} />
+                <AppointmentCard key={appointment.id} data={appointment} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} onStatusChange={handleStatusChange} />
               ))}
             </div>
           </>
