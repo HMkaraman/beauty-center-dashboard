@@ -77,3 +77,49 @@ export function useBulkUpdateAppointmentStatus() {
     },
   });
 }
+
+export function useAvailableSlots(params: {
+  date?: string;
+  serviceId?: string;
+  employeeId?: string;
+  doctorId?: string;
+  excludeId?: string;
+}) {
+  return useQuery({
+    queryKey: ["available-slots", params],
+    queryFn: () =>
+      appointmentsApi.getAvailableSlots({
+        date: params.date!,
+        serviceId: params.serviceId!,
+        employeeId: params.employeeId,
+        doctorId: params.doctorId,
+        excludeId: params.excludeId,
+      }),
+    enabled: !!params.date && !!params.serviceId,
+    staleTime: 30 * 1000,
+    gcTime: 2 * 60 * 1000,
+    retry: 1,
+  });
+}
+
+export function useAvailableDates(params: {
+  serviceId?: string;
+  employeeId?: string;
+  doctorId?: string;
+  excludeId?: string;
+}) {
+  return useQuery({
+    queryKey: ["available-dates", params],
+    queryFn: () =>
+      appointmentsApi.getAvailableDates({
+        serviceId: params.serviceId!,
+        employeeId: params.employeeId,
+        doctorId: params.doctorId,
+        excludeId: params.excludeId,
+      }),
+    enabled: !!params.serviceId,
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+}

@@ -23,7 +23,12 @@ import {
 import { useServices } from "@/lib/hooks/use-services";
 import { useEmployees } from "@/lib/hooks/use-employees";
 import { useDoctors } from "@/lib/hooks/use-doctors";
-import { useCreateAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
+import {
+  useCreateAppointment,
+  useUpdateAppointment,
+  useAvailableSlots,
+  useAvailableDates,
+} from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 import { ClientCombobox } from "./client-combobox";
 
@@ -61,6 +66,9 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
   const doctorsList = doctorsData?.data ?? [];
 
   const [form, setForm] = useState(emptyForm);
+  const [manualTimeMode, setManualTimeMode] = useState(false);
+
+  // Conflict warning state (only used in manual time mode)
   const [conflictWarning, setConflictWarning] = useState<{
     hasConflict: boolean;
     conflictType?: "employee" | "doctor";
@@ -70,6 +78,33 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     doctorHoursWarning?: { start: string; end: string } | null;
   } | null>(null);
   const conflictTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Available dates query
+  const { data: datesData, isLoading: datesLoading } = useAvailableDates({
+    serviceId: form.serviceId || undefined,
+    employeeId: form.employeeId || undefined,
+    doctorId: form.doctorId || undefined,
+    excludeId: editItem?.id,
+  });
+  const availableDates = datesData?.dates ?? [];
+
+  // Available slots query
+  const { data: slotsData, isLoading: slotsLoading } = useAvailableSlots({
+    date: form.date || undefined,
+    serviceId: form.serviceId || undefined,
+    employeeId: form.employeeId || undefined,
+    doctorId: form.doctorId || undefined,
+    excludeId: editItem?.id,
+  });
+  const availableSlots = slotsData?.slots ?? [];
+
+  // Deduplicate slots by time for display (when no specific employee, multiple employees may share a time)
+  const uniqueSlotTimes = availableSlots.reduce<Array<{ time: string; employeeId: string; employeeName: string }>>((acc, slot) => {
+    if (!acc.some((s) => s.time === slot.time)) {
+      acc.push(slot);
+    }
+    return acc;
+  }, []);
 
   useEffect(() => {
     if (editItem) {
@@ -88,11 +123,19 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
       });
     } else {
       setForm(emptyForm);
+      setManualTimeMode(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editItem?.id, open, services.length, employees.length, doctorsList.length]);
 
-  // Proactive conflict check
+  // Clear date + time when service/employee/doctor changes
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, date: "", time: "" }));
+    setConflictWarning(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.serviceId, form.employeeId, form.doctorId]);
+
+  // Proactive conflict check — only in manual time mode
   const checkForConflict = useCallback(async (
     employeeId: string,
     employeeName: string,
@@ -136,9 +179,14 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     }
   }, []);
 
+  // Conflict check effect — only active in manual time mode
   useEffect(() => {
-    setConflictWarning(null);
+    if (!manualTimeMode) {
+      setConflictWarning(null);
+      return;
+    }
 
+    setConflictWarning(null);
     const selectedService = services.find((s) => s.id === form.serviceId);
     if ((!form.employeeId && !form.doctorId) || !form.date || !form.time || !form.serviceId || !selectedService) {
       return;
@@ -160,7 +208,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     }, 300);
 
     return () => clearTimeout(conflictTimerRef.current);
-  }, [form.employeeId, form.doctorId, form.date, form.time, form.serviceId, services, employees, editItem?.id, checkForConflict]);
+  }, [manualTimeMode, form.employeeId, form.doctorId, form.date, form.time, form.serviceId, services, employees, editItem?.id, checkForConflict]);
 
   const handleSubmit = () => {
     if (!form.clientName || !form.serviceId || !form.date || !form.time) {
@@ -213,6 +261,15 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     ? { clientId: form.clientId, clientName: form.clientName, clientPhone: form.clientPhone }
     : null;
 
+  const canShowDates = !!form.serviceId;
+  const canShowSlots = !!form.serviceId && !!form.date;
+
+  // Format date for display: "Wed 19 Feb"
+  const formatDateLabel = (dateStr: string) => {
+    const d = new Date(dateStr + "T00:00:00");
+    return d.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="overflow-y-auto">
@@ -224,6 +281,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         </SheetHeader>
 
         <div className="flex-1 space-y-4 px-4">
+          {/* Client */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("client")}</label>
             <ClientCombobox
@@ -243,9 +301,10 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             />
           </div>
 
+          {/* Service */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("service")}</label>
-            <Select value={form.serviceId} onValueChange={(v) => setForm({ ...form, serviceId: v })}>
+            <Select value={form.serviceId} onValueChange={(v) => setForm({ ...form, serviceId: v, date: "", time: "" })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
@@ -259,11 +318,12 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </Select>
           </div>
 
+          {/* Employee */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("employee")}</label>
             <Select
               value={form.employeeId || ""}
-              onValueChange={(v) => setForm({ ...form, employeeId: v === CLEAR_VALUE ? "" : v })}
+              onValueChange={(v) => setForm({ ...form, employeeId: v === CLEAR_VALUE ? "" : v, date: "", time: "" })}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectEmployee")} />
@@ -283,11 +343,12 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </Select>
           </div>
 
+          {/* Doctor */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("doctor")}</label>
             <Select
               value={form.doctorId || ""}
-              onValueChange={(v) => setForm({ ...form, doctorId: v === CLEAR_VALUE ? "" : v })}
+              onValueChange={(v) => setForm({ ...form, doctorId: v === CLEAR_VALUE ? "" : v, date: "", time: "" })}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectDoctor")} />
@@ -307,27 +368,106 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("date")}</label>
-            <Input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
-              className="font-english"
-            />
-          </div>
+          {/* Available Dates */}
+          {!manualTimeMode && canShowDates && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">{t("availableDates")}</label>
+              {datesLoading ? (
+                <p className="text-sm text-muted-foreground">{t("loadingDates")}</p>
+              ) : availableDates.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("noAvailableDates")}</p>
+              ) : (
+                <div className="grid grid-cols-3 gap-2 max-h-[160px] overflow-y-auto">
+                  {availableDates.map((dateStr) => (
+                    <button
+                      key={dateStr}
+                      type="button"
+                      onClick={() => setForm({ ...form, date: dateStr, time: "" })}
+                      className={`rounded-md border px-2 py-2 text-xs font-english transition-colors ${
+                        form.date === dateStr
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                    >
+                      {formatDateLabel(dateStr)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("time")}</label>
-            <Input
-              type="time"
-              value={form.time}
-              onChange={(e) => setForm({ ...form, time: e.target.value })}
-              className="font-english"
-            />
-          </div>
+          {/* Manual date input (only in manual mode) */}
+          {manualTimeMode && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">{t("date")}</label>
+              <Input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value, time: "" })}
+                className="font-english"
+              />
+            </div>
+          )}
 
-          {conflictWarning?.hasConflict && (
+          {/* Available Time Slots */}
+          {!manualTimeMode && canShowSlots && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">{t("availableSlots")}</label>
+              {slotsLoading ? (
+                <p className="text-sm text-muted-foreground">{t("loadingSlots")}</p>
+              ) : uniqueSlotTimes.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("noAvailableSlots")}</p>
+              ) : (
+                <div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto">
+                  {uniqueSlotTimes.map((slot) => (
+                    <button
+                      key={slot.time}
+                      type="button"
+                      onClick={() => setForm({ ...form, time: slot.time })}
+                      className={`rounded-md border px-2 py-2 text-sm font-english transition-colors ${
+                        form.time === slot.time
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                    >
+                      {slot.time}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Manual time input (only in manual mode) */}
+          {manualTimeMode && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">{t("time")}</label>
+              <Input
+                type="time"
+                value={form.time}
+                onChange={(e) => setForm({ ...form, time: e.target.value })}
+                className="font-english"
+              />
+            </div>
+          )}
+
+          {/* Toggle manual/slot mode */}
+          {canShowDates && (
+            <button
+              type="button"
+              className="text-xs text-muted-foreground underline hover:no-underline"
+              onClick={() => {
+                setManualTimeMode((prev) => !prev);
+                setForm((prev) => ({ ...prev, date: "", time: "" }));
+              }}
+            >
+              {manualTimeMode ? t("slotPickerMode") : t("manualTimeEntry")}
+            </button>
+          )}
+
+          {/* Conflict warnings (manual mode only) */}
+          {manualTimeMode && conflictWarning?.hasConflict && (
             <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
               <p>
                 {conflictWarning.conflictType === "doctor"
@@ -355,7 +495,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </div>
           )}
 
-          {conflictWarning?.employeeHoursWarning && (
+          {manualTimeMode && conflictWarning?.employeeHoursWarning && (
             <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
               <p>
                 {t("outsideEmployeeHours", {
@@ -366,7 +506,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </div>
           )}
 
-          {conflictWarning?.doctorHoursWarning && (
+          {manualTimeMode && conflictWarning?.doctorHoursWarning && (
             <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
               <p>
                 {t("outsideDoctorHours", {
@@ -377,6 +517,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
             </div>
           )}
 
+          {/* Notes */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("notes")}</label>
             <Input

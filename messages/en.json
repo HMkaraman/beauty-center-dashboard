@@ -117,7 +117,16 @@
     "doctorConflictWarning": "This doctor has a conflicting appointment at {time} ({service})",
     "outsideEmployeeHours": "This time is outside the employee's working hours ({start} - {end})",
     "outsideDoctorHours": "This time is outside the doctor's working hours ({start} - {end})",
-    "nextAvailable": "Next available: {time}"
+    "nextAvailable": "Next available: {time}",
+    "availableSlots": "Available Times",
+    "noAvailableSlots": "No available times for this date",
+    "loadingSlots": "Loading available times...",
+    "manualTimeEntry": "Enter time manually",
+    "slotPickerMode": "Show available times",
+    "selectDateFirst": "Select a date to see available times",
+    "availableDates": "Available Dates",
+    "noAvailableDates": "No available dates found",
+    "loadingDates": "Loading available dates..."
   },
   "clients": {
     "title": "Clients",

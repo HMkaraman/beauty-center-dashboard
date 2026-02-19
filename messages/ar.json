@@ -117,7 +117,16 @@
     "doctorConflictWarning": "هذا الطبيب لديه موعد متعارض في {time} ({service})",
     "outsideEmployeeHours": "هذا الوقت خارج ساعات عمل الموظفة ({start} - {end})",
     "outsideDoctorHours": "هذا الوقت خارج ساعات عمل الطبيب ({start} - {end})",
-    "nextAvailable": "أقرب وقت متاح: {time}"
+    "nextAvailable": "أقرب وقت متاح: {time}",
+    "availableSlots": "الأوقات المتاحة",
+    "noAvailableSlots": "لا توجد أوقات متاحة لهذا التاريخ",
+    "loadingSlots": "جاري تحميل الأوقات المتاحة...",
+    "manualTimeEntry": "إدخال الوقت يدوياً",
+    "slotPickerMode": "عرض الأوقات المتاحة",
+    "selectDateFirst": "اختر تاريخاً لعرض الأوقات المتاحة",
+    "availableDates": "التواريخ المتاحة",
+    "noAvailableDates": "لا توجد تواريخ متاحة",
+    "loadingDates": "جاري تحميل التواريخ المتاحة..."
   },
   "clients": {
     "title": "العملاء",
