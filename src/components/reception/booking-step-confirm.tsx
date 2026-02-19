@@ -1,0 +1,76 @@
+"use client";
+
+import { useTranslations, useLocale } from "next-intl";
+import { formatCurrency } from "@/lib/formatters";
+import type { ServiceAssignment } from "./booking-step-provider-time";
+
+interface ClientValue {
+  clientId: string;
+  clientName: string;
+  clientPhone: string;
+}
+
+interface BookingStepConfirmProps {
+  client: ClientValue | null;
+  isWalkIn: boolean;
+  walkInName: string;
+  walkInPhone: string;
+  assignments: ServiceAssignment[];
+}
+
+export function BookingStepConfirm({
+  client,
+  isWalkIn,
+  walkInName,
+  walkInPhone,
+  assignments,
+}: BookingStepConfirmProps) {
+  const t = useTranslations("reception");
+  const locale = useLocale();
+  const total = assignments.reduce((sum, a) => sum + a.service.price, 0);
+
+  return (
+    <div className="max-w-lg mx-auto space-y-4">
+      <h3 className="text-sm font-semibold">{t("confirmBooking")}</h3>
+      <div className="rounded-lg border border-border p-4 space-y-4">
+        {/* Client info */}
+        <div>
+          <p className="text-xs text-muted-foreground">{t("client")}</p>
+          <p className="text-sm font-medium">
+            {isWalkIn ? walkInName : client?.clientName}
+          </p>
+          {(isWalkIn ? walkInPhone : client?.clientPhone) && (
+            <p className="text-xs font-english text-muted-foreground">
+              {isWalkIn ? walkInPhone : client?.clientPhone}
+            </p>
+          )}
+        </div>
+
+        {/* Services with assignments */}
+        <div className="border-t border-border pt-3 space-y-3">
+          {assignments.map((a) => (
+            <div key={a.service.serviceId} className="flex justify-between text-sm">
+              <div>
+                <p className="font-medium">{a.service.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {a.employeeName && a.employeeName}
+                  {a.doctorName && ` · ${a.doctorName}`}
+                  {` · ${a.time}`}
+                </p>
+              </div>
+              <span className="font-english shrink-0">
+                {formatCurrency(a.service.price, locale)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Total */}
+        <div className="border-t border-border pt-3 flex justify-between font-bold">
+          <span>{t("total")}</span>
+          <span className="font-english">{formatCurrency(total, locale)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}

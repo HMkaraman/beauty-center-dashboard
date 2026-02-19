@@ -1,3 +1,4 @@
+/** @deprecated Use BookingOverlay instead */
 "use client";
 
 import { useState, useCallback } from "react";

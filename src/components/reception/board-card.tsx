@@ -8,6 +8,7 @@ import { Appointment } from "@/types";
 interface BoardCardProps {
   appointment: Appointment;
   onAction: (id: string, action: string) => void;
+  className?: string;
 }
 
 const statusActions: Record<string, { action: string; labelKey: string; color: string }> = {
@@ -17,12 +18,12 @@ const statusActions: Record<string, { action: string; labelKey: string; color: s
   "in-progress": { action: "completed", labelKey: "completeService", color: "bg-green-500 hover:bg-green-600" },
 };
 
-export function BoardCard({ appointment, onAction }: BoardCardProps) {
+export function BoardCard({ appointment, onAction, className }: BoardCardProps) {
   const t = useTranslations("reception");
   const actionInfo = statusActions[appointment.status];
 
   return (
-    <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+    <div className={`rounded-lg border border-border bg-card p-3 space-y-2 ${className ?? ""}`}>
       <div className="flex items-center justify-between">
         <p className="font-medium text-sm text-foreground truncate">
           {appointment.clientName}

@@ -1,7 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+  type DragOverEvent,
+} from "@dnd-kit/core";
+import { DroppableColumn } from "./droppable-column";
+import { DraggableCard } from "./draggable-card";
 import { BoardCard } from "./board-card";
 import { Appointment } from "@/types";
 
@@ -44,8 +57,30 @@ const columns: Column[] = [
   },
 ];
 
+// Forward-only transition rules
+const ALLOWED_TRANSITIONS: Record<string, string> = {
+  upcoming: "waiting",
+  waiting: "in-progress",
+  "in-progress": "completed",
+};
+
+// Map column key to the status value for the API
+const COLUMN_TO_STATUS: Record<string, string> = {
+  waiting: "waiting",
+  "in-progress": "in-progress",
+  completed: "completed",
+};
+
 export function AppointmentBoard({ appointments, onAction }: AppointmentBoardProps) {
   const t = useTranslations("reception");
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeSourceColumn, setActiveSourceColumn] = useState<string | null>(null);
+  const [overColumn, setOverColumn] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
 
   const grouped = useMemo(() => {
     const result: Record<string, Appointment[]> = {};
@@ -57,38 +92,113 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
     return result;
   }, [appointments]);
 
+  const activeAppointment = useMemo(
+    () => (activeId ? appointments.find((a) => a.id === activeId) : null),
+    [activeId, appointments]
+  );
+
+  const isValidDrop = useCallback(
+    (sourceColumn: string | null, targetColumn: string | null) => {
+      if (!sourceColumn || !targetColumn) return false;
+      return ALLOWED_TRANSITIONS[sourceColumn] === targetColumn;
+    },
+    []
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    setActiveId(active.id as string);
+    setActiveSourceColumn((active.data.current?.columnKey as string) ?? null);
+  }, []);
+
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { over } = event;
+    setOverColumn(over ? (over.id as string) : null);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
+      setActiveSourceColumn(null);
+      setOverColumn(null);
+
+      if (!over) return;
+
+      const sourceColumn = active.data.current?.columnKey as string;
+      const targetColumn = over.id as string;
+
+      if (sourceColumn === targetColumn) return;
+      if (!isValidDrop(sourceColumn, targetColumn)) return;
+
+      const targetStatus = COLUMN_TO_STATUS[targetColumn];
+      if (targetStatus) {
+        onAction(active.id as string, targetStatus);
+      }
+    },
+    [isValidDrop, onAction]
+  );
+
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+    setActiveSourceColumn(null);
+    setOverColumn(null);
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {columns.map((col) => (
-        <div
-          key={col.key}
-          className={`rounded-lg border border-border bg-muted/30 border-t-4 ${col.color}`}
-        >
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-            <h3 className="text-sm font-semibold text-foreground">
-              {t(col.labelKey)}
-            </h3>
-            <span className="text-xs font-english text-muted-foreground rounded-full bg-muted px-2 py-0.5">
-              {grouped[col.key]?.length ?? 0}
-            </span>
-          </div>
-          <div className="space-y-2 p-2 min-h-[200px]">
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {columns.map((col) => (
+          <DroppableColumn
+            key={col.key}
+            columnKey={col.key}
+            labelKey={col.labelKey}
+            color={col.color}
+            count={grouped[col.key]?.length ?? 0}
+            isValidDrop={isValidDrop(activeSourceColumn, col.key)}
+            isOver={overColumn === col.key && activeSourceColumn !== col.key}
+          >
             {grouped[col.key]?.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-8">
                 {t("noAppointments")}
               </p>
             ) : (
               grouped[col.key]?.map((appointment) => (
-                <BoardCard
-                  key={appointment.id}
-                  appointment={appointment}
-                  onAction={onAction}
-                />
+                col.key === "completed" ? (
+                  <BoardCard
+                    key={appointment.id}
+                    appointment={appointment}
+                    onAction={onAction}
+                  />
+                ) : (
+                  <DraggableCard
+                    key={appointment.id}
+                    appointment={appointment}
+                    columnKey={col.key}
+                    onAction={onAction}
+                  />
+                )
               ))
             )}
-          </div>
-        </div>
-      ))}
-    </div>
+          </DroppableColumn>
+        ))}
+      </div>
+
+      <DragOverlay>
+        {activeAppointment ? (
+          <BoardCard
+            appointment={activeAppointment}
+            onAction={() => {}}
+            className="shadow-lg ring-2 ring-primary/30 rotate-2"
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

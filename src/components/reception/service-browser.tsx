@@ -24,9 +24,10 @@ interface ServiceBrowserProps {
   selectedServices: SelectedService[];
   onAdd: (service: SelectedService) => void;
   onRemove: (serviceId: string) => void;
+  maxHeight?: string;
 }
 
-export function ServiceBrowser({ selectedServices, onAdd, onRemove }: ServiceBrowserProps) {
+export function ServiceBrowser({ selectedServices, onAdd, onRemove, maxHeight = "300px" }: ServiceBrowserProps) {
   const t = useTranslations("reception");
   const locale = useLocale();
   const { data: sectionsData } = useSections({ limit: 100 });
@@ -155,7 +156,7 @@ export function ServiceBrowser({ selectedServices, onAdd, onRemove }: ServiceBro
       )}
 
       {/* Services grid */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 max-h-[300px] overflow-y-auto">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 overflow-y-auto" style={{ maxHeight }}>
         {filteredServices.map((service) => {
           const isSelected = selectedIds.has(service.id);
           return (

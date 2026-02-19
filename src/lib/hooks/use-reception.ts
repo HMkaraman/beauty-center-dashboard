@@ -40,6 +40,41 @@ export function useReceptionStats() {
   });
 }
 
+interface ProviderScheduleParams {
+  date?: string;
+  employeeId?: string;
+  doctorId?: string;
+}
+
+interface ProviderScheduleResponse {
+  workingHours: { start: string; end: string } | null;
+  appointments: Array<{
+    id: string;
+    time: string;
+    duration: number;
+    clientName: string;
+    service: string;
+    status: string;
+  }>;
+  notWorking: boolean;
+}
+
+export function useProviderSchedule(params: ProviderScheduleParams) {
+  const hasProvider = !!params.employeeId || !!params.doctorId;
+  return useQuery({
+    queryKey: ["reception", "provider-schedule", params],
+    queryFn: () => {
+      const sp = new URLSearchParams();
+      if (params.date) sp.set("date", params.date);
+      if (params.employeeId) sp.set("employeeId", params.employeeId);
+      if (params.doctorId) sp.set("doctorId", params.doctorId);
+      return apiFetch<ProviderScheduleResponse>(`/reception/provider-schedule?${sp}`);
+    },
+    enabled: !!params.date && hasProvider,
+    staleTime: 30 * 1000,
+  });
+}
+
 export function useInvalidateReception() {
   const queryClient = useQueryClient();
   return () => {
