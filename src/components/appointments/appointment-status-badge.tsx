@@ -10,6 +10,8 @@ const statusStyles: Record<AppointmentStatus, string> = {
   cancelled: "border-red-500/30 bg-red-500/10 text-red-400",
   completed: "border-purple-500/30 bg-purple-500/10 text-purple-400",
   "no-show": "border-muted-foreground/30 bg-muted/50 text-muted-foreground",
+  waiting: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+  "in-progress": "border-blue-500/30 bg-blue-500/10 text-blue-400",
 };
 
 const statusKeys: Record<AppointmentStatus, string> = {
@@ -18,6 +20,8 @@ const statusKeys: Record<AppointmentStatus, string> = {
   cancelled: "statusCancelled",
   completed: "statusCompleted",
   "no-show": "statusNoShow",
+  waiting: "statusWaiting",
+  "in-progress": "statusInProgress",
 };
 
 interface AppointmentStatusBadgeProps {

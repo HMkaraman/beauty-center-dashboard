@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       conditions.push(
         eq(
           appointments.status,
-          status as "confirmed" | "pending" | "cancelled" | "completed" | "no-show"
+          status as "confirmed" | "pending" | "cancelled" | "completed" | "no-show" | "waiting" | "in-progress"
         )
       );
     }
@@ -171,6 +171,7 @@ export async function POST(req: NextRequest) {
         status: validated.status,
         price: String(validated.price),
         notes: validated.notes,
+        groupId: validated.groupId,
       })
       .returning();
 

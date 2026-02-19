@@ -11,6 +11,8 @@ export const appointmentStatusEnum = pgEnum("appointment_status", [
   "cancelled",
   "completed",
   "no-show",
+  "waiting",
+  "in-progress",
 ]);
 
 export const appointments = pgTable("appointments", {
@@ -31,6 +33,7 @@ export const appointments = pgTable("appointments", {
   status: appointmentStatusEnum("status").notNull().default("pending"),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   notes: text("notes"),
+  groupId: text("group_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

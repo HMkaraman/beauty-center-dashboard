@@ -1,0 +1,49 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api/client";
+import { appointmentsApi } from "@/lib/api/appointments";
+import type { Appointment } from "@/types";
+
+interface ReceptionStats {
+  totalAppointments: number;
+  waiting: number;
+  inProgress: number;
+  completed: number;
+  todayRevenue: number;
+}
+
+interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export function useTodayAppointments() {
+  const today = new Date().toISOString().split("T")[0];
+  return useQuery({
+    queryKey: ["reception", "today-appointments", today],
+    queryFn: () => {
+      const searchParams = new URLSearchParams();
+      searchParams.set("date", today);
+      searchParams.set("limit", "200");
+      return apiFetch<PaginatedResponse<Appointment>>(`/appointments?${searchParams}`);
+    },
+    refetchInterval: 30 * 1000,
+  });
+}
+
+export function useReceptionStats() {
+  return useQuery({
+    queryKey: ["reception", "stats"],
+    queryFn: () => apiFetch<ReceptionStats>("/reception/stats"),
+    refetchInterval: 30 * 1000,
+  });
+}
+
+export function useInvalidateReception() {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: ["reception"] });
+    queryClient.invalidateQueries({ queryKey: ["appointments"] });
+  };
+}

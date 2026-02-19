@@ -494,7 +494,7 @@ export interface ActivityLog {
 
 export type Locale = "ar" | "en";
 
-export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
+export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show" | "waiting" | "in-progress";
 
 export interface Appointment {
   id: string;
@@ -513,4 +513,5 @@ export interface Appointment {
   status: AppointmentStatus;
   notes?: string;
   price: number;
+  groupId?: string;
 }

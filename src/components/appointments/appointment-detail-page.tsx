@@ -21,7 +21,7 @@ import { useAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointmen
 import { formatCurrency } from "@/lib/formatters";
 import type { Appointment, AppointmentStatus } from "@/types";
 
-const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "cancelled", "completed", "no-show"];
+const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
 
 const STATUS_KEYS: Record<AppointmentStatus, string> = {
   confirmed: "statusConfirmed",
@@ -29,6 +29,8 @@ const STATUS_KEYS: Record<AppointmentStatus, string> = {
   cancelled: "statusCancelled",
   completed: "statusCompleted",
   "no-show": "statusNoShow",
+  waiting: "statusWaiting",
+  "in-progress": "statusInProgress",
 };
 
 interface AppointmentDetailPageProps {
