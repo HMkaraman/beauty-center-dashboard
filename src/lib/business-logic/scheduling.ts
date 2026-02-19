@@ -128,7 +128,8 @@ export async function checkConflict(params: {
   return { hasConflict: false };
 }
 
-// Find next available slot for an employee on a date
+// Find next available slot for an employee/doctor on a date
+// Respects employee and doctor working hours schedules
 export async function findNextAvailableSlot(params: {
   tenantId: string;
   employeeId?: string | null;
@@ -139,8 +140,54 @@ export async function findNextAvailableSlot(params: {
   workStart?: string; // default "09:00"
   workEnd?: string; // default "21:00"
 }): Promise<string | null> {
-  const workStartMins = timeToMinutes(params.workStart || "09:00");
-  const workEndMins = timeToMinutes(params.workEnd || "21:00");
+  let workStartMins = timeToMinutes(params.workStart || "09:00");
+  let workEndMins = timeToMinutes(params.workEnd || "21:00");
+  const dayOfWeek = getDayOfWeek(params.date);
+
+  // Narrow window based on employee schedule
+  if (params.employeeId) {
+    const [empSched] = await db
+      .select()
+      .from(employeeSchedules)
+      .where(
+        and(
+          eq(employeeSchedules.tenantId, params.tenantId),
+          eq(employeeSchedules.employeeId, params.employeeId),
+          eq(employeeSchedules.dayOfWeek, dayOfWeek)
+        )
+      )
+      .limit(1);
+
+    if (empSched) {
+      if (!empSched.isAvailable) return null; // Employee not working this day
+      workStartMins = Math.max(workStartMins, timeToMinutes(empSched.startTime));
+      workEndMins = Math.min(workEndMins, timeToMinutes(empSched.endTime));
+    }
+  }
+
+  // Narrow window based on doctor schedule
+  if (params.doctorId) {
+    const [docSched] = await db
+      .select()
+      .from(doctorSchedules)
+      .where(
+        and(
+          eq(doctorSchedules.tenantId, params.tenantId),
+          eq(doctorSchedules.doctorId, params.doctorId),
+          eq(doctorSchedules.dayOfWeek, dayOfWeek)
+        )
+      )
+      .limit(1);
+
+    if (docSched) {
+      if (!docSched.isAvailable) return null; // Doctor not working this day
+      workStartMins = Math.max(workStartMins, timeToMinutes(docSched.startTime));
+      workEndMins = Math.min(workEndMins, timeToMinutes(docSched.endTime));
+    }
+  }
+
+  // If schedules don't overlap, no slot possible
+  if (workStartMins >= workEndMins) return null;
 
   // Collect all booked slots from both employee and doctor
   const allSlots: Array<{ start: number; end: number }> = [];
