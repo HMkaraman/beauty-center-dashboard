@@ -15,6 +15,13 @@
       "when": 1771275879768,
       "tag": "0001_heavy_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771472830163,
+      "tag": "0002_rare_the_initiative",
+      "breakpoints": true
     }
   ]
 }

@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, TrendingUp, DollarSign, XCircle, BarChart3 } from "lucide-react";
+import { ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, TrendingUp, DollarSign, XCircle, BarChart3, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,8 +16,13 @@ import { ClientDetailAppointmentsTable } from "./client-detail-appointments-tabl
 import { ClientDetailInvoicesTable } from "./client-detail-invoices-table";
 import { ClientAppointmentCard } from "./client-appointment-card";
 import { ClientInvoiceCard } from "./client-invoice-card";
-import { useClientDetails } from "@/lib/hooks";
+import { ClientHealingJourneysTable } from "./client-healing-journeys-table";
+import { ClientHealingJourneyCard } from "./client-healing-journey-card";
+import { NewHealingJourneySheet } from "./new-healing-journey-sheet";
+import { HealingJourneyUpdatesSheet } from "./healing-journey-updates-sheet";
+import { useClientDetails, useHealingJourneys, useDeleteHealingJourney } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/formatters";
+import type { HealingJourney } from "@/types";
 
 interface ClientDetailPageProps {
   clientId: string;
@@ -26,6 +33,31 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
   const locale = useLocale();
   const router = useRouter();
   const { data, isLoading, error } = useClientDetails(clientId);
+  const { data: healingJourneys } = useHealingJourneys(clientId);
+  const deleteJourney = useDeleteHealingJourney();
+
+  const [journeySheetOpen, setJourneySheetOpen] = useState(false);
+  const [editingJourney, setEditingJourney] = useState<HealingJourney | null>(null);
+  const [updatesSheetOpen, setUpdatesSheetOpen] = useState(false);
+  const [viewingJourney, setViewingJourney] = useState<HealingJourney | null>(null);
+
+  const handleViewJourney = (journey: HealingJourney) => {
+    setViewingJourney(journey);
+    setUpdatesSheetOpen(true);
+  };
+
+  const handleEditJourney = (journey: HealingJourney) => {
+    setEditingJourney(journey);
+    setJourneySheetOpen(true);
+  };
+
+  const handleDeleteJourney = (journey: HealingJourney) => {
+    if (!confirm(t("deleteJourneyConfirm"))) return;
+    deleteJourney.mutate(
+      { clientId, journeyId: journey.id },
+      { onSuccess: () => toast.success(t("journeyDeleted")) }
+    );
+  };
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -176,6 +208,9 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
           <TabsTrigger value="invoices">
             {t("tabInvoices")} ({recentInvoices.length})
           </TabsTrigger>
+          <TabsTrigger value="healingJourneys">
+            {t("tabHealingJourneys")} ({healingJourneys?.length ?? 0})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="appointments">
@@ -209,7 +244,53 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
             )}
           </div>
         </TabsContent>
+
+        <TabsContent value="healingJourneys">
+          <div className="mb-4 flex justify-end">
+            <Button size="sm" className="gap-2" onClick={() => { setEditingJourney(null); setJourneySheetOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              {t("newJourney")}
+            </Button>
+          </div>
+          <ClientHealingJourneysTable
+            data={healingJourneys ?? []}
+            onView={handleViewJourney}
+            onEdit={handleEditJourney}
+            onDelete={handleDeleteJourney}
+          />
+          {/* Mobile cards */}
+          <div className="space-y-3 md:hidden">
+            {(!healingJourneys || healingJourneys.length === 0) ? (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                {t("noJourneys")}
+              </div>
+            ) : (
+              healingJourneys.map((journey) => (
+                <ClientHealingJourneyCard
+                  key={journey.id}
+                  data={journey}
+                  onView={handleViewJourney}
+                  onEdit={handleEditJourney}
+                  onDelete={handleDeleteJourney}
+                />
+              ))
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
+
+      <NewHealingJourneySheet
+        open={journeySheetOpen}
+        onOpenChange={setJourneySheetOpen}
+        clientId={clientId}
+        editItem={editingJourney}
+      />
+      <HealingJourneyUpdatesSheet
+        open={updatesSheetOpen}
+        onOpenChange={setUpdatesSheetOpen}
+        clientId={clientId}
+        journey={viewingJourney}
+      />
     </div>
   );
 }

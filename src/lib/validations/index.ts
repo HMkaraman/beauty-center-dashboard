@@ -26,3 +26,11 @@ export {
   type RegisterFormData,
   type OnboardingFormData,
 } from "./registration";
+export {
+  healingJourneySchema,
+  journeyEntrySchema,
+  journeyAttachmentSchema,
+  type HealingJourneyFormData,
+  type JourneyEntryFormData,
+  type JourneyAttachmentFormData,
+} from "./healing-journeys";

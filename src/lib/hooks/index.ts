@@ -33,3 +33,13 @@ export { useSubscription, useCreateCheckout, useCreatePortalSession } from "./us
 export { useAdminStats, useAdminTenants } from "./use-admin";
 export { useNotifications, useSendNotification } from "./use-notifications";
 export { useApiKeys, useCreateApiKey, useRevokeApiKey } from "./use-api-keys";
+export {
+  useHealingJourneys,
+  useHealingJourney,
+  useCreateHealingJourney,
+  useUpdateHealingJourney,
+  useDeleteHealingJourney,
+  useJourneyEntries,
+  useCreateJourneyEntry,
+  useDeleteJourneyEntry,
+} from "./use-healing-journeys";

@@ -5,6 +5,7 @@ export function formatCurrency(value: number, locale: string = "ar", currency: s
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
+    numberingSystem: "latn",
   }).format(value);
 }
 
@@ -24,5 +25,5 @@ export function formatPercentage(value: number): string {
 
 export function formatNumber(value: number, locale: string = "ar"): string {
   const intlLocale = locale === "ar" ? "ar-SA" : "en-US";
-  return new Intl.NumberFormat(intlLocale).format(value);
+  return new Intl.NumberFormat(intlLocale, { numberingSystem: "latn" }).format(value);
 }

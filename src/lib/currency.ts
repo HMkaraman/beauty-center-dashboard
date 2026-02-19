@@ -58,6 +58,7 @@ export function formatCurrency(
       currency: config.code,
       minimumFractionDigits: config.decimals,
       maximumFractionDigits: config.decimals,
+      numberingSystem: "latn",
     }).format(num);
   } catch {
     // Fallback if Intl doesn't support the currency

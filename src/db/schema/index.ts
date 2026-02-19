@@ -17,3 +17,4 @@ export * from "./subscriptions";
 export * from "./client-otp";
 export * from "./notifications";
 export * from "./api-keys";
+export * from "./healing-journeys";

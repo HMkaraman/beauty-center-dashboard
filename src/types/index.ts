@@ -349,6 +349,80 @@ export interface Invoice {
   notes?: string;
 }
 
+// Healing Journeys
+export type HealingJourneyStatus = "active" | "completed" | "paused";
+
+export interface HealingJourney {
+  id: string;
+  clientId: string;
+  title: string;
+  description?: string;
+  status: HealingJourneyStatus;
+  startDate: string;
+  endDate?: string;
+  primaryServiceId?: string;
+  entriesCount: number;
+  createdAt: string;
+}
+
+export type JourneyEntryType = "session" | "prescription" | "note" | "photo" | "milestone";
+
+export type AttachmentLabel = "before" | "after" | "during" | "prescription_scan" | "general";
+
+export interface JourneyAttachment {
+  id: string;
+  url: string;
+  thumbnailUrl?: string;
+  filename?: string;
+  mimeType?: string;
+  fileSize?: number;
+  label?: AttachmentLabel;
+  bodyRegion?: string;
+  caption?: string;
+}
+
+interface BaseEntry {
+  id: string;
+  journeyId: string;
+  type: JourneyEntryType;
+  date: string;
+  notes?: string;
+  attachments: JourneyAttachment[];
+  createdAt: string;
+}
+
+export type SessionEntry = BaseEntry & {
+  type: "session";
+  serviceName?: string;
+  doctorName?: string;
+  employeeName?: string;
+  price?: number;
+  duration?: number;
+  appointmentId?: string;
+  invoiceId?: string;
+};
+
+export type PrescriptionEntry = BaseEntry & {
+  type: "prescription";
+  prescriptionText?: string;
+  prescribedByDoctorName?: string;
+};
+
+export type NoteEntry = BaseEntry & {
+  type: "note";
+};
+
+export type PhotoEntry = BaseEntry & {
+  type: "photo";
+};
+
+export type MilestoneEntry = BaseEntry & {
+  type: "milestone";
+  milestoneLabel?: string;
+};
+
+export type JourneyEntry = SessionEntry | PrescriptionEntry | NoteEntry | PhotoEntry | MilestoneEntry;
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
