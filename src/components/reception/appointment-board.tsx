@@ -214,7 +214,7 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
                     layout
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
+                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0 } }}
                     transition={{ layout: { type: "spring", stiffness: 500, damping: 35 }, opacity: { duration: 0.15 } }}
                   >
                     {col.key === "completed" ? (
