@@ -105,7 +105,12 @@
     "notesPlaceholder": "أضف ملاحظات...",
     "checkout": "الدفع",
     "save": "حفظ",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "searchClient": "ابحث عن عميل...",
+    "quickCreate": "إنشاء سريع \"{name}\"",
+    "createNewClient": "إنشاء عميل جديد...",
+    "noClientsFound": "لا يوجد عملاء",
+    "clearSelection": "مسح الاختيار"
   },
   "clients": {
     "title": "العملاء",

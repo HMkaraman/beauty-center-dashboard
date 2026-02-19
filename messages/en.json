@@ -105,7 +105,12 @@
     "notesPlaceholder": "Add notes...",
     "checkout": "Checkout",
     "save": "Save",
-    "close": "Close"
+    "close": "Close",
+    "searchClient": "Search client...",
+    "quickCreate": "Quick Create \"{name}\"",
+    "createNewClient": "Create new client...",
+    "noClientsFound": "No clients found",
+    "clearSelection": "Clear selection"
   },
   "clients": {
     "title": "Clients",

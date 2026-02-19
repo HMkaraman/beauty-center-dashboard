@@ -24,6 +24,7 @@ import { useServices } from "@/lib/hooks/use-services";
 import { useEmployees } from "@/lib/hooks/use-employees";
 import { useCreateAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
+import { ClientCombobox } from "./client-combobox";
 
 interface NewAppointmentSheetProps {
   open: boolean;
@@ -32,6 +33,7 @@ interface NewAppointmentSheetProps {
 }
 
 const emptyForm = {
+  clientId: "",
   clientName: "",
   clientPhone: "",
   serviceId: "",
@@ -60,6 +62,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
       const matchedService = services.find((s) => s.name === editItem.service);
       const matchedEmployee = employees.find((e) => e.name === editItem.employee);
       setForm({
+        clientId: editItem.clientId || "",
         clientName: editItem.clientName,
         clientPhone: editItem.clientPhone,
         serviceId: matchedService?.id || "",
@@ -84,6 +87,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
     if (editItem) {
       updateAppointment.mutate({ id: editItem.id, data: {
+        clientId: form.clientId || undefined,
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         service: selectedService?.name || editItem.service,
@@ -96,6 +100,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
       } }, { onSuccess: () => { toast.success(tc("updateSuccess")); setForm(emptyForm); onOpenChange(false); } });
     } else {
       createAppointment.mutate({
+        clientId: form.clientId || undefined,
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         service: selectedService?.name || "",
@@ -111,6 +116,10 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     return;
   };
 
+  const clientValue = form.clientId
+    ? { clientId: form.clientId, clientName: form.clientName, clientPhone: form.clientPhone }
+    : null;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="overflow-y-auto">
@@ -123,20 +132,21 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
         <div className="flex-1 space-y-4 px-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("clientName")}</label>
-            <Input
-              value={form.clientName}
-              onChange={(e) => setForm({ ...form, clientName: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("clientPhone")}</label>
-            <Input
-              value={form.clientPhone}
-              onChange={(e) => setForm({ ...form, clientPhone: e.target.value })}
-              className="font-english"
-              dir="ltr"
+            <label className="text-sm font-medium text-foreground">{t("client")}</label>
+            <ClientCombobox
+              value={clientValue}
+              onChange={(client) => {
+                if (client) {
+                  setForm({
+                    ...form,
+                    clientId: client.clientId,
+                    clientName: client.clientName,
+                    clientPhone: client.clientPhone,
+                  });
+                } else {
+                  setForm({ ...form, clientId: "", clientName: "", clientPhone: "" });
+                }
+              }}
             />
           </div>
 
