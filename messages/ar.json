@@ -1111,6 +1111,7 @@
     "next": "التالي",
     "bookingCreated": "تم إنشاء الحجز بنجاح",
     "groupNotComplete": "الخدمات الأخرى في هذه المجموعة لم تكتمل بعد",
+    "statusUpdateFailed": "فشل تحديث الحالة، تم التراجع عن التغيير",
     "backToDashboard": "العودة للوحة التحكم",
     "totalAppointments": "الإجمالي",
     "todayRevenue": "الإيرادات",

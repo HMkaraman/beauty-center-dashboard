@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { Appointment } from "@/types";
 
 export function ReceptionPageContent() {
   const t = useTranslations("reception");
+  const queryClient = useQueryClient();
   const { data: todayData, isLoading } = useTodayAppointments();
   const appointments = todayData?.data ?? [];
   const updateAppointment = useUpdateAppointment();
@@ -37,37 +39,58 @@ export function ReceptionPageContent() {
       return;
     }
 
+    const newStatus = action as Appointment["status"];
+    const today = new Date().toISOString().split("T")[0];
+    const queryKey = ["reception", "today-appointments", today];
+
+    // Optimistic update: move the card instantly
+    const previousData = queryClient.getQueryData(queryKey);
+    queryClient.setQueryData(queryKey, (old: { data: Appointment[]; total: number; page: number; limit: number } | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        data: old.data.map((a) =>
+          a.id === id ? { ...a, status: newStatus } : a
+        ),
+      };
+    });
+
+    // If completing, handle checkout immediately (don't wait for API)
+    if (action === "completed") {
+      if (appointment.groupId) {
+        const groupAppts = appointments.filter(
+          (a) => a.groupId === appointment.groupId && a.id !== id
+        );
+        const allOthersCompleted = groupAppts.every(
+          (a) => a.status === "completed"
+        );
+        if (allOthersCompleted) {
+          setCheckoutAppointment({ ...appointment, status: "completed" });
+          setCheckoutOpen(true);
+        } else {
+          toast.info(t("groupNotComplete"));
+        }
+      } else {
+        setCheckoutAppointment({ ...appointment, status: "completed" });
+        setCheckoutOpen(true);
+      }
+    }
+
+    // Fire API call in the background
     updateAppointment.mutate(
-      {
-        id,
-        data: { status: action as Appointment["status"] },
-      },
+      { id, data: { status: newStatus } },
       {
         onSuccess: () => {
           invalidateReception();
-          if (action === "completed") {
-            if (appointment.groupId) {
-              const groupAppts = appointments.filter(
-                (a) => a.groupId === appointment.groupId && a.id !== id
-              );
-              const allOthersCompleted = groupAppts.every(
-                (a) => a.status === "completed"
-              );
-              if (allOthersCompleted) {
-                setCheckoutAppointment({ ...appointment, status: "completed" });
-                setCheckoutOpen(true);
-              } else {
-                toast.info(t("groupNotComplete"));
-              }
-            } else {
-              setCheckoutAppointment({ ...appointment, status: "completed" });
-              setCheckoutOpen(true);
-            }
-          }
+        },
+        onError: () => {
+          // Rollback on failure
+          queryClient.setQueryData(queryKey, previousData);
+          toast.error(t("statusUpdateFailed"));
         },
       }
     );
-  }, [appointments, updateAppointment, invalidateReception, t]);
+  }, [appointments, updateAppointment, invalidateReception, queryClient, t]);
 
   return (
     <div className="flex flex-col h-screen">

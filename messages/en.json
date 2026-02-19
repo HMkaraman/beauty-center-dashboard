@@ -1111,6 +1111,7 @@
     "next": "Next",
     "bookingCreated": "Booking created successfully",
     "groupNotComplete": "Other services in this group are not yet complete",
+    "statusUpdateFailed": "Failed to update status, change has been reverted",
     "backToDashboard": "Back to Dashboard",
     "totalAppointments": "Total",
     "todayRevenue": "Revenue",
