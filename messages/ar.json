@@ -782,7 +782,40 @@
     "sourceManual": "يدوي",
     "lastUpdated": "آخر تحديث",
     "ratesFetchSuccess": "تم تحديث أسعار الصرف",
-    "removeCurrency": "إزالة"
+    "removeCurrency": "إزالة",
+    "roles": "الأدوار",
+    "addRole": "إضافة دور",
+    "editRole": "تعديل الدور",
+    "duplicateRole": "نسخ الدور",
+    "deleteRole": "حذف الدور",
+    "roleName": "اسم الدور (عربي)",
+    "roleNameEn": "اسم الدور (إنجليزي)",
+    "roleSlug": "المعرّف",
+    "roleDescription": "الوصف",
+    "rolePermissions": "الصلاحيات",
+    "systemRole": "نظام",
+    "customRole": "مخصص",
+    "defaultRole": "افتراضي",
+    "usersCount": "{count} مستخدمين",
+    "cannotDeleteSystemRole": "لا يمكن حذف الأدوار الأساسية",
+    "cannotDeleteRoleWithUsers": "لا يمكن حذف دور لديه مستخدمون مرتبطون",
+    "addUser": "إضافة مستخدم",
+    "editUser": "تعديل المستخدم",
+    "deleteUser": "حذف المستخدم",
+    "userName": "الاسم",
+    "userEmail": "البريد الإلكتروني",
+    "userPassword": "كلمة المرور",
+    "userRole": "الدور",
+    "permissionOverrides": "تخصيص الصلاحيات",
+    "inheritedFromRole": "موروث من الدور",
+    "explicitlyGranted": "ممنوح بشكل صريح",
+    "explicitlyRevoked": "مسحوب بشكل صريح",
+    "noUsers": "لا يوجد مستخدمون بعد",
+    "noRoles": "لا توجد أدوار بعد",
+    "selectAll": "تحديد الكل",
+    "roleOwner": "المالك",
+    "roleReceptionist": "موظف الاستقبال",
+    "roleAccountant": "محاسب"
   },
   "common": {
     "comingSoon": "قريباً",
@@ -1137,7 +1170,12 @@
     "freeSlot": "متاح",
     "booked": "محجوز",
     "schedule": "الجدول",
-    "editInvoice": "تعديل الفاتورة"
+    "editInvoice": "تعديل الفاتورة",
+    "browseSections": "تصفح حسب القسم",
+    "backToSections": "العودة للأقسام",
+    "allSectionServices": "الكل",
+    "servicesCount": "{count} خدمات",
+    "uncategorizedServices": "خدمات أخرى"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",
@@ -1154,5 +1192,99 @@
     "selectServices": "اختر الخدمات لهذه الفئة",
     "serviceCount": "{count} خدمات",
     "noServices": "لا توجد خدمات مخصصة"
+  },
+  "permissions": {
+    "clients": {
+      "title": "العملاء",
+      "read": "عرض العملاء",
+      "write": "إضافة وتعديل العملاء",
+      "delete": "حذف العملاء"
+    },
+    "appointments": {
+      "title": "المواعيد",
+      "read": "عرض المواعيد",
+      "write": "إضافة وتعديل المواعيد",
+      "delete": "حذف المواعيد"
+    },
+    "services": {
+      "title": "الخدمات",
+      "read": "عرض الخدمات",
+      "write": "إضافة وتعديل الخدمات",
+      "delete": "حذف الخدمات"
+    },
+    "employees": {
+      "title": "الموظفون",
+      "read": "عرض الموظفين",
+      "write": "إضافة وتعديل الموظفين",
+      "delete": "حذف الموظفين"
+    },
+    "doctors": {
+      "title": "الأطباء",
+      "read": "عرض الأطباء",
+      "write": "إضافة وتعديل الأطباء",
+      "delete": "حذف الأطباء"
+    },
+    "inventory": {
+      "title": "المخزون",
+      "read": "عرض المخزون",
+      "write": "إضافة وتعديل المخزون",
+      "delete": "حذف عناصر المخزون"
+    },
+    "invoices": {
+      "title": "الفواتير",
+      "read": "عرض الفواتير",
+      "write": "إضافة وتعديل الفواتير",
+      "delete": "حذف الفواتير",
+      "editCompleted": "تعديل فواتير المواعيد المكتملة"
+    },
+    "expenses": {
+      "title": "المصروفات",
+      "read": "عرض المصروفات",
+      "write": "إضافة وتعديل المصروفات",
+      "delete": "حذف المصروفات"
+    },
+    "finance": {
+      "title": "المالية",
+      "read": "عرض البيانات المالية",
+      "write": "إدارة البيانات المالية"
+    },
+    "reports": {
+      "title": "التقارير",
+      "read": "عرض التقارير",
+      "export": "تصدير التقارير"
+    },
+    "marketing": {
+      "title": "التسويق",
+      "read": "عرض الحملات",
+      "write": "إضافة وتعديل الحملات",
+      "delete": "حذف الحملات"
+    },
+    "sections": {
+      "title": "الأقسام",
+      "read": "عرض الأقسام",
+      "write": "إضافة وتعديل الأقسام",
+      "delete": "حذف الأقسام"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "read": "عرض الإعدادات",
+      "write": "تعديل الإعدادات"
+    },
+    "users": {
+      "title": "المستخدمون",
+      "read": "عرض المستخدمين",
+      "write": "إضافة وتعديل المستخدمين",
+      "delete": "حذف المستخدمين"
+    },
+    "roles": {
+      "title": "الأدوار",
+      "read": "عرض الأدوار",
+      "write": "إضافة وتعديل الأدوار",
+      "delete": "حذف الأدوار"
+    },
+    "admin": {
+      "title": "الإدارة",
+      "access": "صلاحية الإدارة الكاملة"
+    }
   }
 }

@@ -64,6 +64,13 @@
       "when": 1771511901457,
       "tag": "0008_rainy_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1771521306148,
+      "tag": "0009_wooden_black_cat",
+      "breakpoints": true
     }
   ]
 }

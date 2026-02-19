@@ -1,5 +1,6 @@
 import { pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { tenants } from "./tenants";
+import { roles } from "./roles";
 
 export const userRoleEnum = pgEnum("user_role", [
   "owner",
@@ -17,6 +18,8 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 255 }).notNull(),
   role: userRoleEnum("role").notNull().default("staff"),
   employeeId: text("employee_id"),
+  roleId: text("role_id").references(() => roles.id, { onDelete: "set null" }),
+  customPermissions: text("custom_permissions"),
   image: text("image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

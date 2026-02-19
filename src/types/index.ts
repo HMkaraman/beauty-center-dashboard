@@ -515,3 +515,34 @@ export interface Appointment {
   price: number;
   groupId?: string;
 }
+
+// Roles & Permissions
+export interface RoleType {
+  id: string;
+  tenantId: string;
+  name: string;
+  nameEn?: string | null;
+  slug: string;
+  description?: string | null;
+  isSystem: boolean;
+  isDefault: boolean;
+  permissions: string[];
+  userCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  roleId?: string | null;
+  roleName?: string | null;
+  roleNameEn?: string | null;
+  roleSlug?: string | null;
+  customPermissions?: { granted: string[]; revoked: string[] } | null;
+  image?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}

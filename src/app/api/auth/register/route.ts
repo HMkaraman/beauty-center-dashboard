@@ -2,9 +2,10 @@ import { NextRequest } from "next/server";
 import { hash } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/db";
-import { tenants, users, tenantSettings, workingHours } from "@/db/schema";
+import { tenants, users, tenantSettings, workingHours, roles } from "@/db/schema";
 import { registerSchema } from "@/lib/validations";
 import { badRequest, serverError, success } from "@/lib/api-utils";
+import { PREDEFINED_ROLES } from "@/lib/permissions";
 
 function slugify(text: string): string {
   return (
@@ -98,6 +99,32 @@ export async function POST(req: NextRequest) {
         role: users.role,
         createdAt: users.createdAt,
       });
+
+    // 3.5. Seed predefined roles for the new tenant
+    let ownerRoleId: string | null = null;
+    for (const template of PREDEFINED_ROLES) {
+      const [seeded] = await db
+        .insert(roles)
+        .values({
+          tenantId: tenant.id,
+          name: template.name,
+          nameEn: template.nameEn,
+          slug: template.slug,
+          isSystem: true,
+          isDefault: template.slug === "staff",
+          permissions: JSON.stringify(template.permissions),
+        })
+        .returning({ id: roles.id });
+      if (template.slug === "owner") ownerRoleId = seeded.id;
+    }
+
+    // 3.6. Link owner user to the owner role
+    if (ownerRoleId) {
+      await db
+        .update(users)
+        .set({ roleId: ownerRoleId })
+        .where(eq(users.id, user.id));
+    }
 
     // 4. Insert 7 working hours rows (Sat=0 through Fri=6)
     // Friday (dayOfWeek=6) is closed, others open 09:00-21:00

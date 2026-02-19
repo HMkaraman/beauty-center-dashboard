@@ -782,7 +782,40 @@
     "sourceManual": "Manual",
     "lastUpdated": "Last Updated",
     "ratesFetchSuccess": "Exchange rates updated",
-    "removeCurrency": "Remove"
+    "removeCurrency": "Remove",
+    "roles": "Roles",
+    "addRole": "Add Role",
+    "editRole": "Edit Role",
+    "duplicateRole": "Duplicate Role",
+    "deleteRole": "Delete Role",
+    "roleName": "Role Name (Arabic)",
+    "roleNameEn": "Role Name (English)",
+    "roleSlug": "Slug",
+    "roleDescription": "Description",
+    "rolePermissions": "Permissions",
+    "systemRole": "System",
+    "customRole": "Custom",
+    "defaultRole": "Default",
+    "usersCount": "{count} users",
+    "cannotDeleteSystemRole": "Cannot delete system roles",
+    "cannotDeleteRoleWithUsers": "Cannot delete a role that has users assigned",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "userName": "Name",
+    "userEmail": "Email",
+    "userPassword": "Password",
+    "userRole": "Role",
+    "permissionOverrides": "Permission Overrides",
+    "inheritedFromRole": "Inherited from role",
+    "explicitlyGranted": "Explicitly granted",
+    "explicitlyRevoked": "Explicitly revoked",
+    "noUsers": "No users yet",
+    "noRoles": "No roles yet",
+    "selectAll": "Select all",
+    "roleOwner": "Owner",
+    "roleReceptionist": "Receptionist",
+    "roleAccountant": "Accountant"
   },
   "common": {
     "comingSoon": "Coming Soon",
@@ -1137,7 +1170,12 @@
     "freeSlot": "Available",
     "booked": "Booked",
     "schedule": "Schedule",
-    "editInvoice": "Edit Invoice"
+    "editInvoice": "Edit Invoice",
+    "browseSections": "Browse by Section",
+    "backToSections": "Back to Sections",
+    "allSectionServices": "All",
+    "servicesCount": "{count} services",
+    "uncategorizedServices": "Other Services"
   },
   "serviceCategories": {
     "title": "Service Categories",
@@ -1154,5 +1192,99 @@
     "selectServices": "Select services for this category",
     "serviceCount": "{count} services",
     "noServices": "No services assigned"
+  },
+  "permissions": {
+    "clients": {
+      "title": "Clients",
+      "read": "View clients",
+      "write": "Add & edit clients",
+      "delete": "Delete clients"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "read": "View appointments",
+      "write": "Add & edit appointments",
+      "delete": "Delete appointments"
+    },
+    "services": {
+      "title": "Services",
+      "read": "View services",
+      "write": "Add & edit services",
+      "delete": "Delete services"
+    },
+    "employees": {
+      "title": "Employees",
+      "read": "View employees",
+      "write": "Add & edit employees",
+      "delete": "Delete employees"
+    },
+    "doctors": {
+      "title": "Doctors",
+      "read": "View doctors",
+      "write": "Add & edit doctors",
+      "delete": "Delete doctors"
+    },
+    "inventory": {
+      "title": "Inventory",
+      "read": "View inventory",
+      "write": "Add & edit inventory",
+      "delete": "Delete inventory items"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "read": "View invoices",
+      "write": "Add & edit invoices",
+      "delete": "Delete invoices",
+      "editCompleted": "Edit invoices for completed appointments"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "read": "View expenses",
+      "write": "Add & edit expenses",
+      "delete": "Delete expenses"
+    },
+    "finance": {
+      "title": "Finance",
+      "read": "View financial data",
+      "write": "Manage financial data"
+    },
+    "reports": {
+      "title": "Reports",
+      "read": "View reports",
+      "export": "Export reports"
+    },
+    "marketing": {
+      "title": "Marketing",
+      "read": "View campaigns",
+      "write": "Add & edit campaigns",
+      "delete": "Delete campaigns"
+    },
+    "sections": {
+      "title": "Sections",
+      "read": "View sections",
+      "write": "Add & edit sections",
+      "delete": "Delete sections"
+    },
+    "settings": {
+      "title": "Settings",
+      "read": "View settings",
+      "write": "Edit settings"
+    },
+    "users": {
+      "title": "Users",
+      "read": "View users",
+      "write": "Add & edit users",
+      "delete": "Delete users"
+    },
+    "roles": {
+      "title": "Roles",
+      "read": "View roles",
+      "write": "Add & edit roles",
+      "delete": "Delete roles"
+    },
+    "admin": {
+      "title": "Administration",
+      "access": "Full admin access"
+    }
   }
 }

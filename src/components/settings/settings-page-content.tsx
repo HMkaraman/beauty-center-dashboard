@@ -5,6 +5,7 @@ import { GeneralSettingsCard } from "./general-settings-card";
 import { BusinessInfoCard } from "./business-info-card";
 import { WorkingHoursCard } from "./working-hours-card";
 import { NotificationsCard } from "./notifications-card";
+import { RolesCard } from "./roles-card";
 import { UsersPermissionsCard } from "./users-permissions-card";
 import { AppearanceCard } from "./appearance-card";
 import { SectionsSettingsCard } from "./sections-settings-card";
@@ -23,6 +24,7 @@ export function SettingsPageContent() {
       <SectionsSettingsCard />
       <WorkingHoursCard />
       <NotificationsCard />
+      <RolesCard />
       <UsersPermissionsCard />
       <AppearanceCard />
     </div>
