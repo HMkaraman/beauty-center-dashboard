@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   DndContext,
   DragOverlay,
@@ -58,7 +59,6 @@ const columns: Column[] = [
 ];
 
 // Map column key to the status value for the API
-// Moving to "upcoming" sets status to "confirmed"
 const COLUMN_TO_STATUS: Record<string, string> = {
   upcoming: "confirmed",
   waiting: "waiting",
@@ -72,31 +72,52 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
   const [activeSourceColumn, setActiveSourceColumn] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
 
+  // Local status overrides for instant visual feedback (same render cycle as drag end)
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+
+  // Clear overrides when real data arrives from the server
+  const prevAppointmentsRef = useRef(appointments);
+  useEffect(() => {
+    if (prevAppointmentsRef.current !== appointments) {
+      prevAppointmentsRef.current = appointments;
+      setStatusOverrides({});
+    }
+  }, [appointments]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
+  // Apply local overrides on top of real data for instant visual updates
+  const effectiveAppointments = useMemo(() => {
+    if (Object.keys(statusOverrides).length === 0) return appointments;
+    return appointments.map((a) =>
+      statusOverrides[a.id]
+        ? { ...a, status: statusOverrides[a.id] as Appointment["status"] }
+        : a
+    );
+  }, [appointments, statusOverrides]);
+
   const grouped = useMemo(() => {
     const result: Record<string, Appointment[]> = {};
     for (const col of columns) {
-      result[col.key] = appointments
+      result[col.key] = effectiveAppointments
         .filter(col.filter)
         .sort((a, b) => a.time.localeCompare(b.time));
     }
     return result;
-  }, [appointments]);
+  }, [effectiveAppointments]);
 
   const activeAppointment = useMemo(
-    () => (activeId ? appointments.find((a) => a.id === activeId) : null),
-    [activeId, appointments]
+    () => (activeId ? effectiveAppointments.find((a) => a.id === activeId) : null),
+    [activeId, effectiveAppointments]
   );
 
   const isValidDrop = useCallback(
     (sourceColumn: string | null, targetColumn: string | null) => {
       if (!sourceColumn || !targetColumn) return false;
       if (sourceColumn === targetColumn) return false;
-      // Completed cards cannot be moved
       if (sourceColumn === "completed") return false;
       return true;
     },
@@ -117,22 +138,35 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      setActiveId(null);
-      setActiveSourceColumn(null);
-      setOverColumn(null);
 
-      if (!over) return;
+      if (!over) {
+        setActiveId(null);
+        setActiveSourceColumn(null);
+        setOverColumn(null);
+        return;
+      }
 
       const sourceColumn = active.data.current?.columnKey as string;
       const targetColumn = over.id as string;
-
-      if (sourceColumn === targetColumn) return;
-      if (!isValidDrop(sourceColumn, targetColumn)) return;
-
       const targetStatus = COLUMN_TO_STATUS[targetColumn];
-      if (targetStatus) {
-        onAction(active.id as string, targetStatus);
+
+      if (sourceColumn === targetColumn || !isValidDrop(sourceColumn, targetColumn) || !targetStatus) {
+        setActiveId(null);
+        setActiveSourceColumn(null);
+        setOverColumn(null);
+        return;
       }
+
+      // All state updates in the same batch:
+      // 1. Clear drag state (overlay disappears)
+      // 2. Set local override (card instantly appears in new column)
+      setActiveId(null);
+      setActiveSourceColumn(null);
+      setOverColumn(null);
+      setStatusOverrides((prev) => ({ ...prev, [active.id as string]: targetStatus }));
+
+      // Fire the API call (parent handles optimistic cache + rollback)
+      onAction(active.id as string, targetStatus);
     },
     [isValidDrop, onAction]
   );
@@ -162,28 +196,43 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
             isValidDrop={isValidDrop(activeSourceColumn, col.key)}
             isOver={overColumn === col.key && activeSourceColumn !== col.key}
           >
-            {grouped[col.key]?.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-8">
-                {t("noAppointments")}
-              </p>
-            ) : (
-              grouped[col.key]?.map((appointment) => (
-                col.key === "completed" ? (
-                  <BoardCard
+            <AnimatePresence mode="popLayout">
+              {grouped[col.key]?.length === 0 ? (
+                <motion.p
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-xs text-muted-foreground text-center py-8"
+                >
+                  {t("noAppointments")}
+                </motion.p>
+              ) : (
+                grouped[col.key]?.map((appointment) => (
+                  <motion.div
                     key={appointment.id}
-                    appointment={appointment}
-                    onAction={onAction}
-                  />
-                ) : (
-                  <DraggableCard
-                    key={appointment.id}
-                    appointment={appointment}
-                    columnKey={col.key}
-                    onAction={onAction}
-                  />
-                )
-              ))
-            )}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ layout: { type: "spring", stiffness: 500, damping: 35 }, opacity: { duration: 0.15 } }}
+                  >
+                    {col.key === "completed" ? (
+                      <BoardCard
+                        appointment={appointment}
+                        onAction={onAction}
+                      />
+                    ) : (
+                      <DraggableCard
+                        appointment={appointment}
+                        columnKey={col.key}
+                        onAction={onAction}
+                      />
+                    )}
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
           </DroppableColumn>
         ))}
       </div>
