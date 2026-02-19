@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Clock, User, Stethoscope } from "lucide-react";
+import { Clock, User, Stethoscope, FileEdit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Appointment } from "@/types";
 
@@ -60,6 +60,18 @@ export function BoardCard({ appointment, onAction, className }: BoardCardProps) 
           onClick={() => onAction(appointment.id, actionInfo.action)}
         >
           {t(actionInfo.labelKey)}
+        </Button>
+      )}
+
+      {appointment.status === "completed" && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full text-xs h-7"
+          onClick={() => onAction(appointment.id, "editInvoice")}
+        >
+          <FileEdit className="h-3 w-3" />
+          {t("editInvoice")}
         </Button>
       )}
     </div>

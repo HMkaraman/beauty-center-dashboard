@@ -57,15 +57,10 @@ const columns: Column[] = [
   },
 ];
 
-// Forward-only transition rules
-const ALLOWED_TRANSITIONS: Record<string, string> = {
-  upcoming: "waiting",
-  waiting: "in-progress",
-  "in-progress": "completed",
-};
-
 // Map column key to the status value for the API
+// Moving to "upcoming" sets status to "confirmed"
 const COLUMN_TO_STATUS: Record<string, string> = {
+  upcoming: "confirmed",
   waiting: "waiting",
   "in-progress": "in-progress",
   completed: "completed",
@@ -100,7 +95,10 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
   const isValidDrop = useCallback(
     (sourceColumn: string | null, targetColumn: string | null) => {
       if (!sourceColumn || !targetColumn) return false;
-      return ALLOWED_TRANSITIONS[sourceColumn] === targetColumn;
+      if (sourceColumn === targetColumn) return false;
+      // Completed cards cannot be moved
+      if (sourceColumn === "completed") return false;
+      return true;
     },
     []
   );

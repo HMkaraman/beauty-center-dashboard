@@ -30,6 +30,13 @@ export function ReceptionPageContent() {
     const appointment = appointments.find((a) => a.id === id);
     if (!appointment) return;
 
+    // Edit invoice — open checkout sheet without changing status
+    if (action === "editInvoice") {
+      setCheckoutAppointment(appointment);
+      setCheckoutOpen(true);
+      return;
+    }
+
     updateAppointment.mutate(
       {
         id,

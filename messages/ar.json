@@ -1117,7 +1117,8 @@
     "notWorkingToday": "لا يعمل في هذا اليوم",
     "freeSlot": "متاح",
     "booked": "محجوز",
-    "schedule": "الجدول"
+    "schedule": "الجدول",
+    "editInvoice": "تعديل الفاتورة"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",

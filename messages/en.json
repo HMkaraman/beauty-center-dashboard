@@ -1117,7 +1117,8 @@
     "notWorkingToday": "Not working on this day",
     "freeSlot": "Available",
     "booked": "Booked",
-    "schedule": "Schedule"
+    "schedule": "Schedule",
+    "editInvoice": "Edit Invoice"
   },
   "serviceCategories": {
     "title": "Service Categories",
