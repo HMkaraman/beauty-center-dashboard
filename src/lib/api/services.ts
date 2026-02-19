@@ -23,4 +23,8 @@ export const servicesApi = {
   update: (id: string, data: Partial<Service>) =>
     apiFetch<Service>(`/services/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/services/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/services/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/services/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

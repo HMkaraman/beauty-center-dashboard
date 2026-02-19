@@ -51,3 +51,13 @@ export function useDeleteInventoryItem() {
     },
   });
 }
+
+export function useBulkDeleteInventoryItems() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: inventoryApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
+  });
+}

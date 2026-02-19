@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
@@ -12,9 +13,14 @@ interface InvoiceTableProps {
   data: Invoice[];
   onView?: (item: Invoice) => void;
   onVoid?: (id: string) => void;
+  selectedIds?: string[];
+  onToggle?: (id: string) => void;
+  onToggleAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
 }
 
-export function InvoiceTable({ data, onView, onVoid }: InvoiceTableProps) {
+export function InvoiceTable({ data, onView, onVoid, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: InvoiceTableProps) {
   const t = useTranslations("invoices");
   const locale = useLocale();
 
@@ -29,6 +35,7 @@ export function InvoiceTable({ data, onView, onVoid }: InvoiceTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
+            {onToggleAll && <th className="px-4 py-3 w-10"><Checkbox checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false} onCheckedChange={onToggleAll} /></th>}
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("invoiceNumber")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("date")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("client")}</th>
@@ -45,6 +52,7 @@ export function InvoiceTable({ data, onView, onVoid }: InvoiceTableProps) {
             const extraCount = invoice.items.length - 1;
             return (
               <tr key={invoice.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+                {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(invoice.id) ?? false} onCheckedChange={() => onToggle(invoice.id)} /></td>}
                 <td className="px-4 py-3 font-english font-medium text-foreground">{invoice.invoiceNumber}</td>
                 <td className="px-4 py-3 font-english text-muted-foreground">{invoice.date}</td>
                 <td className="px-4 py-3">

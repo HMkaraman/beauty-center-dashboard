@@ -52,3 +52,13 @@ export function useDeleteTransaction() {
     },
   });
 }
+
+export function useBulkDeleteTransactions() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: financeApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["finance"] });
+    },
+  });
+}

@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CampaignStatusBadge } from "./campaign-status-badge";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { Campaign } from "@/types";
@@ -18,9 +19,14 @@ interface MarketingTableProps {
   data: Campaign[];
   onEdit?: (item: Campaign) => void;
   onDelete?: (id: string) => void;
+  selectedIds?: string[];
+  onToggle?: (id: string) => void;
+  onToggleAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
 }
 
-export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) {
+export function MarketingTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: MarketingTableProps) {
   const t = useTranslations("marketing");
   const locale = useLocale();
 
@@ -29,6 +35,7 @@ export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) 
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
+            {onToggleAll && <th className="px-4 py-3 w-10"><Checkbox checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false} onCheckedChange={onToggleAll} /></th>}
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("name")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("channel")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("status")}</th>
@@ -43,6 +50,7 @@ export function MarketingTable({ data, onEdit, onDelete }: MarketingTableProps) 
         <tbody>
           {data.map((campaign) => (
             <tr key={campaign.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+              {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(campaign.id) ?? false} onCheckedChange={() => onToggle(campaign.id)} /></td>}
               <td className="px-4 py-3 font-medium text-foreground">{campaign.name}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{campaign.channel}</td>
               <td className="px-4 py-3"><CampaignStatusBadge status={campaign.status} /></td>

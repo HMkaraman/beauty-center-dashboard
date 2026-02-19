@@ -52,3 +52,23 @@ export function useDeleteExpense() {
     },
   });
 }
+
+export function useBulkDeleteExpenses() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: expensesApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    },
+  });
+}
+
+export function useBulkUpdateExpenseStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: expensesApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    },
+  });
+}

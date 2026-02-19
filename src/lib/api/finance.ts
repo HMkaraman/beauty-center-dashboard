@@ -24,4 +24,6 @@ export const financeApi = {
   update: (id: string, data: Partial<Transaction>) =>
     apiFetch<Transaction>(`/finance/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/finance/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/finance/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
 };

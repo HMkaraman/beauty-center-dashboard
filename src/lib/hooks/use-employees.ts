@@ -54,3 +54,23 @@ export function useDeleteEmployee() {
     },
   });
 }
+
+export function useBulkDeleteEmployees() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: employeesApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    },
+  });
+}
+
+export function useBulkUpdateEmployeeStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: employeesApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    },
+  });
+}

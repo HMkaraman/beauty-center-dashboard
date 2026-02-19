@@ -54,3 +54,23 @@ export function useDeleteDoctor() {
     },
   });
 }
+
+export function useBulkDeleteDoctors() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: doctorsApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
+    },
+  });
+}
+
+export function useBulkUpdateDoctorStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: doctorsApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
+    },
+  });
+}

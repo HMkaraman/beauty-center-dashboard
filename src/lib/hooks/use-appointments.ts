@@ -57,3 +57,23 @@ export function useDeleteAppointment() {
     },
   });
 }
+
+export function useBulkDeleteAppointments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: appointmentsApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}
+
+export function useBulkUpdateAppointmentStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: appointmentsApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}

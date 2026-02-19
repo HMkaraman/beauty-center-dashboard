@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
+import { useRowSelection } from "@/hooks/use-row-selection";
+import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { FinanceTable } from "./finance-table";
 import { TransactionCard } from "./transaction-card";
 import { NewTransactionSheet } from "./new-transaction-sheet";
@@ -20,7 +22,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { useTransactions, useDeleteTransaction } from "@/lib/hooks/use-finance";
+import { useTransactions, useDeleteTransaction, useBulkDeleteTransactions } from "@/lib/hooks/use-finance";
 import { Transaction } from "@/types";
 
 export function FinanceTransactionsTab() {
@@ -29,10 +31,12 @@ export function FinanceTransactionsTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const { data } = useTransactions({ search: searchQuery || undefined });
   const deleteTransaction = useDeleteTransaction();
+  const bulkDeleteTransactions = useBulkDeleteTransactions();
   const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Transaction | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -42,6 +46,9 @@ export function FinanceTransactionsTab() {
       item.category.toLowerCase().includes(q)
     );
   });
+
+  const ids = useMemo(() => filtered.map((t2) => t2.id), [filtered]);
+  const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
   const handleEdit = (item: Transaction) => {
     setEditItem(item);
@@ -62,6 +69,8 @@ export function FinanceTransactionsTab() {
       });
     }
   };
+
+  const confirmBulkDelete = () => { bulkDeleteTransactions.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkDeleteSuccess", { count: res.deleted })); clearSelection(); setBulkDeleteOpen(false); } }); };
 
   return (
     <div className="space-y-4">
@@ -99,6 +108,11 @@ export function FinanceTransactionsTab() {
             data={filtered}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            selectedIds={selectedIds}
+            onToggle={toggle}
+            onToggleAll={toggleAll}
+            isAllSelected={isAllSelected}
+            isSomeSelected={isSomeSelected}
           />
           <div className="space-y-3 md:hidden">
             {filtered.map((t2) => (
@@ -112,6 +126,7 @@ export function FinanceTransactionsTab() {
           </div>
         </>
       )}
+      <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[{ id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) }]} />
       <NewTransactionSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
@@ -133,6 +148,18 @@ export function FinanceTransactionsTab() {
             <AlertDialogAction onClick={confirmDelete}>
               {tc("confirmDelete")}
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkDeleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkDeleteConfirmMessage", { count: selectedCount })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkDelete}>{tc("confirmDelete")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

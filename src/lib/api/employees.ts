@@ -24,4 +24,8 @@ export const employeesApi = {
     apiFetch<Employee>(`/employees/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/employees/${id}`, { method: "DELETE" }),
   getDetails: (id: string) => apiFetch<EmployeeDetailResponse>(`/employees/${id}/details`),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/employees/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/employees/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

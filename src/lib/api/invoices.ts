@@ -23,4 +23,6 @@ export const invoicesApi = {
   update: (id: string, data: Partial<Invoice>) =>
     apiFetch<Invoice>(`/invoices/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/invoices/${id}`, { method: "DELETE" }),
+  bulkVoid: (ids: string[]) =>
+    apiFetch<{ voided: number }>("/invoices/bulk", { method: "PATCH", body: JSON.stringify({ ids }) }),
 };

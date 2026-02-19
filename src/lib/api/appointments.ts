@@ -24,4 +24,8 @@ export const appointmentsApi = {
   update: (id: string, data: Partial<Appointment>) =>
     apiFetch<Appointment>(`/appointments/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/appointments/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/appointments/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/appointments/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

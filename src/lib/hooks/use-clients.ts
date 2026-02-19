@@ -54,3 +54,23 @@ export function useDeleteClient() {
     },
   });
 }
+
+export function useBulkDeleteClients() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: clientsApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+    },
+  });
+}
+
+export function useBulkUpdateClientStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: clientsApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+    },
+  });
+}

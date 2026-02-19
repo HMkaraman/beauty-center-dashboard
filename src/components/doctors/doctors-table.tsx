@@ -6,18 +6,20 @@ import { MoreHorizontal, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DoctorStatusBadge } from "./doctor-status-badge";
 import { Doctor } from "@/types";
 
-interface DoctorsTableProps { data: Doctor[]; onEdit?: (item: Doctor) => void; onDelete?: (id: string) => void; }
+interface DoctorsTableProps { data: Doctor[]; onEdit?: (item: Doctor) => void; onDelete?: (id: string) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
-export function DoctorsTable({ data, onEdit, onDelete }: DoctorsTableProps) {
+export function DoctorsTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: DoctorsTableProps) {
   const t = useTranslations("doctors");
   const router = useRouter();
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
         <thead><tr className="border-b border-border">
+          {onToggleAll && <th className="px-4 py-3 w-10"><Checkbox checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false} onCheckedChange={onToggleAll} /></th>}
           <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("name")}</th>
           <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("specialty")}</th>
           <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("phone")}</th>
@@ -29,6 +31,7 @@ export function DoctorsTable({ data, onEdit, onDelete }: DoctorsTableProps) {
         </tr></thead>
         <tbody>{data.map((doctor) => (
           <tr key={doctor.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+            {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(doctor.id) ?? false} onCheckedChange={() => onToggle(doctor.id)} /></td>}
             <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar size="sm"><AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback></Avatar><div><p className="font-medium text-foreground">{doctor.name}</p><p className="text-xs text-muted-foreground font-english">{doctor.phone}</p></div></div></td>
             <td className="px-4 py-3 text-muted-foreground">{doctor.specialty}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{doctor.phone}</td>

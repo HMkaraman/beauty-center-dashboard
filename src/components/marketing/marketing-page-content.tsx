@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, Trash2, Play, Pause, CheckCircle, FileEdit } from "lucide-react";
+import { useRowSelection } from "@/hooks/use-row-selection";
+import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
 import { MarketingChannelChart } from "./marketing-channel-chart";
 import { MarketingReachChart } from "./marketing-reach-chart";
@@ -28,7 +30,7 @@ import {
   marketingByChannelData,
   marketingReachTrendData,
 } from "@/lib/mock-data";
-import { useCampaigns, useDeleteCampaign } from "@/lib/hooks/use-marketing";
+import { useCampaigns, useDeleteCampaign, useBulkDeleteCampaigns, useBulkUpdateCampaignStatus } from "@/lib/hooks/use-marketing";
 import { Campaign } from "@/types";
 
 export function MarketingPageContent() {
@@ -37,10 +39,15 @@ export function MarketingPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const { data } = useCampaigns({ search: searchQuery || undefined });
   const deleteCampaign = useDeleteCampaign();
+  const bulkDeleteCampaigns = useBulkDeleteCampaigns();
+  const bulkUpdateStatus = useBulkUpdateCampaignStatus();
   const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Campaign | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState("");
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -50,6 +57,9 @@ export function MarketingPageContent() {
       item.channel.toLowerCase().includes(q)
     );
   });
+
+  const ids = useMemo(() => filtered.map((c) => c.id), [filtered]);
+  const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
   const handleEdit = (item: Campaign) => {
     setEditItem(item);
@@ -70,6 +80,10 @@ export function MarketingPageContent() {
       });
     }
   };
+
+  const confirmBulkDelete = () => { bulkDeleteCampaigns.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkDeleteSuccess", { count: res.deleted })); clearSelection(); setBulkDeleteOpen(false); } }); };
+  const handleBulkStatus = (status: string) => { setPendingStatus(status); setBulkStatusOpen(true); };
+  const confirmBulkStatus = () => { bulkUpdateStatus.mutate({ ids: selectedIds, status: pendingStatus }, { onSuccess: (res) => { toast.success(tc("bulkStatusSuccess", { count: res.updated })); clearSelection(); setBulkStatusOpen(false); } }); };
 
   return (
     <div className="space-y-6">
@@ -107,7 +121,7 @@ export function MarketingPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <MarketingTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} />
+            <MarketingTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
             <div className="space-y-3 md:hidden">
               {filtered.map((campaign) => (
                 <CampaignCard key={campaign.id} data={campaign} onEdit={handleEdit} onDelete={handleDelete} />
@@ -116,6 +130,14 @@ export function MarketingPageContent() {
           </>
         )}
       </div>
+
+      <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[
+        { id: "status-active", label: t("statusActive"), variant: "outline", icon: <Play className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("active") },
+        { id: "status-paused", label: t("statusPaused"), variant: "outline", icon: <Pause className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("paused") },
+        { id: "status-completed", label: t("statusCompleted"), variant: "outline", icon: <CheckCircle className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("completed") },
+        { id: "status-draft", label: t("statusDraft"), variant: "outline", icon: <FileEdit className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("draft") },
+        { id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) },
+      ]} />
 
       <NewCampaignSheet
         open={sheetOpen}
@@ -132,6 +154,30 @@ export function MarketingPageContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkDeleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkDeleteConfirmMessage", { count: selectedCount })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkStatusOpen} onOpenChange={setBulkStatusOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkStatusConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkStatusConfirmMessage", { count: selectedCount, status: pendingStatus })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkStatus}>{tc("bulkStatusChange")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

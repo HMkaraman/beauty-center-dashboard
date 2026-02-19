@@ -46,3 +46,23 @@ export function useDeleteService() {
     },
   });
 }
+
+export function useBulkDeleteServices() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: servicesApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+    },
+  });
+}
+
+export function useBulkUpdateServiceStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: servicesApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+    },
+  });
+}

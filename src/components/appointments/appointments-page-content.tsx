@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, Trash2, CheckCircle, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { useRowSelection } from "@/hooks/use-row-selection";
+import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
 import { AppointmentsStatusChart } from "./appointments-status-chart";
 import { AppointmentsTrendChart } from "@/components/charts/appointments-trend-chart";
@@ -29,7 +31,7 @@ import {
   appointmentsByStatusData,
   appointmentsTrendData,
 } from "@/lib/mock-data";
-import { useAppointments, useDeleteAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
+import { useAppointments, useDeleteAppointment, useUpdateAppointment, useBulkDeleteAppointments, useBulkUpdateAppointmentStatus } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 
 export function AppointmentsPageContent() {
@@ -39,10 +41,15 @@ export function AppointmentsPageContent() {
   const { data } = useAppointments();
   const items = data?.data ?? [];
   const deleteAppointment = useDeleteAppointment();
+  const bulkDeleteAppointments = useBulkDeleteAppointments();
+  const bulkUpdateStatus = useBulkUpdateAppointmentStatus();
   const updateAppointment = useUpdateAppointment();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Appointment | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState("");
   const [checkoutItem, setCheckoutItem] = useState<Appointment | null>(null);
 
   const filtered = items.filter((item) => {
@@ -55,6 +62,9 @@ export function AppointmentsPageContent() {
       item.employee.toLowerCase().includes(q)
     );
   });
+
+  const ids = useMemo(() => filtered.map((a) => a.id), [filtered]);
+  const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
   const handleEdit = (item: Appointment) => {
     setEditItem(item);
@@ -81,6 +91,10 @@ export function AppointmentsPageContent() {
       setDeleteId(null);
     }
   };
+
+  const confirmBulkDelete = () => { bulkDeleteAppointments.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkDeleteSuccess", { count: res.deleted })); clearSelection(); setBulkDeleteOpen(false); } }); };
+  const handleBulkStatus = (status: string) => { setPendingStatus(status); setBulkStatusOpen(true); };
+  const confirmBulkStatus = () => { bulkUpdateStatus.mutate({ ids: selectedIds, status: pendingStatus }, { onSuccess: (res) => { toast.success(tc("bulkStatusSuccess", { count: res.updated })); clearSelection(); setBulkStatusOpen(false); } }); };
 
   return (
     <div className="space-y-6">
@@ -118,7 +132,7 @@ export function AppointmentsPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} />
+            <AppointmentsTable data={filtered} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
             <div className="space-y-3 md:hidden">
               {filtered.map((appointment) => (
                 <AppointmentCard key={appointment.id} data={appointment} onEdit={handleEdit} onDelete={handleDelete} onCheckout={handleCheckout} />
@@ -127,6 +141,14 @@ export function AppointmentsPageContent() {
           </>
         )}
       </div>
+
+      <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[
+        { id: "status-confirmed", label: t("statusConfirmed"), variant: "outline", icon: <CheckCircle className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("confirmed") },
+        { id: "status-completed", label: t("statusCompleted"), variant: "outline", icon: <CheckCircle className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("completed") },
+        { id: "status-cancelled", label: t("statusCancelled"), variant: "outline", icon: <XCircle className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("cancelled") },
+        { id: "status-no-show", label: t("statusNoShow"), variant: "outline", icon: <AlertTriangle className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("no-show") },
+        { id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) },
+      ]} />
 
       <NewAppointmentSheet
         open={sheetOpen}
@@ -150,6 +172,30 @@ export function AppointmentsPageContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkDeleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkDeleteConfirmMessage", { count: selectedCount })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkStatusOpen} onOpenChange={setBulkStatusOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkStatusConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkStatusConfirmMessage", { count: selectedCount, status: pendingStatus })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkStatus}>{tc("bulkStatusChange")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

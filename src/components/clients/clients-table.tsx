@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ClientStatusBadge } from "./client-status-badge";
 import { formatCurrency } from "@/lib/formatters";
 import { Client } from "@/types";
@@ -16,9 +17,14 @@ interface ClientsTableProps {
   data: Client[];
   onEdit?: (item: Client) => void;
   onDelete?: (id: string) => void;
+  selectedIds?: string[];
+  onToggle?: (id: string) => void;
+  onToggleAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
 }
 
-export function ClientsTable({ data, onEdit, onDelete }: ClientsTableProps) {
+export function ClientsTable({ data, onEdit, onDelete, selectedIds, onToggle, onToggleAll, isAllSelected, isSomeSelected }: ClientsTableProps) {
   const t = useTranslations("clients");
   const locale = useLocale();
   const router = useRouter();
@@ -28,6 +34,7 @@ export function ClientsTable({ data, onEdit, onDelete }: ClientsTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
+            {onToggleAll && <th className="px-4 py-3 w-10"><Checkbox checked={isAllSelected ? true : isSomeSelected ? "indeterminate" : false} onCheckedChange={onToggleAll} /></th>}
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("client")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("phone")}</th>
             <th className="px-4 py-3 text-start text-xs font-medium text-muted-foreground">{t("status")}</th>
@@ -41,6 +48,7 @@ export function ClientsTable({ data, onEdit, onDelete }: ClientsTableProps) {
         <tbody>
           {data.map((client) => (
             <tr key={client.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+              {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(client.id) ?? false} onCheckedChange={() => onToggle(client.id)} /></td>}
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <Avatar size="sm"><AvatarFallback>{client.name.charAt(0)}</AvatarFallback></Avatar>

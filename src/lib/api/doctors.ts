@@ -24,4 +24,8 @@ export const doctorsApi = {
     apiFetch<Doctor>(`/doctors/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/doctors/${id}`, { method: "DELETE" }),
   getDetails: (id: string) => apiFetch<DoctorDetailResponse>(`/doctors/${id}/details`),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/doctors/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/doctors/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

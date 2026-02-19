@@ -24,4 +24,8 @@ export const expensesApi = {
   update: (id: string, data: Partial<Expense>) =>
     apiFetch<Expense>(`/expenses/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/expenses/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/expenses/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/expenses/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

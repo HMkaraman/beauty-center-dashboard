@@ -23,4 +23,8 @@ export const marketingApi = {
   update: (id: string, data: Partial<Campaign>) =>
     apiFetch<Campaign>(`/marketing/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/marketing/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/marketing/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/marketing/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

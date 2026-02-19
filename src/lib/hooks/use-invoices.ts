@@ -46,3 +46,13 @@ export function useDeleteInvoice() {
     },
   });
 }
+
+export function useBulkVoidInvoices() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: invoicesApi.bulkVoid,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+  });
+}

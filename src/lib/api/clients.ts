@@ -24,4 +24,8 @@ export const clientsApi = {
     apiFetch<Client>(`/clients/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/clients/${id}`, { method: "DELETE" }),
   getDetails: (id: string) => apiFetch<ClientDetailResponse>(`/clients/${id}/details`),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/clients/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
+  bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
+    apiFetch<{ updated: number }>("/clients/bulk", { method: "PATCH", body: JSON.stringify(data) }),
 };

@@ -46,3 +46,23 @@ export function useDeleteCampaign() {
     },
   });
 }
+
+export function useBulkDeleteCampaigns() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: marketingApi.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["marketing"] });
+    },
+  });
+}
+
+export function useBulkUpdateCampaignStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: marketingApi.bulkUpdateStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["marketing"] });
+    },
+  });
+}

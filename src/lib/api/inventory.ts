@@ -23,4 +23,6 @@ export const inventoryApi = {
   update: (id: string, data: Partial<InventoryItem>) =>
     apiFetch<InventoryItem>(`/inventory/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: string) => apiFetch(`/inventory/${id}`, { method: "DELETE" }),
+  bulkDelete: (ids: string[]) =>
+    apiFetch<{ deleted: number }>("/inventory/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
 };

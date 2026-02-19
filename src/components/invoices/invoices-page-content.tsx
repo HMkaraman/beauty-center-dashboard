@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, Ban } from "lucide-react";
+import { useRowSelection } from "@/hooks/use-row-selection";
+import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
 import { InvoiceTable } from "./invoice-table";
 import { InvoiceCard } from "./invoice-card";
@@ -23,7 +25,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { invoicesKpiData } from "@/lib/mock-data";
-import { useInvoices, useUpdateInvoice } from "@/lib/hooks/use-invoices";
+import { useInvoices, useUpdateInvoice, useBulkVoidInvoices } from "@/lib/hooks/use-invoices";
 import { Invoice } from "@/types";
 
 export function InvoicesPageContent() {
@@ -32,10 +34,12 @@ export function InvoicesPageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const { data } = useInvoices({ search: searchQuery || undefined });
   const updateInvoice = useUpdateInvoice();
+  const bulkVoidInvoices = useBulkVoidInvoices();
   const items = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [viewItem, setViewItem] = useState<Invoice | null>(null);
   const [voidId, setVoidId] = useState<string | null>(null);
+  const [bulkVoidOpen, setBulkVoidOpen] = useState(false);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;
@@ -46,6 +50,9 @@ export function InvoicesPageContent() {
       item.clientPhone.includes(q)
     );
   });
+
+  const ids = useMemo(() => filtered.map((i) => i.id), [filtered]);
+  const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
   const handleView = (item: Invoice) => {
     setViewItem(item);
@@ -65,6 +72,8 @@ export function InvoicesPageContent() {
       });
     }
   };
+
+  const confirmBulkVoid = () => { bulkVoidInvoices.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkVoidSuccess", { count: res.voided })); clearSelection(); setBulkVoidOpen(false); } }); };
 
   return (
     <div className="space-y-6">
@@ -97,7 +106,7 @@ export function InvoicesPageContent() {
           <p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>
         ) : (
           <>
-            <InvoiceTable data={filtered} onView={handleView} onVoid={handleVoid} />
+            <InvoiceTable data={filtered} onView={handleView} onVoid={handleVoid} selectedIds={selectedIds} onToggle={toggle} onToggleAll={toggleAll} isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} />
             <div className="space-y-3 md:hidden">
               {filtered.map((invoice) => (
                 <InvoiceCard key={invoice.id} data={invoice} onView={handleView} onVoid={handleVoid} />
@@ -106,6 +115,8 @@ export function InvoicesPageContent() {
           </>
         )}
       </div>
+
+      <BulkActionBar selectedCount={selectedCount} onClearSelection={clearSelection} label={tc("selected", { count: selectedCount })} actions={[{ id: "bulk-void", label: tc("bulkVoid"), variant: "destructive", icon: <Ban className="h-3.5 w-3.5" />, onClick: () => setBulkVoidOpen(true) }]} />
 
       <NewInvoiceSheet open={sheetOpen} onOpenChange={setSheetOpen} />
 
@@ -120,6 +131,18 @@ export function InvoicesPageContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmVoid}>{t("voidInvoice")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={bulkVoidOpen} onOpenChange={setBulkVoidOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("bulkVoidConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("bulkVoidConfirmMessage", { count: selectedCount })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkVoid}>{tc("bulkVoid")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
