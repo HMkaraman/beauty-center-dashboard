@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { appointments, doctorSchedules } from "@/db/schema";
+import { appointments, doctorSchedules, employeeSchedules } from "@/db/schema";
 import { eq, and, ne, sql } from "drizzle-orm";
 
 // Convert "HH:MM" time string to minutes since midnight
@@ -245,6 +245,57 @@ export async function checkDoctorWorkingHours(params: {
   }
 
   // Doctor not available this day
+  if (!schedule.isAvailable) {
+    return {
+      withinSchedule: false,
+      schedule: { startTime: schedule.startTime, endTime: schedule.endTime },
+    };
+  }
+
+  const apptStart = timeToMinutes(params.time);
+  const apptEnd = apptStart + params.duration;
+  const schedStart = timeToMinutes(schedule.startTime);
+  const schedEnd = timeToMinutes(schedule.endTime);
+
+  const withinSchedule = apptStart >= schedStart && apptEnd <= schedEnd;
+
+  return {
+    withinSchedule,
+    schedule: { startTime: schedule.startTime, endTime: schedule.endTime },
+  };
+}
+
+// Check if appointment time is within employee's working hours
+export async function checkEmployeeWorkingHours(params: {
+  tenantId: string;
+  employeeId: string;
+  date: string;
+  time: string;
+  duration: number;
+}): Promise<{
+  withinSchedule: boolean;
+  schedule?: { startTime: string; endTime: string };
+}> {
+  const dayOfWeek = getDayOfWeek(params.date);
+
+  const [schedule] = await db
+    .select()
+    .from(employeeSchedules)
+    .where(
+      and(
+        eq(employeeSchedules.tenantId, params.tenantId),
+        eq(employeeSchedules.employeeId, params.employeeId),
+        eq(employeeSchedules.dayOfWeek, dayOfWeek)
+      )
+    )
+    .limit(1);
+
+  // No schedule defined — don't block
+  if (!schedule) {
+    return { withinSchedule: true };
+  }
+
+  // Employee not available this day
   if (!schedule.isAvailable) {
     return {
       withinSchedule: false,

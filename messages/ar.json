@@ -115,6 +115,7 @@
     "doctor": "الطبيب",
     "selectDoctor": "اختر الطبيب",
     "doctorConflictWarning": "هذا الطبيب لديه موعد متعارض في {time} ({service})",
+    "outsideEmployeeHours": "هذا الوقت خارج ساعات عمل الموظفة ({start} - {end})",
     "outsideDoctorHours": "هذا الوقت خارج ساعات عمل الطبيب ({start} - {end})",
     "nextAvailable": "أقرب وقت متاح: {time}"
   },

@@ -66,6 +66,8 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     conflictType?: "employee" | "doctor";
     conflictingAppointment?: { time: string; service: string };
     nextAvailableSlot?: string | null;
+    employeeHoursWarning?: { start: string; end: string } | null;
+    doctorHoursWarning?: { start: string; end: string } | null;
   } | null>(null);
   const conflictTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -117,12 +119,14 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
       if (!res.ok) return;
       const json = await res.json();
       const data = json.data ?? json;
-      if (data.hasConflict) {
+      if (data.hasConflict || data.employeeHoursWarning || data.doctorHoursWarning) {
         setConflictWarning({
-          hasConflict: true,
+          hasConflict: data.hasConflict,
           conflictType: data.conflictType,
           conflictingAppointment: data.conflictingAppointment,
           nextAvailableSlot: data.nextAvailableSlot,
+          employeeHoursWarning: data.employeeHoursWarning,
+          doctorHoursWarning: data.doctorHoursWarning,
         });
       } else {
         setConflictWarning(null);
@@ -348,6 +352,28 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
                   </button>
                 </p>
               )}
+            </div>
+          )}
+
+          {conflictWarning?.employeeHoursWarning && (
+            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+              <p>
+                {t("outsideEmployeeHours", {
+                  start: conflictWarning.employeeHoursWarning.start,
+                  end: conflictWarning.employeeHoursWarning.end,
+                })}
+              </p>
+            </div>
+          )}
+
+          {conflictWarning?.doctorHoursWarning && (
+            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+              <p>
+                {t("outsideDoctorHours", {
+                  start: conflictWarning.doctorHoursWarning.start,
+                  end: conflictWarning.doctorHoursWarning.end,
+                })}
+              </p>
             </div>
           )}
 

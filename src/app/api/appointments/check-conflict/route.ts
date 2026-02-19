@@ -9,6 +9,8 @@ import {
 import {
   checkConflict,
   findNextAvailableSlot,
+  checkEmployeeWorkingHours,
+  checkDoctorWorkingHours,
 } from "@/lib/business-logic/scheduling";
 
 export async function POST(req: NextRequest) {
@@ -46,9 +48,41 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Check working hours for employee and doctor
+    let employeeHoursWarning: { start: string; end: string } | null = null;
+    let doctorHoursWarning: { start: string; end: string } | null = null;
+
+    if (employeeId) {
+      const empCheck = await checkEmployeeWorkingHours({
+        tenantId: session.user.tenantId,
+        employeeId,
+        date,
+        time,
+        duration: duration || 60,
+      });
+      if (!empCheck.withinSchedule && empCheck.schedule) {
+        employeeHoursWarning = { start: empCheck.schedule.startTime, end: empCheck.schedule.endTime };
+      }
+    }
+
+    if (doctorId) {
+      const docCheck = await checkDoctorWorkingHours({
+        tenantId: session.user.tenantId,
+        doctorId,
+        date,
+        time,
+        duration: duration || 60,
+      });
+      if (!docCheck.withinSchedule && docCheck.schedule) {
+        doctorHoursWarning = { start: docCheck.schedule.startTime, end: docCheck.schedule.endTime };
+      }
+    }
+
     return success({
       ...conflict,
       nextAvailableSlot: nextSlot,
+      employeeHoursWarning,
+      doctorHoursWarning,
     });
   } catch (error) {
     console.error("POST /api/appointments/check-conflict error:", error);

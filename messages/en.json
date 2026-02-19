@@ -115,6 +115,7 @@
     "doctor": "Doctor",
     "selectDoctor": "Select Doctor",
     "doctorConflictWarning": "This doctor has a conflicting appointment at {time} ({service})",
+    "outsideEmployeeHours": "This time is outside the employee's working hours ({start} - {end})",
     "outsideDoctorHours": "This time is outside the doctor's working hours ({start} - {end})",
     "nextAvailable": "Next available: {time}"
   },

@@ -12,7 +12,7 @@ import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { deductInventoryForService } from "@/lib/business-logic/inventory";
-import { checkConflict, checkDoctorWorkingHours } from "@/lib/business-logic/scheduling";
+import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -100,6 +100,24 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         return badRequest(
           `Employee has a conflicting appointment at ${conflict.conflictingAppointment?.time} (${conflict.conflictingAppointment?.service})`
         );
+      }
+
+      // Check employee working hours
+      const mergedEmployeeId = validated.employeeId ?? existing.employeeId;
+      if (mergedEmployeeId) {
+        const empHoursCheck = await checkEmployeeWorkingHours({
+          tenantId: session.user.tenantId,
+          employeeId: mergedEmployeeId,
+          date: validated.date ?? existing.date,
+          time: validated.time ?? existing.time,
+          duration: validated.duration ?? existing.duration,
+        });
+
+        if (!empHoursCheck.withinSchedule && empHoursCheck.schedule) {
+          return badRequest(
+            `This time is outside the employee's working hours (${empHoursCheck.schedule.startTime} - ${empHoursCheck.schedule.endTime})`
+          );
+        }
       }
 
       // Check doctor working hours
