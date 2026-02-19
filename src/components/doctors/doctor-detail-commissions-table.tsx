@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { formatCurrency } from "@/lib/formatters";
 import { DoctorCommission } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface DoctorDetailCommissionsTableProps {
   data: DoctorCommission[];
@@ -37,7 +37,7 @@ export function DoctorDetailCommissionsTable({ data }: DoctorDetailCommissionsTa
               <td className="px-4 py-3 font-english text-muted-foreground">{commission.date}</td>
               <td className="px-4 py-3 text-foreground">{commission.clientName || "—"}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{commission.rate}%</td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(commission.amount, locale)}</td>
+              <td className="px-4 py-3 font-english text-foreground"><Price value={commission.amount} /></td>
             </tr>
           ))}
         </tbody>

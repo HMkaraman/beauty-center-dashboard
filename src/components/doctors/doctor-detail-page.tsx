@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Phone, Mail, Calendar, Clock, TrendingUp,
@@ -18,9 +18,9 @@ import { DoctorDetailCommissionsTable } from "./doctor-detail-commissions-table"
 import { DoctorAppointmentCard } from "./doctor-appointment-card";
 import { DoctorCommissionCard } from "./doctor-commission-card";
 import { useDoctorDetails } from "@/lib/hooks";
-import { formatCurrency } from "@/lib/formatters";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { DoctorScheduleCard } from "./doctor-schedule-card";
+import { Price } from "@/components/ui/price";
 
 interface DoctorDetailPageProps {
   doctorId: string;
@@ -28,7 +28,6 @@ interface DoctorDetailPageProps {
 
 export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
   const t = useTranslations("doctors");
-  const locale = useLocale();
   const router = useRouter();
   const { data, isLoading, error } = useDoctorDetails(doctorId);
 
@@ -60,17 +59,17 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
     },
     {
       label: t("kpiRevenueGenerated"),
-      value: formatCurrency(kpis.revenueGenerated, locale),
+      value: <Price value={kpis.revenueGenerated} />,
       icon: <DollarSign className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiAvgRevenuePerConsultation"),
-      value: formatCurrency(kpis.avgRevenuePerConsultation, locale),
+      value: <Price value={kpis.avgRevenuePerConsultation} />,
       icon: <TrendingUp className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiCommissionEarned"),
-      value: formatCurrency(kpis.commissionEarned, locale),
+      value: <Price value={kpis.commissionEarned} />,
       icon: <Briefcase className="h-5 w-5 text-gold" />,
     },
     {
@@ -180,7 +179,7 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
             {doctor.salary > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <DollarSign className="h-3.5 w-3.5" />
-                <span>{t("monthlySalary")}: <span className="font-english">{formatCurrency(doctor.salary, locale)}</span></span>
+                <span>{t("monthlySalary")}: <span className="font-english"><Price value={doctor.salary} /></span></span>
               </div>
             )}
             {doctor.commissionRate > 0 && (

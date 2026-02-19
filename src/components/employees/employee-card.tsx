@@ -8,8 +8,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EmployeeStatusBadge } from "./employee-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Employee } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface EmployeeCardProps {
   data: Employee;
@@ -38,7 +38,7 @@ export function EmployeeCard({ data, onEdit, onDelete }: EmployeeCardProps) {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs font-english text-muted-foreground">{data.hireDate}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.revenue, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.revenue} /></p>
       </div>
     </motion.div>
   );

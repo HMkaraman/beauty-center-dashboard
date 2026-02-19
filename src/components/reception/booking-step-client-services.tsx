@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClientCombobox } from "@/components/appointments/client-combobox";
 import { ServiceBrowser, type SelectedService } from "./service-browser";
-import { formatCurrency } from "@/lib/formatters";
 import { X } from "lucide-react";
+import { Price } from "@/components/ui/price";
 
 interface ClientValue {
   clientId: string;
@@ -113,7 +113,7 @@ export function BookingStepClientServices({
                 {t("selectedServices")} ({selectedServices.length})
               </p>
               <p className="text-sm font-english font-bold">
-                {formatCurrency(total, locale)}
+                <Price value={total} />
               </p>
             </div>
             <div className="flex flex-wrap gap-1">

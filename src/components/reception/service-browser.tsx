@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useSections } from "@/lib/hooks/use-sections";
 import { useServiceCategories } from "@/lib/hooks/use-service-categories";
 import { useServices } from "@/lib/hooks/use-services";
-import { formatCurrency } from "@/lib/formatters";
 import type { Service } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface SelectedService {
   serviceId: string;
@@ -190,7 +190,7 @@ export function ServiceBrowser({ selectedServices, onAdd, onRemove, maxHeight = 
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-sm font-english font-medium">
-                  {formatCurrency(service.price, locale)}
+                  <Price value={service.price} />
                 </span>
                 {isSelected ? (
                   <X className="h-4 w-4 text-destructive" />
@@ -216,7 +216,7 @@ export function ServiceBrowser({ selectedServices, onAdd, onRemove, maxHeight = 
               {t("selectedServices")} ({selectedServices.length})
             </p>
             <p className="text-sm font-english font-bold">
-              {formatCurrency(total, locale)}
+              <Price value={total} />
             </p>
           </div>
           <div className="flex flex-wrap gap-1">

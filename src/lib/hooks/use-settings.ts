@@ -35,3 +35,13 @@ export function useUpdateWorkingHours() {
     },
   });
 }
+
+export function useFetchExchangeRates() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => settingsApi.fetchExchangeRates(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
+    },
+  });
+}

@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ServiceStatusBadge } from "./service-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Service } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ServicesTableProps { data: Service[]; onEdit?: (item: Service) => void; onDelete?: (id: string) => void; onActivity?: (item: Service) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
@@ -34,7 +34,7 @@ export function ServicesTable({ data, onEdit, onDelete, onActivity, selectedIds,
             <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar size="sm"><AvatarFallback>{service.name.charAt(0)}</AvatarFallback></Avatar><p className="font-medium text-foreground">{service.name}</p></div></td>
             <td className="px-4 py-3 text-muted-foreground">{service.category}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{service.duration}{t("minutes")}</td>
-            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(service.price, locale)}</td>
+            <td className="px-4 py-3 font-english text-foreground"><Price value={service.price} /></td>
             <td className="px-4 py-3"><ServiceStatusBadge status={service.status} /></td>
             <td className="px-4 py-3 font-english text-muted-foreground">{service.bookings}</td>
             <td className="px-4 py-3">

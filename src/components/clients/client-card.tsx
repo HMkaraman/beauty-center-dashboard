@@ -10,8 +10,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ClientStatusBadge } from "./client-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Client } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ClientCardProps {
   data: Client;
@@ -64,7 +64,7 @@ export function ClientCard({ data, onEdit, onDelete }: ClientCardProps) {
           <span>{data.lastVisit}</span>
           <span>{data.joinDate}</span>
         </div>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.totalSpent, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.totalSpent} /></p>
       </div>
     </motion.div>
   );

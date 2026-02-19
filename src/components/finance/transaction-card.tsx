@@ -5,8 +5,8 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TransactionTypeBadge } from "./transaction-type-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Transaction } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface TransactionCardProps { data: Transaction; onEdit?: (item: Transaction) => void; onDelete?: (id: string) => void; }
 
@@ -24,7 +24,7 @@ export function TransactionCard({ data, onEdit, onDelete }: TransactionCardProps
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs font-english text-muted-foreground">{data.date}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.amount, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.amount} /></p>
       </div>
     </motion.div>
   );

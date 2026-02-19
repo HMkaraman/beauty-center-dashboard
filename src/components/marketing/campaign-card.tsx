@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CampaignStatusBadge } from "./campaign-status-badge";
-import { formatCurrency, formatNumber } from "@/lib/formatters";
+import { formatNumber } from "@/lib/formatters";
 import { Campaign } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface CampaignCardProps {
   data: Campaign;
@@ -55,7 +56,7 @@ export function CampaignCard({ data, onEdit, onDelete }: CampaignCardProps) {
 
       <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
         <div className="flex justify-between">
-          <span>{t("budget")}: <span className="font-english">{formatCurrency(data.budget, locale)}</span></span>
+          <span>{t("budget")}: <span className="font-english"><Price value={data.budget} /></span></span>
         </div>
         <div className="flex justify-between">
           <span>{t("reach")}: <span className="font-english">{formatNumber(data.reach, locale)}</span></span>

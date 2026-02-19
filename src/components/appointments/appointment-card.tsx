@@ -17,8 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Appointment, AppointmentStatus } from "@/types";
+import { Price } from "@/components/ui/price";
 
 const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
 
@@ -110,7 +110,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
           <span>{data.duration}{t("minutes")}</span>
         </div>
         <p className="text-sm font-bold font-english text-foreground">
-          {formatCurrency(data.price, locale)}
+          <Price value={data.price} />
         </p>
       </div>
     </motion.div>

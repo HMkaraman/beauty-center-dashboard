@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface InvoiceTableProps {
   data: Invoice[];
@@ -62,7 +62,7 @@ export function InvoiceTable({ data, onView, onVoid, selectedIds, onToggle, onTo
                 <td className="px-4 py-3 text-muted-foreground">
                   {firstItem}{extraCount > 0 && <span className="text-xs opacity-60"> +{extraCount}</span>}
                 </td>
-                <td className="px-4 py-3 font-english font-medium text-foreground">{formatCurrency(invoice.total, locale)}</td>
+                <td className="px-4 py-3 font-english font-medium text-foreground"><Price value={invoice.total} /></td>
                 <td className="px-4 py-3 text-muted-foreground">{paymentLabel(invoice.paymentMethod)}</td>
                 <td className="px-4 py-3"><InvoiceStatusBadge status={invoice.status} /></td>
                 <td className="px-4 py-3">

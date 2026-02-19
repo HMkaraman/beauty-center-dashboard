@@ -7,8 +7,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ServiceStatusBadge } from "./service-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Service } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ServiceCardProps { data: Service; onEdit?: (item: Service) => void; onDelete?: (id: string) => void; }
 
@@ -27,7 +27,7 @@ export function ServiceCard({ data, onEdit, onDelete }: ServiceCardProps) {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <div className="flex items-center gap-3 text-xs font-english text-muted-foreground"><span>{data.duration}{t("minutes")}</span></div>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.price, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.price} /></p>
       </div>
     </motion.div>
   );

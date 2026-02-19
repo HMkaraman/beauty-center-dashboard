@@ -1,0 +1,32 @@
+/* Saudi Riyal official currency symbol font */
+/* Uses U+E900 (Private Use Area) — no system font has this, so our web font is guaranteed to render */
+@font-face {
+  font-family: "SaudiRiyal";
+  src: url("/fonts/saudi-riyal/saudi_riyal.woff2") format("woff2"),
+       url("/fonts/saudi-riyal/saudi_riyal.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+E900;
+}
+
+@font-face {
+  font-family: "SaudiRiyal";
+  src: url("/fonts/saudi-riyal/saudi_riyal_bold.woff2") format("woff2"),
+       url("/fonts/saudi-riyal/saudi_riyal_bold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+E900;
+}
+
+/* UAE Dirham official currency symbol font */
+/* Uses U+00EA (ê) — the dirham font maps the symbol glyph to this codepoint */
+@font-face {
+  font-family: "UAEDirham";
+  src: url("/fonts/uae-dirham/uae.symbol.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00EA;
+}

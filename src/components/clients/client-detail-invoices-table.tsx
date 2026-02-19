@@ -2,8 +2,8 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { InvoiceStatusBadge } from "@/components/invoices/invoice-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ClientDetailInvoicesTableProps {
   data: Invoice[];
@@ -56,7 +56,7 @@ export function ClientDetailInvoicesTable({ data }: ClientDetailInvoicesTablePro
                 <td className="px-4 py-3 text-muted-foreground">
                   {firstItem}{extraCount > 0 && <span className="text-xs opacity-60"> +{extraCount}</span>}
                 </td>
-                <td className="px-4 py-3 font-english font-medium text-foreground">{formatCurrency(invoice.total, locale)}</td>
+                <td className="px-4 py-3 font-english font-medium text-foreground"><Price value={invoice.total} /></td>
                 <td className="px-4 py-3 text-muted-foreground">{paymentLabel(invoice.paymentMethod)}</td>
                 <td className="px-4 py-3"><InvoiceStatusBadge status={invoice.status} /></td>
               </tr>

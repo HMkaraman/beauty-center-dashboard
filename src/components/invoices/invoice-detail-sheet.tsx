@@ -4,8 +4,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface InvoiceDetailSheetProps {
   open: boolean;
@@ -62,8 +62,8 @@ export function InvoiceDetailSheet({ open, onOpenChange, invoice }: InvoiceDetai
                     <tr key={i} className="border-b border-border last:border-0">
                       <td className="px-3 py-2 text-foreground">{item.description}</td>
                       <td className="px-3 py-2 font-english text-muted-foreground">{item.quantity}</td>
-                      <td className="px-3 py-2 font-english text-muted-foreground">{formatCurrency(item.unitPrice, locale)}</td>
-                      <td className="px-3 py-2 font-english font-medium text-foreground">{formatCurrency(item.total, locale)}</td>
+                      <td className="px-3 py-2 font-english text-muted-foreground"><Price value={item.unitPrice} /></td>
+                      <td className="px-3 py-2 font-english font-medium text-foreground"><Price value={item.total} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -75,17 +75,17 @@ export function InvoiceDetailSheet({ open, onOpenChange, invoice }: InvoiceDetai
           <div className="rounded-lg border border-border p-3 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t("subtotal")}</span>
-              <span className="font-english text-foreground">{formatCurrency(invoice.subtotal, locale)}</span>
+              <span className="font-english text-foreground"><Price value={invoice.subtotal} /></span>
             </div>
             {invoice.taxRate > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t("tax")} ({invoice.taxRate}%)</span>
-                <span className="font-english text-foreground">{formatCurrency(invoice.taxAmount, locale)}</span>
+                <span className="font-english text-foreground"><Price value={invoice.taxAmount} /></span>
               </div>
             )}
             <div className="flex justify-between border-t border-border pt-2 font-bold">
               <span className="text-foreground">{t("total")}</span>
-              <span className="font-english text-gold">{formatCurrency(invoice.total, locale)}</span>
+              <span className="font-english text-gold"><Price value={invoice.total} /></span>
             </div>
           </div>
 

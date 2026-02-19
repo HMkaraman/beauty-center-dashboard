@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EmployeeStatusBadge } from "./employee-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Employee } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface EmployeesTableProps {
   data: Employee[];
@@ -47,7 +47,7 @@ export function EmployeesTable({ data, onEdit, onDelete, selectedIds, onToggle, 
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.phone}</td>
             <td className="px-4 py-3"><EmployeeStatusBadge status={employee.status} /></td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.appointments}</td>
-            <td className="px-4 py-3 font-english text-foreground">{formatCurrency(employee.revenue, locale)}</td>
+            <td className="px-4 py-3 font-english text-foreground"><Price value={employee.revenue} /></td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.rating > 0 ? employee.rating : "—"}</td>
             <td className="px-4 py-3 font-english text-muted-foreground">{employee.hireDate}</td>
             <td className="px-4 py-3">

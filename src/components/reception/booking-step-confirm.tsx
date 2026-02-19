@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { formatCurrency } from "@/lib/formatters";
 import type { ServiceAssignment } from "./booking-step-provider-time";
+import { Price } from "@/components/ui/price";
 
 interface ClientValue {
   clientId: string;
@@ -59,7 +59,7 @@ export function BookingStepConfirm({
                 </p>
               </div>
               <span className="font-english shrink-0">
-                {formatCurrency(a.service.price, locale)}
+                <Price value={a.service.price} />
               </span>
             </div>
           ))}
@@ -68,7 +68,7 @@ export function BookingStepConfirm({
         {/* Total */}
         <div className="border-t border-border pt-3 flex justify-between font-bold">
           <span>{t("total")}</span>
-          <span className="font-english">{formatCurrency(total, locale)}</span>
+          <span className="font-english"><Price value={total} /></span>
         </div>
       </div>
     </div>

@@ -17,6 +17,9 @@ const DEFAULT_SETTINGS = {
   taxRate: 15,
   nextInvoiceNumber: 1,
   currency: "SAR",
+  country: "SA",
+  taxEnabled: 1,
+  exchangeRates: null as string | null,
   smsEnabled: 0,
   emailEnabled: 0,
 };
@@ -71,6 +74,9 @@ export async function PATCH(req: NextRequest) {
     if (validated.businessName !== undefined) updateValues.businessName = validated.businessName;
     if (validated.taxRate !== undefined) updateValues.taxRate = validated.taxRate;
     if (validated.currency !== undefined) updateValues.currency = validated.currency;
+    if (validated.country !== undefined) updateValues.country = validated.country;
+    if (validated.taxEnabled !== undefined) updateValues.taxEnabled = validated.taxEnabled ? 1 : 0;
+    if (validated.exchangeRates !== undefined) updateValues.exchangeRates = validated.exchangeRates;
     if (validated.smsEnabled !== undefined) updateValues.smsEnabled = validated.smsEnabled ? 1 : 0;
     if (validated.emailEnabled !== undefined) updateValues.emailEnabled = validated.emailEnabled ? 1 : 0;
 
@@ -92,6 +98,9 @@ export async function PATCH(req: NextRequest) {
           businessName: validated.businessName ?? DEFAULT_SETTINGS.businessName,
           taxRate: validated.taxRate ?? DEFAULT_SETTINGS.taxRate,
           currency: validated.currency ?? DEFAULT_SETTINGS.currency,
+          country: validated.country ?? DEFAULT_SETTINGS.country,
+          taxEnabled: validated.taxEnabled ? 1 : DEFAULT_SETTINGS.taxEnabled,
+          exchangeRates: validated.exchangeRates ?? DEFAULT_SETTINGS.exchangeRates,
           smsEnabled: validated.smsEnabled ? 1 : DEFAULT_SETTINGS.smsEnabled,
           emailEnabled: validated.emailEnabled ? 1 : DEFAULT_SETTINGS.emailEnabled,
         })

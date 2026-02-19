@@ -1,5 +1,11 @@
 import { apiFetch } from "./client";
 
+export interface ExchangeRateEntry {
+  rate: number;
+  isManual: boolean;
+  updatedAt: string;
+}
+
 export interface Settings {
   id?: string;
   tenantId?: string;
@@ -10,9 +16,12 @@ export interface Settings {
   address?: string;
   taxNumber?: string;
   currency: string;
+  country?: string;
   locale?: string;
   timezone?: string;
   taxRate: number;
+  taxEnabled?: number | boolean;
+  exchangeRates?: string | null;
   nextInvoiceNumber?: number;
   smsEnabled?: number | boolean;
   emailEnabled?: number | boolean;
@@ -42,4 +51,9 @@ export const settingsApi = {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+  fetchExchangeRates: () =>
+    apiFetch<{ exchangeRates: Record<string, ExchangeRateEntry> }>(
+      "/settings/exchange-rates/fetch",
+      { method: "POST" }
+    ),
 };

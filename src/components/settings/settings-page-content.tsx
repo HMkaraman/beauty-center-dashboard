@@ -8,6 +8,8 @@ import { NotificationsCard } from "./notifications-card";
 import { UsersPermissionsCard } from "./users-permissions-card";
 import { AppearanceCard } from "./appearance-card";
 import { SectionsSettingsCard } from "./sections-settings-card";
+import { CurrencyTaxCard } from "./currency-tax-card";
+import { ExchangeRatesCard } from "./exchange-rates-card";
 
 export function SettingsPageContent() {
   const t = useTranslations("settings");
@@ -15,6 +17,8 @@ export function SettingsPageContent() {
   return (
     <div className="space-y-6">
       <GeneralSettingsCard />
+      <CurrencyTaxCard />
+      <ExchangeRatesCard />
       <BusinessInfoCard />
       <SectionsSettingsCard />
       <WorkingHoursCard />

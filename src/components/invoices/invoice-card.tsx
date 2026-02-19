@@ -6,8 +6,8 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface InvoiceCardProps {
   data: Invoice;
@@ -55,7 +55,7 @@ export function InvoiceCard({ data, onView, onVoid }: InvoiceCardProps) {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs font-english text-muted-foreground">{data.date}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.total, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.total} /></p>
       </div>
     </motion.div>
   );

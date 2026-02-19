@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useServices } from "@/lib/hooks/use-services";
 import { useCreateInvoice } from "@/lib/hooks/use-invoices";
-import { formatCurrency } from "@/lib/formatters";
+import { useSettings } from "@/lib/hooks/use-settings";
 import { Appointment, InvoicePaymentMethod } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface CheckoutSheetProps {
   open: boolean;
@@ -30,8 +31,12 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
   const locale = useLocale();
   const createInvoice = useCreateInvoice();
 
+  const { data: settingsData } = useSettings();
   const { data: servicesData } = useServices({ limit: 100 });
   const services = servicesData?.data ?? [];
+
+  const settingsTaxEnabled = settingsData?.taxEnabled === 1 || settingsData?.taxEnabled === true;
+  const settingsTaxRate = settingsTaxEnabled ? String(settingsData?.taxRate ?? 0) : "0";
 
   const paymentMethods = [
     { value: "cash", label: t("paymentCash") },
@@ -44,7 +49,7 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
   const [mainServicePrice, setMainServicePrice] = useState(0);
   const [extras, setExtras] = useState<ExtraRow[]>([]);
   const [discountPercent, setDiscountPercent] = useState("0");
-  const [taxRate, setTaxRate] = useState("0");
+  const [taxRate, setTaxRate] = useState(settingsTaxRate);
   const [paymentMethod, setPaymentMethod] = useState<InvoicePaymentMethod>("cash");
   const [notes, setNotes] = useState("");
 
@@ -55,6 +60,10 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
     setMainServiceName(appointment.service);
     setMainServicePrice(appointment.price);
   }, [appointment, services]);
+
+  useEffect(() => {
+    setTaxRate(settingsTaxRate);
+  }, [settingsTaxRate]);
 
   const handleMainServiceSelect = (serviceId: string) => {
     if (serviceId === CUSTOM_ITEM_VALUE) {
@@ -122,7 +131,7 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
       onSuccess: () => {
         toast.success(t("checkoutSuccess"));
         setMainServiceId(""); setMainServiceName(""); setMainServicePrice(0);
-        setExtras([]); setDiscountPercent("0"); setTaxRate("0"); setPaymentMethod("cash"); setNotes("");
+        setExtras([]); setDiscountPercent("0"); setTaxRate(settingsTaxRate); setPaymentMethod("cash"); setNotes("");
         onComplete?.();
         onOpenChange(false);
       },
@@ -220,10 +229,10 @@ export function CheckoutSheet({ open, onOpenChange, appointment, onComplete }: C
 
           {/* Summary */}
           <div className="rounded-lg border border-border bg-secondary/20 p-3 space-y-1 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">{t("subtotalRaw")}</span><span className="font-english">{formatCurrency(calc.rawSubtotal, locale)}</span></div>
-            {Number(discountPercent) > 0 && <div className="flex justify-between text-destructive"><span>{t("discountPercent")} ({discountPercent}%)</span><span className="font-english">- {formatCurrency(calc.discountAmount, locale)}</span></div>}
-            {Number(taxRate) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">{t("tax")} ({taxRate}%)</span><span className="font-english">{formatCurrency(calc.taxAmount, locale)}</span></div>}
-            <div className="flex justify-between font-bold border-t border-border pt-1"><span>{t("total")}</span><span className="font-english text-gold">{formatCurrency(calc.total, locale)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t("subtotalRaw")}</span><span className="font-english"><Price value={calc.rawSubtotal} /></span></div>
+            {Number(discountPercent) > 0 && <div className="flex justify-between text-destructive"><span>{t("discountPercent")} ({discountPercent}%)</span><span className="font-english">- <Price value={calc.discountAmount} /></span></div>}
+            {Number(taxRate) > 0 && <div className="flex justify-between"><span className="text-muted-foreground">{t("tax")} ({taxRate}%)</span><span className="font-english"><Price value={calc.taxAmount} /></span></div>}
+            <div className="flex justify-between font-bold border-t border-border pt-1"><span>{t("total")}</span><span className="font-english text-gold"><Price value={calc.total} /></span></div>
           </div>
 
           {/* Payment */}

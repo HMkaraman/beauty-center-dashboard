@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExpenseStatusBadge } from "./expense-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Expense } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ExpensesTableProps { data: Expense[]; onEdit?: (item: Expense) => void; onDelete?: (id: string) => void; onActivity?: (item: Expense) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
@@ -31,7 +31,7 @@ export function ExpensesTable({ data, onEdit, onDelete, onActivity, selectedIds,
           <td className="px-4 py-3 font-english text-muted-foreground">{expense.date}</td>
           <td className="px-4 py-3"><p className="font-medium text-foreground">{expense.description}</p></td>
           <td className="px-4 py-3 text-muted-foreground">{expense.category}</td>
-          <td className="px-4 py-3 font-english text-foreground">{formatCurrency(expense.amount, locale)}</td>
+          <td className="px-4 py-3 font-english text-foreground"><Price value={expense.amount} /></td>
           <td className="px-4 py-3 text-muted-foreground">{expense.paymentMethod}</td>
           <td className="px-4 py-3"><ExpenseStatusBadge status={expense.status} /></td>
           <td className="px-4 py-3"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>

@@ -30,8 +30,8 @@ import { useSections } from "@/lib/hooks/use-sections";
 import { useServiceCategories } from "@/lib/hooks/use-service-categories";
 import { useCreateAppointment } from "@/lib/hooks/use-appointments";
 import { useCreateClient } from "@/lib/hooks/use-clients";
-import { formatCurrency } from "@/lib/formatters";
 import { useInvalidateReception } from "@/lib/hooks/use-reception";
+import { Price } from "@/components/ui/price";
 
 interface QuickBookingWizardProps {
   open: boolean;
@@ -424,14 +424,14 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
                           {` · ${a.time}`}
                         </p>
                       </div>
-                      <span className="font-english">{formatCurrency(a.service.price, locale)}</span>
+                      <span className="font-english"><Price value={a.service.price} /></span>
                     </div>
                   ))}
                 </div>
 
                 <div className="border-t border-border pt-2 flex justify-between font-bold">
                   <span>{t("total")}</span>
-                  <span className="font-english">{formatCurrency(total, locale)}</span>
+                  <span className="font-english"><Price value={total} /></span>
                 </div>
               </div>
             </div>

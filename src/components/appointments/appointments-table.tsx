@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Appointment, AppointmentStatus } from "@/types";
+import { Price } from "@/components/ui/price";
 
 const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
 
@@ -90,7 +90,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
               <td className="px-4 py-3">
                 <AppointmentStatusBadge status={appointment.status} />
               </td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(appointment.price, locale)}</td>
+              <td className="px-4 py-3 font-english text-foreground"><Price value={appointment.price} /></td>
               <td className="px-4 py-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

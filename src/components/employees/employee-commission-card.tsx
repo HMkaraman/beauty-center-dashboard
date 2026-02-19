@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { formatCurrency } from "@/lib/formatters";
 import { EmployeeCommission } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface EmployeeCommissionCardProps {
   data: EmployeeCommission;
@@ -22,7 +22,7 @@ export function EmployeeCommissionCard({ data }: EmployeeCommissionCardProps) {
         <span className="text-xs font-english text-muted-foreground">{data.rate}%</span>
       </div>
       <div className="mt-3 flex items-center justify-end border-t border-border pt-3">
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.amount, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.amount} /></p>
       </div>
     </div>
   );

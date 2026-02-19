@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Phone, Mail, Calendar, Clock, TrendingUp,
@@ -19,9 +19,9 @@ import { EmployeeDetailCommissionsTable } from "./employee-detail-commissions-ta
 import { EmployeeAppointmentCard } from "./employee-appointment-card";
 import { EmployeeCommissionCard } from "./employee-commission-card";
 import { useEmployeeDetails } from "@/lib/hooks";
-import { formatCurrency } from "@/lib/formatters";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { EmployeeScheduleCard } from "./employee-schedule-card";
+import { Price } from "@/components/ui/price";
 
 interface EmployeeDetailPageProps {
   employeeId: string;
@@ -29,7 +29,6 @@ interface EmployeeDetailPageProps {
 
 export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
   const t = useTranslations("employees");
-  const locale = useLocale();
   const router = useRouter();
   const { data, isLoading, error } = useEmployeeDetails(employeeId);
 
@@ -61,17 +60,17 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
     },
     {
       label: t("kpiRevenueGenerated"),
-      value: formatCurrency(kpis.revenueGenerated, locale),
+      value: <Price value={kpis.revenueGenerated} />,
       icon: <DollarSign className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiAvgRevenuePerVisit"),
-      value: formatCurrency(kpis.avgRevenuePerVisit, locale),
+      value: <Price value={kpis.avgRevenuePerVisit} />,
       icon: <TrendingUp className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiCommissionEarned"),
-      value: formatCurrency(kpis.commissionEarned, locale),
+      value: <Price value={kpis.commissionEarned} />,
       icon: <Briefcase className="h-5 w-5 text-gold" />,
     },
     {
@@ -154,7 +153,7 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
           {employee.salary > 0 && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <DollarSign className="h-3.5 w-3.5" />
-              <span>{t("monthlySalary")}: <span className="font-english">{formatCurrency(employee.salary, locale)}</span></span>
+              <span>{t("monthlySalary")}: <span className="font-english"><Price value={employee.salary} /></span></span>
             </div>
           )}
           {employee.nationalId && (

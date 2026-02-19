@@ -5,8 +5,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { ArrowLeft, Clock, CalendarDays, Users, Activity, DollarSign, CalendarSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReceptionStats } from "@/lib/hooks/use-reception";
-import { formatCurrency } from "@/lib/formatters";
 import Link from "next/link";
+import { Price } from "@/components/ui/price";
 
 interface ReceptionHeaderProps {
   onCheckAvailability?: () => void;
@@ -69,7 +69,7 @@ export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-600">
               <DollarSign className="h-3.5 w-3.5" />
-              <span className="font-english">{formatCurrency(stats?.todayRevenue ?? 0, locale)}</span>
+              <span className="font-english"><Price value={stats?.todayRevenue ?? 0} /></span>
             </div>
           </div>
 

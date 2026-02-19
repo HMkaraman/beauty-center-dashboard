@@ -2,8 +2,8 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { AppointmentStatusBadge } from "@/components/appointments/appointment-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Appointment } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface DoctorDetailAppointmentsTableProps {
   data: Appointment[];
@@ -44,7 +44,7 @@ export function DoctorDetailAppointmentsTable({ data }: DoctorDetailAppointments
               <td className="px-4 py-3 text-muted-foreground">{appointment.service}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{appointment.duration}{t("minutes")}</td>
               <td className="px-4 py-3"><AppointmentStatusBadge status={appointment.status} /></td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(appointment.price, locale)}</td>
+              <td className="px-4 py-3 font-english text-foreground"><Price value={appointment.price} /></td>
             </tr>
           ))}
         </tbody>

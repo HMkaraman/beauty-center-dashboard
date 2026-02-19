@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { DynamicIcon } from "./dynamic-icon";
 import { ChangeBadge } from "./change-badge";
-import { formatCurrency, formatNumber } from "@/lib/formatters";
+import { Price } from "./price";
+import { formatNumber } from "@/lib/formatters";
 import { KPIData } from "@/types";
 
 interface KPICardProps {
@@ -14,11 +15,6 @@ interface KPICardProps {
 export function KPICard({ data }: KPICardProps) {
   const t = useTranslations();
   const locale = useLocale();
-
-  const formattedValue =
-    data.format === "currency"
-      ? formatCurrency(data.value, locale)
-      : formatNumber(data.value, locale);
 
   return (
     <motion.div
@@ -34,7 +30,9 @@ export function KPICard({ data }: KPICardProps) {
       </div>
       <div className="mt-4">
         <p className="text-2xl font-bold font-english text-foreground">
-          {formattedValue}
+          {data.format === "currency"
+            ? <Price value={data.value} />
+            : formatNumber(data.value, locale)}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           {t(data.label)}

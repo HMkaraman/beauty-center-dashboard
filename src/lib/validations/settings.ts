@@ -4,6 +4,9 @@ export const tenantSettingsSchema = z.object({
   businessName: z.string().optional(),
   taxRate: z.number().nonnegative("Tax rate must be zero or greater").optional(),
   currency: z.string().optional(),
+  country: z.string().optional(),
+  taxEnabled: z.boolean().optional(),
+  exchangeRates: z.string().optional(),
   smsEnabled: z.boolean().optional(),
   emailEnabled: z.boolean().optional(),
 });

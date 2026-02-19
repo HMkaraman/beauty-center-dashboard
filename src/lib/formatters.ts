@@ -1,12 +1,9 @@
-export function formatCurrency(value: number, locale: string = "ar", currency: string = "SAR"): string {
-  const intlLocale = locale === "ar" ? "ar-SA" : "en-US";
-  return new Intl.NumberFormat(intlLocale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-    numberingSystem: "latn",
-  }).format(value);
+import { formatCurrency as formatDetailed } from "@/lib/currency";
+import { useSettingsStore } from "@/store/useSettingsStore";
+
+export function formatCurrency(value: number, locale: string = "ar", currency?: string): string {
+  const resolved = currency || useSettingsStore.getState().currency || "SAR";
+  return formatDetailed(value, resolved, locale);
 }
 
 export function formatCompactNumber(value: number): string {

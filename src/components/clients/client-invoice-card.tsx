@@ -2,8 +2,8 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { InvoiceStatusBadge } from "@/components/invoices/invoice-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Invoice } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ClientInvoiceCardProps {
   data: Invoice;
@@ -45,7 +45,7 @@ export function ClientInvoiceCard({ data }: ClientInvoiceCardProps) {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-end border-t border-border pt-3">
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.total, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.total} /></p>
       </div>
     </div>
   );

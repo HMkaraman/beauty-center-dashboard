@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "./chart-card";
 import { TopEmployee } from "@/types";
-import { formatCurrency } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 
 interface TopEmployeesChartProps {
   data: TopEmployee[];
@@ -33,7 +33,7 @@ export function TopEmployeesChart({ data }: TopEmployeesChartProps) {
                   </div>
                 </div>
                 <span className="text-sm font-english text-foreground">
-                  {formatCurrency(employee.revenue, locale)}
+                  <Price value={employee.revenue} />
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowLeft, User, Phone, Calendar, Clock, DollarSign, Scissors, UserCheck } from "lucide-react";
@@ -18,7 +18,7 @@ import { NewAppointmentSheet } from "./new-appointment-sheet";
 import { CheckoutSheet } from "@/components/invoices/checkout-sheet";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { useAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
-import { formatCurrency } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 import type { Appointment, AppointmentStatus } from "@/types";
 
 const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
@@ -40,7 +40,6 @@ interface AppointmentDetailPageProps {
 export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPageProps) {
   const t = useTranslations("appointments");
   const tc = useTranslations("common");
-  const locale = useLocale();
   const router = useRouter();
   const { data: appointment, isLoading, error } = useAppointment(appointmentId);
   const updateAppointment = useUpdateAppointment();
@@ -133,7 +132,7 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
           <DetailItem icon={Calendar} label={t("date")} value={appointment.date} isLtr />
           <DetailItem icon={Clock} label={t("time")} value={appointment.time} isLtr />
           <DetailItem icon={Clock} label={t("duration")} value={`${appointment.duration} ${t("minutes")}`} isLtr />
-          <DetailItem icon={DollarSign} label={t("price")} value={formatCurrency(appointment.price, locale)} isLtr />
+          <DetailItem icon={DollarSign} label={t("price")} value={<Price value={appointment.price} />} isLtr />
         </div>
 
         {/* Notes */}
@@ -191,7 +190,7 @@ function DetailItem({
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string;
+  value: React.ReactNode;
   isLtr?: boolean;
 }) {
   return (

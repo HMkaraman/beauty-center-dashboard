@@ -13,7 +13,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
 import { CHART_COLORS } from "@/constants/colors";
-import { formatCurrency } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 
 interface EmployeesRevenueChartProps {
   data: ChartDataPoint[];
@@ -35,7 +35,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
       <p className="text-xs font-english text-foreground">
-        {formatCurrency(payload[0].value, locale)}
+        <Price value={payload[0].value} />
       </p>
     </div>
   );

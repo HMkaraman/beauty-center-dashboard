@@ -16,8 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { HealingJourneyStatusBadge } from "./client-healing-journeys-table";
 import { useJourneyEntries, useCreateJourneyEntry, useDeleteJourneyEntry } from "@/lib/hooks/use-healing-journeys";
 import { useUpload } from "@/hooks/use-upload";
-import { formatCurrency } from "@/lib/formatters";
 import type { HealingJourney, JourneyEntry, JourneyEntryType, AttachmentLabel, JourneyAttachment } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface HealingJourneyTimelineSheetProps {
   open: boolean;
@@ -72,7 +72,7 @@ function EntryCard({ entry, onDelete, locale }: { entry: JourneyEntry; onDelete:
             {entry.employeeName && <span>{t("entryEmployee")}: {entry.employeeName}</span>}
             {entry.duration && <span>{entry.duration} {t("minutes")}</span>}
             {entry.price != null && entry.price > 0 && (
-              <span className="font-english">{formatCurrency(entry.price, locale)}</span>
+              <span className="font-english"><Price value={entry.price} /></span>
             )}
           </div>
         </div>

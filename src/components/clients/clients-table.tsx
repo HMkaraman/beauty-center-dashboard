@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClientStatusBadge } from "./client-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Client } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ClientsTableProps {
   data: Client[];
@@ -61,7 +61,7 @@ export function ClientsTable({ data, onEdit, onDelete, selectedIds, onToggle, on
               <td className="px-4 py-3 font-english text-muted-foreground">{client.phone}</td>
               <td className="px-4 py-3"><ClientStatusBadge status={client.status} /></td>
               <td className="px-4 py-3 font-english text-muted-foreground">{client.totalAppointments}</td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(client.totalSpent, locale)}</td>
+              <td className="px-4 py-3 font-english text-foreground"><Price value={client.totalSpent} /></td>
               <td className="px-4 py-3 font-english text-muted-foreground">{client.lastVisit}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{client.joinDate}</td>
               <td className="px-4 py-3">

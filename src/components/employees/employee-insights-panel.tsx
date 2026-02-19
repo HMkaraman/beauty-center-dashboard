@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { formatCurrency } from "@/lib/formatters";
 import { EmployeeAnalytics } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface EmployeeInsightsPanelProps {
   analytics: EmployeeAnalytics;
@@ -71,7 +71,7 @@ export function EmployeeInsightsPanel({ analytics }: EmployeeInsightsPanelProps)
           {analytics.monthlyRevenue.map((month) => (
             <div key={month.month} className="flex-1 flex flex-col items-center gap-1">
               <span className="text-[9px] font-english text-muted-foreground truncate max-w-full">
-                {formatCurrency(month.revenue, locale)}
+                <Price value={month.revenue} />
               </span>
               <div
                 className="w-full rounded-t bg-gold/70 transition-all min-h-[2px]"

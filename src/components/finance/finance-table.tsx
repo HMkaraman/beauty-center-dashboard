@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TransactionTypeBadge } from "./transaction-type-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Transaction } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface FinanceTableProps { data: Transaction[]; onEdit?: (item: Transaction) => void; onDelete?: (id: string) => void; onActivity?: (item: Transaction) => void; selectedIds?: string[]; onToggle?: (id: string) => void; onToggleAll?: () => void; isAllSelected?: boolean; isSomeSelected?: boolean; }
 
@@ -31,7 +31,7 @@ export function FinanceTable({ data, onEdit, onDelete, onActivity, selectedIds, 
           <td className="px-4 py-3 font-medium text-foreground">{transaction.description}</td>
           <td className="px-4 py-3 text-muted-foreground">{transaction.category}</td>
           <td className="px-4 py-3"><TransactionTypeBadge type={transaction.type} /></td>
-          <td className="px-4 py-3 font-english text-foreground">{formatCurrency(transaction.amount, locale)}</td>
+          <td className="px-4 py-3 font-english text-foreground"><Price value={transaction.amount} /></td>
           <td className="px-4 py-3"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-xs"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => onEdit?.(transaction)}>{t("edit")}</DropdownMenuItem><DropdownMenuItem onClick={() => onActivity?.(transaction)}>{t("activityLog")}</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onClick={() => onDelete?.(transaction.id)}>{t("delete")}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
         </tr>

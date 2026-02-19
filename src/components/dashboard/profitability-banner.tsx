@@ -3,7 +3,8 @@
 import { useTranslations, useLocale } from "next-intl";
 import { TrendingUp } from "lucide-react";
 import { ProfitabilityData } from "@/types";
-import { formatCurrency, formatPercentage } from "@/lib/formatters";
+import { formatPercentage } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 
 interface ProfitabilityBannerProps {
   data: ProfitabilityData;
@@ -45,19 +46,19 @@ export function ProfitabilityBanner({ data }: ProfitabilityBannerProps) {
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("revenue")}</p>
             <p className="text-sm font-bold font-english text-foreground">
-              {formatCurrency(data.revenue, locale)}
+              <Price value={data.revenue} />
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("expenses")}</p>
             <p className="text-sm font-bold font-english text-red">
-              {formatCurrency(data.expenses, locale)}
+              <Price value={data.expenses} />
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground">{t("netProfit")}</p>
             <p className="text-sm font-bold font-english text-green">
-              {formatCurrency(data.profit, locale)}
+              <Price value={data.profit} />
             </p>
           </div>
         </div>

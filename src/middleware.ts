@@ -79,6 +79,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt
      */
-    "/((?!api/auth|api/public|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json).*)",
+    "/((?!api/auth|api/public|_next/static|_next/image|fonts/|icons/|currency-fonts\\.css|favicon.ico|sitemap.xml|robots.txt|manifest.json).*)",
   ],
 };

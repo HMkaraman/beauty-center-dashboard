@@ -5,8 +5,8 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ExpenseStatusBadge } from "./expense-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Expense } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface ExpenseCardProps { data: Expense; onEdit?: (item: Expense) => void; onDelete?: (id: string) => void; }
 
@@ -28,7 +28,7 @@ export function ExpenseCard({ data, onEdit, onDelete }: ExpenseCardProps) {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <span className="text-xs font-english text-muted-foreground">{data.date}</span>
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.amount, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.amount} /></p>
       </div>
     </motion.div>
   );

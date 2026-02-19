@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { DonutSegment } from "@/types";
-import { formatCurrency } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 
 interface ExpensesCategoryChartProps {
   data: DonutSegment[];
@@ -25,7 +25,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="text-xs text-foreground">{segment.name}</p>
       <p className="text-xs font-english text-muted-foreground">
-        {formatCurrency(segment.value, locale)}
+        <Price value={segment.value} />
       </p>
     </div>
   );
@@ -66,7 +66,7 @@ export function ExpensesCategoryChart({ data }: ExpensesCategoryChartProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <p className="text-xs text-muted-foreground">{t("total")}</p>
             <p className="text-sm font-bold font-english text-foreground">
-              {formatCurrency(total, locale)}
+              <Price value={total} />
             </p>
           </div>
         </div>

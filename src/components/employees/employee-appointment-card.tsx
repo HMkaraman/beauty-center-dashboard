@@ -2,8 +2,8 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { AppointmentStatusBadge } from "@/components/appointments/appointment-status-badge";
-import { formatCurrency } from "@/lib/formatters";
 import { Appointment } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface EmployeeAppointmentCardProps {
   data: Appointment;
@@ -32,7 +32,7 @@ export function EmployeeAppointmentCard({ data }: EmployeeAppointmentCardProps) 
         </div>
       </div>
       <div className="mt-3 flex items-center justify-end border-t border-border pt-3">
-        <p className="text-sm font-bold font-english text-foreground">{formatCurrency(data.price, locale)}</p>
+        <p className="text-sm font-bold font-english text-foreground"><Price value={data.price} /></p>
       </div>
     </div>
   );

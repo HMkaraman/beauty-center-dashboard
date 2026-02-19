@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, TrendingUp, DollarSign, XCircle, BarChart3, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { NewHealingJourneySheet } from "./new-healing-journey-sheet";
 import { HealingJourneyUpdatesSheet } from "./healing-journey-updates-sheet";
 import { useClientDetails, useHealingJourneys, useDeleteHealingJourney } from "@/lib/hooks";
-import { formatCurrency } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 import type { HealingJourney } from "@/types";
 
 interface ClientDetailPageProps {
@@ -31,7 +31,6 @@ interface ClientDetailPageProps {
 
 export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
   const t = useTranslations("clients");
-  const locale = useLocale();
   const router = useRouter();
   const { data, isLoading, error } = useClientDetails(clientId);
   const { data: healingJourneys } = useHealingJourneys(clientId);
@@ -88,12 +87,12 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
     },
     {
       label: t("kpiTotalSpent"),
-      value: formatCurrency(kpis.totalSpent, locale),
+      value: <Price value={kpis.totalSpent} />,
       icon: <DollarSign className="h-5 w-5 text-gold" />,
     },
     {
       label: t("kpiAvgSpendPerVisit"),
-      value: formatCurrency(kpis.averageSpendPerVisit, locale),
+      value: <Price value={kpis.averageSpendPerVisit} />,
       icon: <TrendingUp className="h-5 w-5 text-gold" />,
     },
     {

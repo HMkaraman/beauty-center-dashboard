@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CampaignStatusBadge } from "./campaign-status-badge";
-import { formatCurrency, formatNumber } from "@/lib/formatters";
+import { formatNumber } from "@/lib/formatters";
 import { Campaign } from "@/types";
+import { Price } from "@/components/ui/price";
 
 interface MarketingTableProps {
   data: Campaign[];
@@ -57,7 +58,7 @@ export function MarketingTable({ data, onEdit, onDelete, onActivity, selectedIds
               <td className="px-4 py-3"><CampaignStatusBadge status={campaign.status} /></td>
               <td className="px-4 py-3 font-english text-muted-foreground">{campaign.startDate}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{campaign.endDate}</td>
-              <td className="px-4 py-3 font-english text-foreground">{formatCurrency(campaign.budget, locale)}</td>
+              <td className="px-4 py-3 font-english text-foreground"><Price value={campaign.budget} /></td>
               <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.reach, locale)}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{formatNumber(campaign.conversions, locale)}</td>
               <td className="px-4 py-3">

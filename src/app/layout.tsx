@@ -46,6 +46,7 @@ export default async function RootLayout({
     <html lang={locale} dir={dir} className="dark" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon.svg" />
+        <link rel="stylesheet" href="/currency-fonts.css" />
         <meta name="mobile-web-app-capable" content="yes" />
         <script
           dangerouslySetInnerHTML={{

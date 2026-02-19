@@ -4,7 +4,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "./chart-card";
 import { DonutSegment } from "@/types";
-import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
+import { formatCompactNumber } from "@/lib/formatters";
+import { Price } from "@/components/ui/price";
 
 interface RevenueByServiceChartProps {
   data: DonutSegment[];
@@ -25,7 +26,7 @@ function CustomTooltip({
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="text-xs text-foreground">{segment.name}</p>
       <p className="text-xs font-english text-muted-foreground">
-        {formatCurrency(segment.value, locale)}
+        <Price value={segment.value} />
       </p>
     </div>
   );
