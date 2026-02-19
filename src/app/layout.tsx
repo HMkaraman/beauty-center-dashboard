@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Kufi_Arabic, Outfit } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -18,11 +18,14 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#C5A572",
+};
+
 export const metadata: Metadata = {
   title: "بيوتي سنتر - لوحة التحكم",
   description: "لوحة تحكم إدارة مركز التجميل",
   manifest: "/manifest.json",
-  themeColor: "#C5A572",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -42,7 +45,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir} className="dark" suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
         <meta name="mobile-web-app-capable" content="yes" />
         <script
           dangerouslySetInnerHTML={{
@@ -52,6 +55,7 @@ export default async function RootLayout({
       </head>
       <body
         className={`${notoKufiArabic.variable} ${outfit.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
           <NextIntlClientProvider messages={messages}>
