@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useServices } from "@/lib/hooks/use-services";
 import { useEmployees } from "@/lib/hooks/use-employees";
+import { useDoctors } from "@/lib/hooks/use-doctors";
 import { useCreateAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 import { ClientCombobox } from "./client-combobox";
@@ -38,10 +39,13 @@ const emptyForm = {
   clientPhone: "",
   serviceId: "",
   employeeId: "",
+  doctorId: "",
   date: "",
   time: "",
   notes: "",
 };
+
+const CLEAR_VALUE = "__clear__";
 
 export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppointmentSheetProps) {
   const t = useTranslations("appointments");
@@ -51,14 +55,22 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
   const { data: servicesData } = useServices({ limit: 100 });
   const { data: employeesData } = useEmployees({ limit: 100 });
+  const { data: doctorsData } = useDoctors({ limit: 100 });
   const services = servicesData?.data ?? [];
   const employees = employeesData?.data ?? [];
+  const doctorsList = doctorsData?.data ?? [];
 
   const [form, setForm] = useState(emptyForm);
+  const [conflictWarning, setConflictWarning] = useState<{
+    hasConflict: boolean;
+    conflictType?: "employee" | "doctor";
+    conflictingAppointment?: { time: string; service: string };
+    nextAvailableSlot?: string | null;
+  } | null>(null);
+  const conflictTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (editItem) {
-      // When editing, try to match existing service/employee names to IDs
       const matchedService = services.find((s) => s.name === editItem.service);
       const matchedEmployee = employees.find((e) => e.name === editItem.employee);
       setForm({
@@ -67,6 +79,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         clientPhone: editItem.clientPhone,
         serviceId: matchedService?.id || "",
         employeeId: matchedEmployee?.id || "",
+        doctorId: editItem.doctorId || "",
         date: editItem.date,
         time: editItem.time,
         notes: editItem.notes || "",
@@ -74,7 +87,76 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
     } else {
       setForm(emptyForm);
     }
-  }, [editItem, open, services, employees]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editItem?.id, open, services.length, employees.length, doctorsList.length]);
+
+  // Proactive conflict check
+  const checkForConflict = useCallback(async (
+    employeeId: string,
+    employeeName: string,
+    doctorId: string,
+    date: string,
+    time: string,
+    duration: number,
+    excludeId?: string,
+  ) => {
+    try {
+      const res = await fetch("/api/appointments/check-conflict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employeeId: employeeId || undefined,
+          employee: employeeName || undefined,
+          doctorId: doctorId || undefined,
+          date,
+          time,
+          duration,
+          excludeId,
+        }),
+      });
+      if (!res.ok) return;
+      const json = await res.json();
+      const data = json.data ?? json;
+      if (data.hasConflict) {
+        setConflictWarning({
+          hasConflict: true,
+          conflictType: data.conflictType,
+          conflictingAppointment: data.conflictingAppointment,
+          nextAvailableSlot: data.nextAvailableSlot,
+        });
+      } else {
+        setConflictWarning(null);
+      }
+    } catch {
+      // Silently fail — server still validates on submit
+    }
+  }, []);
+
+  useEffect(() => {
+    setConflictWarning(null);
+
+    const selectedService = services.find((s) => s.id === form.serviceId);
+    if ((!form.employeeId && !form.doctorId) || !form.date || !form.time || !form.serviceId || !selectedService) {
+      return;
+    }
+
+    const selectedEmployee = employees.find((e) => e.id === form.employeeId);
+
+    clearTimeout(conflictTimerRef.current);
+    conflictTimerRef.current = setTimeout(() => {
+      checkForConflict(
+        form.employeeId,
+        selectedEmployee?.name || "",
+        form.doctorId,
+        form.date,
+        form.time,
+        selectedService.duration || 60,
+        editItem?.id,
+      );
+    }, 300);
+
+    return () => clearTimeout(conflictTimerRef.current);
+  }, [form.employeeId, form.doctorId, form.date, form.time, form.serviceId, services, employees, editItem?.id, checkForConflict]);
 
   const handleSubmit = () => {
     if (!form.clientName || !form.serviceId || !form.date || !form.time) {
@@ -84,6 +166,7 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
     const selectedService = services.find((s) => s.id === form.serviceId);
     const selectedEmployee = employees.find((e) => e.id === form.employeeId);
+    const selectedDoctor = doctorsList.find((d) => d.id === form.doctorId);
 
     if (editItem) {
       updateAppointment.mutate({ id: editItem.id, data: {
@@ -91,7 +174,10 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         service: selectedService?.name || editItem.service,
-        employee: selectedEmployee?.name || editItem.employee,
+        employee: selectedEmployee?.name || "",
+        employeeId: form.employeeId || undefined,
+        doctor: selectedDoctor?.name || undefined,
+        doctorId: form.doctorId || undefined,
         date: form.date,
         time: form.time,
         notes: form.notes || undefined,
@@ -105,6 +191,9 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         clientPhone: form.clientPhone,
         service: selectedService?.name || "",
         employee: selectedEmployee?.name || "",
+        employeeId: form.employeeId || undefined,
+        doctor: selectedDoctor?.name || undefined,
+        doctorId: form.doctorId || undefined,
         date: form.date,
         time: form.time,
         duration: selectedService?.duration || 60,
@@ -168,14 +257,46 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("employee")}</label>
-            <Select value={form.employeeId} onValueChange={(v) => setForm({ ...form, employeeId: v })}>
+            <Select
+              value={form.employeeId || ""}
+              onValueChange={(v) => setForm({ ...form, employeeId: v === CLEAR_VALUE ? "" : v })}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectEmployee")} />
               </SelectTrigger>
               <SelectContent>
+                {form.employeeId && (
+                  <SelectItem value={CLEAR_VALUE} className="text-muted-foreground">
+                    {t("clearSelection")}
+                  </SelectItem>
+                )}
                 {employees.map((emp) => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">{t("doctor")}</label>
+            <Select
+              value={form.doctorId || ""}
+              onValueChange={(v) => setForm({ ...form, doctorId: v === CLEAR_VALUE ? "" : v })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("selectDoctor")} />
+              </SelectTrigger>
+              <SelectContent>
+                {form.doctorId && (
+                  <SelectItem value={CLEAR_VALUE} className="text-muted-foreground">
+                    {t("clearSelection")}
+                  </SelectItem>
+                )}
+                {doctorsList.map((doc) => (
+                  <SelectItem key={doc.id} value={doc.id}>
+                    {doc.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -201,6 +322,34 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
               className="font-english"
             />
           </div>
+
+          {conflictWarning?.hasConflict && (
+            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+              <p>
+                {conflictWarning.conflictType === "doctor"
+                  ? t("doctorConflictWarning", {
+                      time: conflictWarning.conflictingAppointment?.time ?? "",
+                      service: conflictWarning.conflictingAppointment?.service ?? "",
+                    })
+                  : t("conflictWarning", {
+                      time: conflictWarning.conflictingAppointment?.time ?? "",
+                      service: conflictWarning.conflictingAppointment?.service ?? "",
+                    })
+                }
+              </p>
+              {conflictWarning.nextAvailableSlot && (
+                <p className="mt-1">
+                  <button
+                    type="button"
+                    className="font-medium underline hover:no-underline"
+                    onClick={() => setForm({ ...form, time: conflictWarning.nextAvailableSlot! })}
+                  >
+                    {t("nextAvailable", { time: conflictWarning.nextAvailableSlot })}
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("notes")}</label>

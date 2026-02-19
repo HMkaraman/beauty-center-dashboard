@@ -4,7 +4,8 @@ export const appointmentSchema = z.object({
   clientName: z.string().min(1, "Client name is required"),
   clientPhone: z.string().optional(),
   service: z.string().min(1, "Service is required"),
-  employee: z.string().min(1, "Employee is required"),
+  employee: z.string().optional(),
+  doctor: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
   time: z.string().regex(/^\d{2}:\d{2}$/, "Time must be in HH:MM format"),
   duration: z.number().positive("Duration must be a positive number"),
@@ -14,6 +15,7 @@ export const appointmentSchema = z.object({
   clientId: z.string().optional(),
   serviceId: z.string().optional(),
   employeeId: z.string().optional(),
+  doctorId: z.string().optional(),
 });
 
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;

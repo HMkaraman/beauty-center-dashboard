@@ -11,7 +11,8 @@ import { db } from "@/db/db";
 import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
-import { checkConflict } from "@/lib/business-logic/scheduling";
+import { checkConflict, checkDoctorWorkingHours } from "@/lib/business-logic/scheduling";
+import { logActivity } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
   try {
@@ -95,15 +96,38 @@ export async function POST(req: NextRequest) {
       tenantId: session.user.tenantId,
       employeeId: validated.employeeId,
       employee: validated.employee,
+      doctorId: validated.doctorId,
       date: validated.date,
       time: validated.time,
       duration: validated.duration,
     });
 
     if (conflict.hasConflict) {
+      if (conflict.conflictType === "doctor") {
+        return badRequest(
+          `Doctor has a conflicting appointment at ${conflict.conflictingAppointment?.time} (${conflict.conflictingAppointment?.service})`
+        );
+      }
       return badRequest(
         `Employee has a conflicting appointment at ${conflict.conflictingAppointment?.time} (${conflict.conflictingAppointment?.service})`
       );
+    }
+
+    // Check doctor working hours
+    if (validated.doctorId) {
+      const hoursCheck = await checkDoctorWorkingHours({
+        tenantId: session.user.tenantId,
+        doctorId: validated.doctorId,
+        date: validated.date,
+        time: validated.time,
+        duration: validated.duration,
+      });
+
+      if (!hoursCheck.withinSchedule && hoursCheck.schedule) {
+        return badRequest(
+          `This time is outside the doctor's working hours (${hoursCheck.schedule.startTime} - ${hoursCheck.schedule.endTime})`
+        );
+      }
     }
 
     const [created] = await db
@@ -116,7 +140,9 @@ export async function POST(req: NextRequest) {
         serviceId: validated.serviceId,
         service: validated.service,
         employeeId: validated.employeeId,
-        employee: validated.employee,
+        employee: validated.employee || "",
+        doctorId: validated.doctorId,
+        doctor: validated.doctor,
         date: validated.date,
         time: validated.time,
         duration: validated.duration,
@@ -125,6 +151,14 @@ export async function POST(req: NextRequest) {
         notes: validated.notes,
       })
       .returning();
+
+    logActivity({
+      session,
+      entityType: "appointment",
+      entityId: created.id,
+      action: "create",
+      entityLabel: `${created.clientName} - ${created.service}`,
+    });
 
     return success(
       {

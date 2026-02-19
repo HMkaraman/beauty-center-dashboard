@@ -28,4 +28,8 @@ export const doctorsApi = {
     apiFetch<{ deleted: number }>("/doctors/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
   bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
     apiFetch<{ updated: number }>("/doctors/bulk", { method: "PATCH", body: JSON.stringify(data) }),
+  getSchedules: (id: string) =>
+    apiFetch<Array<{ id: string; dayOfWeek: number; startTime: string; endTime: string; isAvailable: number }>>(`/doctors/${id}/schedules`),
+  updateSchedules: (id: string, data: Array<{ dayOfWeek: number; startTime: string; endTime: string; isAvailable?: number }>) =>
+    apiFetch(`/doctors/${id}/schedules`, { method: "PUT", body: JSON.stringify(data) }),
 };

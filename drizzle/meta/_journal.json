@@ -22,6 +22,20 @@
       "when": 1771472830163,
       "tag": "0002_rare_the_initiative",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1771485135571,
+      "tag": "0003_silky_forge",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1771492139988,
+      "tag": "0004_slimy_sheva_callister",
+      "breakpoints": true
     }
   ]
 }

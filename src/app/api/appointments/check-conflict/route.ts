@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     if (!session) return unauthorized();
 
     const body = await req.json();
-    const { employeeId, employee, date, time, duration, excludeId } = body;
+    const { employeeId, employee, doctorId, date, time, duration, excludeId } = body;
 
     if (!date || !time || !duration) {
       return badRequest("date, time, and duration are required");
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       tenantId: session.user.tenantId,
       employeeId,
       employee,
+      doctorId,
       date,
       time,
       duration: duration || 60,
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
         tenantId: session.user.tenantId,
         employeeId,
         employee,
+        doctorId,
         date,
         duration: duration || 60,
       });

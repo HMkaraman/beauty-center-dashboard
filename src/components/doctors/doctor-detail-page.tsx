@@ -19,6 +19,8 @@ import { DoctorAppointmentCard } from "./doctor-appointment-card";
 import { DoctorCommissionCard } from "./doctor-commission-card";
 import { useDoctorDetails } from "@/lib/hooks";
 import { formatCurrency } from "@/lib/formatters";
+import { ActivityTimeline } from "@/components/activity/activity-timeline";
+import { DoctorScheduleCard } from "./doctor-schedule-card";
 
 interface DoctorDetailPageProps {
   doctorId: string;
@@ -225,6 +227,12 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
           <TabsTrigger value="commissions">
             {t("tabCommissions")} ({recentCommissions.length})
           </TabsTrigger>
+          <TabsTrigger value="schedule">
+            {t("tabSchedule")}
+          </TabsTrigger>
+          <TabsTrigger value="activity">
+            {t("tabActivity")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="consultations">
@@ -256,6 +264,16 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
                 <DoctorCommissionCard key={comm.id} data={comm} />
               ))
             )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="schedule">
+          <DoctorScheduleCard doctorId={doctorId} />
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <div className="rounded-lg border border-border bg-card p-6">
+            <ActivityTimeline entityType="doctor" entityId={doctorId} />
           </div>
         </TabsContent>
       </Tabs>

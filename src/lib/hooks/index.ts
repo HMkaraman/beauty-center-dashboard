@@ -1,6 +1,6 @@
 export { useClients, useClient, useClientDetails, useCreateClient, useUpdateClient, useDeleteClient } from "./use-clients";
 export { useEmployees, useEmployee, useEmployeeDetails, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from "./use-employees";
-export { useDoctors, useDoctor, useDoctorDetails, useCreateDoctor, useUpdateDoctor, useDeleteDoctor } from "./use-doctors";
+export { useDoctors, useDoctor, useDoctorDetails, useCreateDoctor, useUpdateDoctor, useDeleteDoctor, useDoctorSchedules, useUpdateDoctorSchedules } from "./use-doctors";
 export { useServices, useService, useCreateService, useUpdateService, useDeleteService } from "./use-services";
 export {
   useAppointments,
@@ -43,3 +43,4 @@ export {
   useCreateJourneyEntry,
   useDeleteJourneyEntry,
 } from "./use-healing-journeys";
+export { useActivityLogs, useCreateActivityNote } from "./use-activity-logs";

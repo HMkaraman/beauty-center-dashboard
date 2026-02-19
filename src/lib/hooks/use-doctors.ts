@@ -74,3 +74,22 @@ export function useBulkUpdateDoctorStatus() {
     },
   });
 }
+
+export function useDoctorSchedules(id: string) {
+  return useQuery({
+    queryKey: ["doctors", id, "schedules"],
+    queryFn: () => doctorsApi.getSchedules(id),
+    enabled: !!id,
+  });
+}
+
+export function useUpdateDoctorSchedules() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof doctorsApi.updateSchedules>[1] }) =>
+      doctorsApi.updateSchedules(id, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["doctors", variables.id, "schedules"] });
+    },
+  });
+}

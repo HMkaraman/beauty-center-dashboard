@@ -24,6 +24,7 @@ export const appointments = pgTable("appointments", {
   employeeId: text("employee_id").references(() => employees.id, { onDelete: "set null" }),
   employee: varchar("employee_name", { length: 255 }).notNull(),
   doctorId: text("doctor_id").references(() => doctors.id, { onDelete: "set null" }),
+  doctor: varchar("doctor_name", { length: 255 }),
   date: varchar("date", { length: 10 }).notNull(),
   time: varchar("time", { length: 5 }).notNull(),
   duration: integer("duration").notNull(),

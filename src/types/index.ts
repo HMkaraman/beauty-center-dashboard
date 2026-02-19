@@ -423,6 +423,44 @@ export type MilestoneEntry = BaseEntry & {
 
 export type JourneyEntry = SessionEntry | PrescriptionEntry | NoteEntry | PhotoEntry | MilestoneEntry;
 
+// Activity Logs
+export type ActivityEntityType =
+  | "appointment"
+  | "client"
+  | "employee"
+  | "doctor"
+  | "invoice"
+  | "expense"
+  | "service"
+  | "inventory_item"
+  | "campaign"
+  | "transaction";
+
+export type ActivityAction = "create" | "update" | "delete" | "note";
+
+export interface ActivityLogAttachment {
+  id: string;
+  url: string;
+  filename?: string;
+  mimeType?: string;
+  fileSize?: number;
+  createdAt: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  entityType: ActivityEntityType;
+  entityId: string;
+  action: ActivityAction;
+  userId?: string;
+  userName?: string;
+  changes?: Record<string, { old: unknown; new: unknown }>;
+  content?: string;
+  entityLabel?: string;
+  attachments: ActivityLogAttachment[];
+  createdAt: string;
+}
+
 export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show";
@@ -432,8 +470,12 @@ export interface Appointment {
   clientId?: string;
   clientName: string;
   clientPhone: string;
+  serviceId?: string;
   service: string;
+  employeeId?: string;
   employee: string;
+  doctorId?: string;
+  doctor?: string;
   date: string;
   time: string;
   duration: number;
