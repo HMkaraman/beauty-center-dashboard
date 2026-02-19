@@ -811,6 +811,8 @@
     "totalLabel": "Total",
     "revenueLabel": "Revenue",
     "expensesLabel": "Expenses",
+    "save": "Save",
+    "cancel": "Cancel",
     "editItem": "Edit",
     "logout": "Logout",
     "retry": "Retry",
@@ -1140,12 +1142,17 @@
   "serviceCategories": {
     "title": "Service Categories",
     "newCategory": "New Category",
+    "editCategory": "Edit Category",
     "nameAr": "Name (Arabic)",
     "nameEn": "Name (English)",
     "section": "Section",
     "selectSection": "Select section",
     "noSection": "No section",
     "noCategories": "No categories yet. Add your first category.",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "services": "Services",
+    "selectServices": "Select services for this category",
+    "serviceCount": "{count} services",
+    "noServices": "No services assigned"
   }
 }

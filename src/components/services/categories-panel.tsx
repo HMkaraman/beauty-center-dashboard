@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ import {
   useDeleteServiceCategory,
 } from "@/lib/hooks/use-service-categories";
 import { useSections } from "@/lib/hooks/use-sections";
+import { useServices, useUpdateService } from "@/lib/hooks/use-services";
 import { ServiceCategory } from "@/types";
 
 export function CategoriesPanel() {
@@ -47,18 +49,34 @@ export function CategoriesPanel() {
   const categories = data?.data ?? [];
   const { data: sectionsData } = useSections({ limit: 100 });
   const sections = sectionsData?.data ?? [];
+  const { data: servicesData } = useServices({ limit: 200 });
+  const allServices = servicesData?.data ?? [];
   const createCategory = useCreateServiceCategory();
   const updateCategory = useUpdateServiceCategory();
   const deleteCategory = useDeleteServiceCategory();
+  const updateService = useUpdateService();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<ServiceCategory | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", nameEn: "", sectionId: "" });
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
+
+  // Count services per category
+  const serviceCountMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const svc of allServices) {
+      if (svc.categoryId) {
+        map[svc.categoryId] = (map[svc.categoryId] || 0) + 1;
+      }
+    }
+    return map;
+  }, [allServices]);
 
   const openCreate = () => {
     setEditItem(null);
     setForm({ name: "", nameEn: "", sectionId: "" });
+    setSelectedServiceIds([]);
     setSheetOpen(true);
   };
 
@@ -69,10 +87,14 @@ export function CategoriesPanel() {
       nameEn: cat.nameEn || "",
       sectionId: cat.sectionId || "",
     });
+    // Pre-select services that belong to this category
+    setSelectedServiceIds(
+      allServices.filter((s) => s.categoryId === cat.id).map((s) => s.id)
+    );
     setSheetOpen(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name) {
       toast.error(tc("requiredField"));
       return;
@@ -84,23 +106,36 @@ export function CategoriesPanel() {
       sectionId: form.sectionId || undefined,
     };
 
-    if (editItem) {
-      updateCategory.mutate(
-        { id: editItem.id, data: payload },
-        {
-          onSuccess: () => {
-            toast.success(tc("updateSuccess"));
-            setSheetOpen(false);
-          },
+    try {
+      if (editItem) {
+        await updateCategory.mutateAsync({ id: editItem.id, data: payload });
+
+        // Update service assignments: unassign removed, assign added
+        const prevIds = allServices.filter((s) => s.categoryId === editItem.id).map((s) => s.id);
+        const toUnassign = prevIds.filter((id) => !selectedServiceIds.includes(id));
+        const toAssign = selectedServiceIds.filter((id) => !prevIds.includes(id));
+
+        for (const id of toUnassign) {
+          await updateService.mutateAsync({ id, data: { categoryId: "" } });
         }
-      );
-    } else {
-      createCategory.mutate(payload, {
-        onSuccess: () => {
-          toast.success(tc("addSuccess"));
-          setSheetOpen(false);
-        },
-      });
+        for (const id of toAssign) {
+          await updateService.mutateAsync({ id, data: { categoryId: editItem.id } });
+        }
+
+        toast.success(tc("updateSuccess"));
+      } else {
+        const created = await createCategory.mutateAsync(payload);
+
+        // Assign selected services to the new category
+        for (const id of selectedServiceIds) {
+          await updateService.mutateAsync({ id, data: { categoryId: created.id } });
+        }
+
+        toast.success(tc("addSuccess"));
+      }
+      setSheetOpen(false);
+    } catch {
+      toast.error(tc("error"));
     }
   };
 
@@ -113,6 +148,14 @@ export function CategoriesPanel() {
         },
       });
     }
+  };
+
+  const toggleService = (serviceId: string) => {
+    setSelectedServiceIds((prev) =>
+      prev.includes(serviceId)
+        ? prev.filter((id) => id !== serviceId)
+        : [...prev, serviceId]
+    );
   };
 
   // Group categories by section
@@ -165,9 +208,14 @@ export function CategoriesPanel() {
                   {sectionCats.map((cat) => (
                     <div
                       key={cat.id}
-                      className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs"
+                      className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs"
                     >
                       <span>{cat.name}</span>
+                      {serviceCountMap[cat.id] > 0 && (
+                        <span className="text-muted-foreground font-english">
+                          ({serviceCountMap[cat.id]})
+                        </span>
+                      )}
                       <button
                         type="button"
                         onClick={() => openEdit(cat)}
@@ -199,9 +247,14 @@ export function CategoriesPanel() {
                 {uncategorized.map((cat) => (
                   <div
                     key={cat.id}
-                    className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs"
+                    className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs"
                   >
                     <span>{cat.name}</span>
+                    {serviceCountMap[cat.id] > 0 && (
+                      <span className="text-muted-foreground font-english">
+                        ({serviceCountMap[cat.id]})
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => openEdit(cat)}
@@ -229,10 +282,10 @@ export function CategoriesPanel() {
         <SheetContent side="left" className="overflow-y-auto">
           <SheetHeader>
             <SheetTitle>
-              {editItem ? tc("editItem") : t("newCategory")}
+              {editItem ? t("editCategory") : t("newCategory")}
             </SheetTitle>
             <SheetDescription className="sr-only">
-              {editItem ? tc("editItem") : t("newCategory")}
+              {editItem ? t("editCategory") : t("newCategory")}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 space-y-4 px-4">
@@ -261,7 +314,7 @@ export function CategoriesPanel() {
                 {t("section")}
               </label>
               <Select
-                value={form.sectionId}
+                value={form.sectionId || "none"}
                 onValueChange={(v) =>
                   setForm({ ...form, sectionId: v === "none" ? "" : v })
                 }
@@ -278,6 +331,47 @@ export function CategoriesPanel() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Service assignment */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("services")}
+              </label>
+              <p className="text-xs text-muted-foreground">{t("selectServices")}</p>
+              {allServices.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-2">{t("noServices")}</p>
+              ) : (
+                <div className="space-y-1 max-h-48 overflow-y-auto rounded-lg border border-border p-2">
+                  {allServices.map((svc) => {
+                    const isSelected = selectedServiceIds.includes(svc.id);
+                    const belongsToOther = svc.categoryId && svc.categoryId !== editItem?.id;
+                    const otherCat = belongsToOther
+                      ? categories.find((c) => c.id === svc.categoryId)
+                      : null;
+
+                    return (
+                      <label
+                        key={svc.id}
+                        className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm cursor-pointer hover:bg-muted/50 ${
+                          isSelected ? "bg-primary/5" : ""
+                        }`}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleService(svc.id)}
+                        />
+                        <span className="flex-1 truncate">{svc.name}</span>
+                        {otherCat && !isSelected && (
+                          <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+                            {otherCat.name}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
           <SheetFooter>

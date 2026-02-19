@@ -811,6 +811,8 @@
     "totalLabel": "الإجمالي",
     "revenueLabel": "الإيرادات",
     "expensesLabel": "المصروفات",
+    "save": "حفظ",
+    "cancel": "إلغاء",
     "editItem": "تعديل",
     "logout": "تسجيل الخروج",
     "retry": "إعادة المحاولة",
@@ -1140,12 +1142,17 @@
   "serviceCategories": {
     "title": "فئات الخدمات",
     "newCategory": "فئة جديدة",
+    "editCategory": "تعديل الفئة",
     "nameAr": "الاسم (عربي)",
     "nameEn": "الاسم (إنجليزي)",
     "section": "القسم",
     "selectSection": "اختر القسم",
     "noSection": "بدون قسم",
     "noCategories": "لا توجد فئات بعد. أضف أول فئة.",
-    "uncategorized": "غير مصنفة"
+    "uncategorized": "غير مصنفة",
+    "services": "الخدمات",
+    "selectServices": "اختر الخدمات لهذه الفئة",
+    "serviceCount": "{count} خدمات",
+    "noServices": "لا توجد خدمات مخصصة"
   }
 }
