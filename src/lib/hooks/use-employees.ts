@@ -74,3 +74,22 @@ export function useBulkUpdateEmployeeStatus() {
     },
   });
 }
+
+export function useEmployeeSchedules(id: string) {
+  return useQuery({
+    queryKey: ["employees", id, "schedules"],
+    queryFn: () => employeesApi.getSchedules(id),
+    enabled: !!id,
+  });
+}
+
+export function useUpdateEmployeeSchedules() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof employeesApi.updateSchedules>[1] }) =>
+      employeesApi.updateSchedules(id, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["employees", variables.id, "schedules"] });
+    },
+  });
+}

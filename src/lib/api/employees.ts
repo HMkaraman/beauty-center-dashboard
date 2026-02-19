@@ -28,4 +28,8 @@ export const employeesApi = {
     apiFetch<{ deleted: number }>("/employees/bulk", { method: "DELETE", body: JSON.stringify({ ids }) }),
   bulkUpdateStatus: (data: { ids: string[]; status: string }) =>
     apiFetch<{ updated: number }>("/employees/bulk", { method: "PATCH", body: JSON.stringify(data) }),
+  getSchedules: (id: string) =>
+    apiFetch<Array<{ id: string; dayOfWeek: number; startTime: string; endTime: string; isAvailable: number }>>(`/employees/${id}/schedules`),
+  updateSchedules: (id: string, data: Array<{ dayOfWeek: number; startTime: string; endTime: string; isAvailable?: number }>) =>
+    apiFetch(`/employees/${id}/schedules`, { method: "PUT", body: JSON.stringify(data) }),
 };

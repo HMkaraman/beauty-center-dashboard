@@ -338,7 +338,10 @@
     "notes": "Notes",
     "personalInfo": "Personal Information",
     "employment": "Employment",
-    "compensationSection": "Compensation"
+    "compensationSection": "Compensation",
+    "tabSchedule": "Schedule",
+    "scheduleTitle": "Working Schedule",
+    "scheduleSaved": "Schedule saved successfully"
   },
   "services": {
     "title": "Services",

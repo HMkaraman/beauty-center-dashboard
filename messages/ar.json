@@ -338,7 +338,10 @@
     "notes": "ملاحظات",
     "personalInfo": "المعلومات الشخصية",
     "employment": "التوظيف",
-    "compensationSection": "التعويضات"
+    "compensationSection": "التعويضات",
+    "tabSchedule": "الجدول",
+    "scheduleTitle": "جدول العمل",
+    "scheduleSaved": "تم حفظ الجدول بنجاح"
   },
   "services": {
     "title": "الخدمات",
