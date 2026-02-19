@@ -10,7 +10,6 @@ import { BookingStepClientServices } from "./booking-step-client-services";
 import { BookingStepProviderTime, type ServiceAssignment } from "./booking-step-provider-time";
 import { BookingStepConfirm } from "./booking-step-confirm";
 import { useCreateAppointment } from "@/lib/hooks/use-appointments";
-import { useCreateClient } from "@/lib/hooks/use-clients";
 import { useInvalidateReception } from "@/lib/hooks/use-reception";
 import { useEmployees } from "@/lib/hooks/use-employees";
 import { useDoctors } from "@/lib/hooks/use-doctors";
@@ -41,7 +40,6 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
   const tc = useTranslations("common");
   const locale = useLocale();
   const createAppointment = useCreateAppointment();
-  const createClient = useCreateClient();
   const invalidateReception = useInvalidateReception();
 
   const { data: employeesData } = useEmployees({ limit: 200 });
@@ -51,9 +49,6 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
 
   const [step, setStep] = useState<Step>("client-services");
   const [client, setClient] = useState<ClientValue | null>(null);
-  const [isWalkIn, setIsWalkIn] = useState(false);
-  const [walkInName, setWalkInName] = useState("");
-  const [walkInPhone, setWalkInPhone] = useState("");
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [assignments, setAssignments] = useState<ServiceAssignment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,20 +109,9 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      let clientId = client?.clientId;
-      let clientName = client?.clientName || "";
-      let clientPhone = client?.clientPhone || "";
-
-      if (isWalkIn && walkInName) {
-        const newClient = await createClient.mutateAsync({
-          name: walkInName,
-          phone: walkInPhone,
-          status: "active",
-        });
-        clientId = newClient.id;
-        clientName = newClient.name;
-        clientPhone = newClient.phone || "";
-      }
+      const clientId = client?.clientId;
+      const clientName = client?.clientName || "";
+      const clientPhone = client?.clientPhone || "";
 
       if (!clientName) {
         toast.error(tc("requiredField"));
@@ -171,9 +155,6 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
   const resetAndClose = () => {
     setStep("client-services");
     setClient(null);
-    setIsWalkIn(false);
-    setWalkInName("");
-    setWalkInPhone("");
     setSelectedServices([]);
     setAssignments([]);
     onClose();
@@ -182,10 +163,7 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
   const canNext = (() => {
     switch (step) {
       case "client-services":
-        return (
-          (!!client?.clientId || (isWalkIn && !!walkInName)) &&
-          selectedServices.length > 0
-        );
+        return !!client?.clientId && selectedServices.length > 0;
       case "provider-time":
         return assignments.every((a) => a.time);
       default:
@@ -266,12 +244,6 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
               <BookingStepClientServices
                 client={client}
                 onClientChange={setClient}
-                isWalkIn={isWalkIn}
-                onWalkInChange={setIsWalkIn}
-                walkInName={walkInName}
-                onWalkInNameChange={setWalkInName}
-                walkInPhone={walkInPhone}
-                onWalkInPhoneChange={setWalkInPhone}
                 selectedServices={selectedServices}
                 onAddService={handleAddService}
                 onRemoveService={handleRemoveService}
@@ -286,9 +258,6 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
             {step === "confirm" && (
               <BookingStepConfirm
                 client={client}
-                isWalkIn={isWalkIn}
-                walkInName={walkInName}
-                walkInPhone={walkInPhone}
                 assignments={assignments}
               />
             )}

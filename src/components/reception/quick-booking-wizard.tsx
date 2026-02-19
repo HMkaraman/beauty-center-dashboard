@@ -29,7 +29,6 @@ import { useDoctors } from "@/lib/hooks/use-doctors";
 import { useSections } from "@/lib/hooks/use-sections";
 import { useServiceCategories } from "@/lib/hooks/use-service-categories";
 import { useCreateAppointment } from "@/lib/hooks/use-appointments";
-import { useCreateClient } from "@/lib/hooks/use-clients";
 import { useInvalidateReception } from "@/lib/hooks/use-reception";
 import { Price } from "@/components/ui/price";
 
@@ -61,14 +60,10 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
   const tc = useTranslations("common");
   const locale = useLocale();
   const createAppointment = useCreateAppointment();
-  const createClient = useCreateClient();
   const invalidateReception = useInvalidateReception();
 
   const [step, setStep] = useState<Step>("client");
   const [client, setClient] = useState<ClientValue | null>(null);
-  const [isWalkIn, setIsWalkIn] = useState(false);
-  const [walkInName, setWalkInName] = useState("");
-  const [walkInPhone, setWalkInPhone] = useState("");
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [assignments, setAssignments] = useState<ServiceAssignment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -156,21 +151,9 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      let clientId = client?.clientId;
-      let clientName = client?.clientName || "";
-      let clientPhone = client?.clientPhone || "";
-
-      // Handle walk-in: create client first
-      if (isWalkIn && walkInName) {
-        const newClient = await createClient.mutateAsync({
-          name: walkInName,
-          phone: walkInPhone,
-          status: "active",
-        });
-        clientId = newClient.id;
-        clientName = newClient.name;
-        clientPhone = newClient.phone || "";
-      }
+      const clientId = client?.clientId;
+      const clientName = client?.clientName || "";
+      const clientPhone = client?.clientPhone || "";
 
       if (!clientName) {
         toast.error(tc("requiredField"));
@@ -215,9 +198,6 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
   const resetWizard = () => {
     setStep("client");
     setClient(null);
-    setIsWalkIn(false);
-    setWalkInName("");
-    setWalkInPhone("");
     setSelectedServices([]);
     setAssignments([]);
   };
@@ -226,7 +206,7 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
   const canNext = (() => {
     switch (step) {
       case "client":
-        return !!client?.clientId || (isWalkIn && !!walkInName);
+        return !!client?.clientId;
       case "services":
         return selectedServices.length > 0;
       case "providers":
@@ -263,53 +243,7 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
           {step === "client" && (
             <div className="space-y-4">
               <h3 className="text-sm font-semibold">{t("selectClient")}</h3>
-              {!isWalkIn ? (
-                <>
-                  <ClientCombobox value={client} onChange={setClient} />
-                  <div className="relative flex items-center justify-center">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-border" />
-                    </div>
-                    <span className="relative bg-background px-2 text-xs text-muted-foreground">
-                      {t("or")}
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => { setIsWalkIn(true); setClient(null); }}
-                  >
-                    {t("walkIn")}
-                  </Button>
-                </>
-              ) : (
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("clientName")}</label>
-                    <Input
-                      value={walkInName}
-                      onChange={(e) => setWalkInName(e.target.value)}
-                      autoFocus
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("clientPhone")}</label>
-                    <Input
-                      value={walkInPhone}
-                      onChange={(e) => setWalkInPhone(e.target.value)}
-                      className="font-english"
-                      dir="ltr"
-                    />
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => { setIsWalkIn(false); setWalkInName(""); setWalkInPhone(""); }}
-                  >
-                    {t("backToSearch")}
-                  </Button>
-                </div>
-              )}
+              <ClientCombobox value={client} onChange={setClient} />
             </div>
           )}
 
@@ -403,12 +337,10 @@ export function QuickBookingWizard({ open, onOpenChange }: QuickBookingWizardPro
               <div className="rounded-lg border border-border p-3 space-y-3">
                 <div>
                   <p className="text-xs text-muted-foreground">{t("client")}</p>
-                  <p className="text-sm font-medium">
-                    {isWalkIn ? walkInName : client?.clientName}
-                  </p>
-                  {(isWalkIn ? walkInPhone : client?.clientPhone) && (
+                  <p className="text-sm font-medium">{client?.clientName}</p>
+                  {client?.clientPhone && (
                     <p className="text-xs font-english text-muted-foreground">
-                      {isWalkIn ? walkInPhone : client?.clientPhone}
+                      {client.clientPhone}
                     </p>
                   )}
                 </div>

@@ -12,17 +12,11 @@ interface ClientValue {
 
 interface BookingStepConfirmProps {
   client: ClientValue | null;
-  isWalkIn: boolean;
-  walkInName: string;
-  walkInPhone: string;
   assignments: ServiceAssignment[];
 }
 
 export function BookingStepConfirm({
   client,
-  isWalkIn,
-  walkInName,
-  walkInPhone,
   assignments,
 }: BookingStepConfirmProps) {
   const t = useTranslations("reception");
@@ -36,12 +30,10 @@ export function BookingStepConfirm({
         {/* Client info */}
         <div>
           <p className="text-xs text-muted-foreground">{t("client")}</p>
-          <p className="text-sm font-medium">
-            {isWalkIn ? walkInName : client?.clientName}
-          </p>
-          {(isWalkIn ? walkInPhone : client?.clientPhone) && (
+          <p className="text-sm font-medium">{client?.clientName}</p>
+          {client?.clientPhone && (
             <p className="text-xs font-english text-muted-foreground">
-              {isWalkIn ? walkInPhone : client?.clientPhone}
+              {client.clientPhone}
             </p>
           )}
         </div>
