@@ -31,6 +31,7 @@ import {
 } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
 import { ClientCombobox } from "./client-combobox";
+import { ClientLeftoverBanner } from "./client-leftover-banner";
 
 interface NewAppointmentSheetProps {
   open: boolean;
@@ -281,6 +282,11 @@ export function NewAppointmentSheet({ open, onOpenChange, editItem }: NewAppoint
         </SheetHeader>
 
         <div className="flex-1 space-y-4 px-4">
+          {/* Client Leftover Banner */}
+          {form.clientId && (
+            <ClientLeftoverBanner clientId={form.clientId} />
+          )}
+
           {/* Client */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("client")}</label>

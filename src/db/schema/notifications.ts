@@ -6,6 +6,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "appointment_reminder",
   "invoice_receipt",
   "low_stock_alert",
+  "product_expiry_reminder",
   "custom",
 ]);
 

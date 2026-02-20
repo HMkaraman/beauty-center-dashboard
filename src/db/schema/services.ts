@@ -25,6 +25,12 @@ export const services = pgTable("services", {
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   status: serviceStatusEnum("status").notNull().default("active"),
   description: text("description"),
+  // Consumption tracking fields
+  serviceType: varchar("service_type", { length: 20 }), // "laser" | "injectable" | null (general)
+  laserMinShots: integer("laser_min_shots"),
+  laserMaxShots: integer("laser_max_shots"),
+  injectableUnit: varchar("injectable_unit", { length: 10 }), // "units" | "cc"
+  injectableExpiryDays: integer("injectable_expiry_days"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

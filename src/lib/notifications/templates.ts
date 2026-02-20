@@ -98,3 +98,31 @@ export function lowStockAlert(params: {
     },
   };
 }
+
+export function productExpiryReminder(params: {
+  clientName: string;
+  productName: string;
+  remainingAmount: string;
+  unit: string;
+  expiryDate: string;
+  businessName: string;
+}) {
+  return {
+    sms: `${params.businessName}: عزيزتي ${params.clientName}، لديك بقية من ${params.productName} (${params.remainingAmount} ${params.unit}) تنتهي صلاحيتها في ${params.expiryDate}. يرجى حجز موعد لاستخدامها.`,
+    email: {
+      subject: `تذكير بانتهاء صلاحية المنتج - ${params.businessName}`,
+      html: `<div dir="rtl" style="font-family: sans-serif; padding: 20px;">
+        <h2>تذكير بانتهاء صلاحية المنتج</h2>
+        <p>مرحباً ${params.clientName}،</p>
+        <p>لديك بقية من منتج محفوظ لك:</p>
+        <ul>
+          <li>المنتج: ${params.productName}</li>
+          <li>الكمية المتبقية: ${params.remainingAmount} ${params.unit}</li>
+          <li>تاريخ انتهاء الصلاحية: ${params.expiryDate}</li>
+        </ul>
+        <p>يرجى حجز موعد لاستخدام المتبقي قبل انتهاء الصلاحية.</p>
+        <p>شكراً لك،<br/>${params.businessName}</p>
+      </div>`,
+    },
+  };
+}

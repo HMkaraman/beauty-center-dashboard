@@ -209,6 +209,8 @@ export interface ServiceCategory {
 // Services
 export type ServiceStatus = "active" | "inactive";
 
+export type ServiceType = "laser" | "injectable" | null;
+
 export interface Service {
   id: string;
   name: string;
@@ -219,6 +221,11 @@ export interface Service {
   price: number;
   status: ServiceStatus;
   bookings: number;
+  serviceType?: ServiceType;
+  laserMinShots?: number;
+  laserMaxShots?: number;
+  injectableUnit?: string;
+  injectableExpiryDays?: number;
 }
 
 // Doctors
@@ -628,6 +635,69 @@ export interface ActivityLog {
   entityLabel?: string;
   attachments: ActivityLogAttachment[];
   createdAt: string;
+}
+
+// Consumption Tracking
+export type ConsumptionType = "laser_shots" | "injectable";
+export type ShotDeviation = "within_range" | "below" | "above";
+export type ReservationStatus = "active" | "used" | "expired" | "disposed";
+
+export interface SessionConsumptionLog {
+  id: string;
+  tenantId: string;
+  appointmentId: string;
+  serviceId?: string;
+  clientId?: string;
+  consumptionType: ConsumptionType;
+  actualShots?: number;
+  expectedMinShots?: number;
+  expectedMaxShots?: number;
+  shotDeviation?: ShotDeviation;
+  inventoryItemId?: string;
+  productName?: string;
+  totalAllocated?: number;
+  amountUsed?: number;
+  leftoverAmount?: number;
+  unit?: string;
+  deviceId?: string;
+  deviceModel?: string;
+  notes?: string;
+  recordedById?: string;
+  createdAt: string;
+}
+
+export interface ClientProductReservation {
+  id: string;
+  tenantId: string;
+  clientId: string;
+  consumptionLogId: string;
+  inventoryItemId?: string;
+  productName: string;
+  leftoverAmount: number;
+  remainingAmount: number;
+  unit: string;
+  originalAppointmentId?: string;
+  openedDate?: string;
+  expiryDate?: string;
+  expiryDays?: number;
+  status: ReservationStatus;
+  touchUpAppointmentId?: string;
+  touchUpDate?: string;
+  touchUpAmountUsed?: number;
+  touchUpIsFree?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Joined fields
+  clientName?: string;
+  clientPhone?: string;
+}
+
+export interface LeftoverDashboardData {
+  activeCount: number;
+  expiringSoonCount: number;
+  monthlyExpiredCount: number;
+  expiringSoonList: (ClientProductReservation & { clientName: string; daysLeft: number })[];
 }
 
 export type Locale = "ar" | "en";

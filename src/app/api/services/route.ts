@@ -103,6 +103,11 @@ export async function POST(req: NextRequest) {
         price: String(validated.price),
         status: validated.status,
         description: validated.description,
+        serviceType: validated.serviceType ?? null,
+        laserMinShots: validated.laserMinShots ?? null,
+        laserMaxShots: validated.laserMaxShots ?? null,
+        injectableUnit: validated.injectableUnit ?? null,
+        injectableExpiryDays: validated.injectableExpiryDays ?? null,
       })
       .returning();
 

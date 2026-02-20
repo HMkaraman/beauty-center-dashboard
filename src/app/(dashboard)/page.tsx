@@ -5,6 +5,7 @@ import { MiniKPICard } from "@/components/ui/mini-kpi-card";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { ProfitabilityBanner } from "@/components/dashboard/profitability-banner";
 import { QuickActions } from "@/components/dashboard/quick-actions";
+import { LeftoverReservationsWidget } from "@/components/dashboard/leftover-reservations-widget";
 import { useDashboardStats } from "@/lib/hooks/use-dashboard";
 import {
   kpiData as mockKpiData,
@@ -79,6 +80,9 @@ export default function DashboardPage() {
           <MiniKPICard key={kpi.id} data={kpi} />
         ))}
       </div>
+
+      {/* Leftover Reservations Widget */}
+      <LeftoverReservationsWidget />
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} />

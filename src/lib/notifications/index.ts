@@ -30,4 +30,5 @@ export {
   appointmentReminder,
   invoiceReceipt,
   lowStockAlert,
+  productExpiryReminder,
 } from "./templates";
