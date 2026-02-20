@@ -9,6 +9,7 @@ export const serviceSchema = z.object({
   price: z.number().nonnegative("Price must be zero or greater"),
   status: z.enum(["active", "inactive"]),
   description: z.string().optional(),
+  image: z.string().nullable().optional(),
   serviceType: z.enum(["laser", "injectable"]).nullable().optional(),
   laserMinShots: z.number().int().positive().nullable().optional(),
   laserMaxShots: z.number().int().positive().nullable().optional(),

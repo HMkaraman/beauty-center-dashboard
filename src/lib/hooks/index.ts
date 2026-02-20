@@ -1,7 +1,7 @@
 export { useClients, useClient, useClientDetails, useCreateClient, useUpdateClient, useDeleteClient } from "./use-clients";
 export { useEmployees, useEmployee, useEmployeeDetails, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useEmployeeSchedules, useUpdateEmployeeSchedules } from "./use-employees";
 export { useDoctors, useDoctor, useDoctorDetails, useCreateDoctor, useUpdateDoctor, useDeleteDoctor, useDoctorSchedules, useUpdateDoctorSchedules } from "./use-doctors";
-export { useServices, useService, useCreateService, useUpdateService, useDeleteService } from "./use-services";
+export { useServices, useService, useServiceDetails, useServiceInventory, useServiceEmployees, useCreateService, useUpdateService, useUpdateServiceInventory, useUpdateServiceEmployees, useDeleteService } from "./use-services";
 export {
   useAppointments,
   useAppointment,

@@ -1,0 +1,10 @@
+import { ServiceDetailPage } from "@/components/services/service-detail-page";
+
+export default async function ServiceDetailRoute({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <ServiceDetailPage serviceId={id} />;
+}

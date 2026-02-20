@@ -30,7 +30,7 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
   const updateInvoice = useUpdateInvoice();
 
   const { data: servicesData } = useServices({ limit: 100 });
-  const services = servicesData?.data ?? [];
+  const services = useMemo(() => servicesData?.data ?? [], [servicesData]);
 
   const paymentMethods = [
     { value: "cash", label: t("paymentCash") },

@@ -221,11 +221,38 @@ export interface Service {
   price: number;
   status: ServiceStatus;
   bookings: number;
+  image?: string;
+  description?: string;
   serviceType?: ServiceType;
   laserMinShots?: number;
   laserMaxShots?: number;
   injectableUnit?: string;
   injectableExpiryDays?: number;
+}
+
+// Service Detail types
+export interface ServiceKPIs {
+  totalBookings: number;
+  totalRevenue: number;
+  avgRevenuePerBooking: number;
+  uniqueClients: number;
+  cancellationRate: number;
+  lastBooked: string | null;
+}
+
+export interface ServiceAnalytics {
+  topEmployees: { employeeName: string; count: number }[];
+  topClients: { clientName: string; count: number }[];
+  monthlyRevenue: { month: string; revenue: number }[];
+}
+
+export interface ServiceDetailResponse {
+  service: Service & { description: string | null };
+  kpis: ServiceKPIs;
+  analytics: ServiceAnalytics;
+  recentAppointments: Appointment[];
+  inventoryRequirements: { id: string; inventoryItemId: string; inventoryItemName: string; quantityRequired: number }[];
+  assignedEmployees: { id: string; name: string; role: string }[];
 }
 
 // Doctors

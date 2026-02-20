@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Search, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Search, Trash2, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import { useRowSelection } from "@/hooks/use-row-selection";
 import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -25,6 +26,7 @@ import { Service } from "@/types";
 export function ServicesPageContent() {
   const t = useTranslations("services");
   const tc = useTranslations("common");
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isLoading } = useServices({ search: searchQuery });
   const deleteService = useDeleteService();
@@ -58,7 +60,10 @@ export function ServicesPageContent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">{t("servicesList")}</h2>
-          <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm"><DynamicIcon name="Plus" className="h-4 w-4" />{t("newService")}</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => router.push("/services/new")} className="gap-1"><ExternalLink className="h-3.5 w-3.5" />{t("openFullForm")}</Button>
+            <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm"><DynamicIcon name="Plus" className="h-4 w-4" />{t("newService")}</Button>
+          </div>
         </div>
         <div className="relative"><Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tc("searchPlaceholder")} className="ps-9" /></div>
         {filtered.length === 0 ? (<p className="py-8 text-center text-sm text-muted-foreground">{tc("noResults")}</p>) : (

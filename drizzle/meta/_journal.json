@@ -85,6 +85,13 @@
       "when": 1771587505690,
       "tag": "0011_steady_black_tom",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1771601732964,
+      "tag": "0012_milky_annihilus",
+      "breakpoints": true
     }
   ]
 }
