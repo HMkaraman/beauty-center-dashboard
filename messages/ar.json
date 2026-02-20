@@ -395,7 +395,7 @@
     "newService": "خدمة جديدة",
     "name": "الاسم",
     "category": "الفئة",
-    "duration": "المدة",
+    "duration": "المدة (بالدقائق)",
     "price": "السعر",
     "status": "الحالة",
     "bookings": "الحجوزات",

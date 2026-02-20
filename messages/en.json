@@ -395,7 +395,7 @@
     "newService": "New Service",
     "name": "Name",
     "category": "Category",
-    "duration": "Duration",
+    "duration": "Duration (Minutes)",
     "price": "Price",
     "status": "Status",
     "bookings": "Bookings",
