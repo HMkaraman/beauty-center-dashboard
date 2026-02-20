@@ -1196,7 +1196,16 @@
     "backToSections": "العودة للأقسام",
     "allSectionServices": "الكل",
     "servicesCount": "{count} خدمات",
-    "uncategorizedServices": "خدمات أخرى"
+    "uncategorizedServices": "خدمات أخرى",
+    "todayAvailability": "التوفر اليوم",
+    "free": "متاح",
+    "busy": "مشغول",
+    "off": "غير متوفر",
+    "currentlyWith": "حالياً مع {client}",
+    "nextAvailable": "التالي المتاح: {time}",
+    "noMoreSlots": "محجوز بالكامل",
+    "notWorkingShort": "يوم إجازة",
+    "workingToday": "{count} يعملون اليوم"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",

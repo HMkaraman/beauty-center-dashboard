@@ -1196,7 +1196,16 @@
     "backToSections": "Back to Sections",
     "allSectionServices": "All",
     "servicesCount": "{count} services",
-    "uncategorizedServices": "Other Services"
+    "uncategorizedServices": "Other Services",
+    "todayAvailability": "Today's Availability",
+    "free": "Free",
+    "busy": "Busy",
+    "off": "Off",
+    "currentlyWith": "Currently with {client}",
+    "nextAvailable": "Next available: {time}",
+    "noMoreSlots": "Fully booked",
+    "notWorkingShort": "Day off",
+    "workingToday": "{count} working today"
   },
   "serviceCategories": {
     "title": "Service Categories",

@@ -11,6 +11,7 @@ import { AppointmentBoard } from "./appointment-board";
 import { BookingOverlay } from "./booking-overlay";
 import { QuickCheckout } from "./quick-checkout";
 import { AvailabilityChecker } from "./availability-checker";
+import { TodayAvailability } from "./today-availability";
 import { useTodayAppointments, useInvalidateReception } from "@/lib/hooks/use-reception";
 import { useUpdateAppointment } from "@/lib/hooks/use-appointments";
 import { Appointment } from "@/types";
@@ -25,6 +26,7 @@ export function ReceptionPageContent() {
 
   const [bookingOpen, setBookingOpen] = useState(false);
   const [checkerOpen, setCheckerOpen] = useState(false);
+  const [preselectedProvider, setPreselectedProvider] = useState<{ id: string; type: "employee" | "doctor" } | null>(null);
   const [checkoutAppointment, setCheckoutAppointment] = useState<Appointment | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
@@ -106,6 +108,14 @@ export function ReceptionPageContent() {
           </Button>
         </div>
 
+        {/* Today's Availability */}
+        <TodayAvailability
+          onViewDetails={(id, type) => {
+            setPreselectedProvider({ id, type });
+            setCheckerOpen(true);
+          }}
+        />
+
         {/* Board */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
@@ -128,7 +138,11 @@ export function ReceptionPageContent() {
       {/* Availability Checker */}
       <AvailabilityChecker
         open={checkerOpen}
-        onOpenChange={setCheckerOpen}
+        onOpenChange={(open) => {
+          setCheckerOpen(open);
+          if (!open) setPreselectedProvider(null);
+        }}
+        preselectedProvider={preselectedProvider}
       />
 
       {/* Quick Checkout */}

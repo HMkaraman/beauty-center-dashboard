@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowLeft, Clock, CalendarDays, Users, Activity, DollarSign, CalendarSearch } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, CalendarDays, Users, Activity, Banknote, CalendarSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReceptionStats } from "@/lib/hooks/use-reception";
 import Link from "next/link";
@@ -17,14 +17,23 @@ export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
   const locale = useLocale();
   const { data: stats } = useReceptionStats();
   const [time, setTime] = useState("");
+  const [dateStr, setDateStr] = useState("");
 
   useEffect(() => {
     const update = () => {
+      const now = new Date();
       setTime(
-        new Date().toLocaleTimeString(locale === "ar" ? "ar-SA" : "en-US", {
+        now.toLocaleTimeString(locale === "ar" ? "ar-SA" : "en-US", {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
+        })
+      );
+      setDateStr(
+        now.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
         })
       );
     };
@@ -43,9 +52,15 @@ export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
               {t("backToDashboard")}
             </Button>
           </Link>
-          <div className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="font-english tabular-nums">{time}</span>
+          <div className="hidden sm:flex items-center gap-3 text-sm font-medium text-foreground">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>{dateStr}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="font-english tabular-nums">{time}</span>
+            </div>
           </div>
         </div>
 
@@ -68,7 +83,7 @@ export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
               <span>{t("inProgress")}</span>
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-600">
-              <DollarSign className="h-3.5 w-3.5" />
+              <Banknote className="h-3.5 w-3.5" />
               <span className="font-english"><Price value={stats?.todayRevenue ?? 0} /></span>
             </div>
           </div>

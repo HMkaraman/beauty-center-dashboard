@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   Sheet,
@@ -26,15 +26,30 @@ import { ScheduleTimeline } from "./schedule-timeline";
 interface AvailabilityCheckerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedProvider?: { id: string; type: "employee" | "doctor" } | null;
 }
 
-export function AvailabilityChecker({ open, onOpenChange }: AvailabilityCheckerProps) {
+export function AvailabilityChecker({ open, onOpenChange, preselectedProvider }: AvailabilityCheckerProps) {
   const t = useTranslations("reception");
 
   const [tab, setTab] = useState<"employees" | "doctors">("employees");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+
+  useEffect(() => {
+    if (open && preselectedProvider) {
+      if (preselectedProvider.type === "employee") {
+        setTab("employees");
+        setSelectedEmployeeId(preselectedProvider.id);
+        setSelectedDoctorId("");
+      } else {
+        setTab("doctors");
+        setSelectedDoctorId(preselectedProvider.id);
+        setSelectedEmployeeId("");
+      }
+    }
+  }, [open, preselectedProvider]);
 
   const { data: employeesData } = useEmployees({ limit: 200 });
   const allEmployees = (employeesData?.data ?? []).filter((e) => e.status === "active");

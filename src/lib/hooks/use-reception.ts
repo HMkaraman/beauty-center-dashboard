@@ -75,6 +75,46 @@ export function useProviderSchedule(params: ProviderScheduleParams) {
   });
 }
 
+export interface TodayAvailabilityProvider {
+  id: string;
+  name: string;
+  type: "employee" | "doctor";
+  image: string | null;
+  role: string;
+  notWorking: boolean;
+  workingHours: { start: string; end: string } | null;
+  currentStatus: "free" | "busy" | "off";
+  currentAppointment: {
+    clientName: string;
+    service: string;
+    time: string;
+    duration: number;
+  } | null;
+  nextAvailableTime: string | null;
+  appointmentCount: number;
+  appointments: Array<{
+    id: string;
+    time: string;
+    duration: number;
+    clientName: string;
+    service: string;
+    status: string;
+  }>;
+}
+
+interface TodayAvailabilityResponse {
+  providers: TodayAvailabilityProvider[];
+}
+
+export function useTodayAvailability() {
+  return useQuery({
+    queryKey: ["reception", "today-availability"],
+    queryFn: () =>
+      apiFetch<TodayAvailabilityResponse>("/reception/today-availability"),
+    refetchInterval: 30 * 1000,
+  });
+}
+
 export function useInvalidateReception() {
   const queryClient = useQueryClient();
   return () => {
