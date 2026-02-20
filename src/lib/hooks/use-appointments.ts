@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { appointmentsApi } from "@/lib/api/appointments";
-import type { AppointmentStatus } from "@/types";
+import type { Appointment, AppointmentStatus } from "@/types";
 
 export function useAppointments(params?: {
   page?: number;
@@ -121,5 +121,53 @@ export function useAvailableDates(params: {
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
     retry: 1,
+  });
+}
+
+export function useAppointmentDetails(id: string) {
+  return useQuery({
+    queryKey: ["appointments", id, "details"],
+    queryFn: () => appointmentsApi.getDetails(id),
+    enabled: !!id,
+  });
+}
+
+export function useAppointmentAttachments(id: string) {
+  return useQuery({
+    queryKey: ["appointments", id, "attachments"],
+    queryFn: () => appointmentsApi.getAttachments(id),
+    enabled: !!id,
+  });
+}
+
+export function useAddAppointmentAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof appointmentsApi.addAttachment>[1] }) =>
+      appointmentsApi.addAttachment(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}
+
+export function useDeleteAppointmentAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, attachmentId }: { id: string; attachmentId: string }) =>
+      appointmentsApi.deleteAttachment(id, attachmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+}
+
+export function useCreateRecurringAppointments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: appointmentsApi.createRecurring,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
   });
 }

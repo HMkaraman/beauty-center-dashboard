@@ -9,7 +9,7 @@ import {
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
 import { services, serviceCategories } from "@/db/schema";
-import { serviceSchema } from "@/lib/validations";
+import { serviceBaseSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
 
@@ -46,7 +46,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await req.json();
-    const result = serviceSchema.partial().safeParse(body);
+    const result = serviceBaseSchema.partial().safeParse(body);
 
     if (!result.success) {
       return badRequest(result.error.issues[0]?.message ?? "Invalid input");

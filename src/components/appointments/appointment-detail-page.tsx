@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowLeft, User, Phone, Calendar, Clock, DollarSign, Scissors, UserCheck, Zap, Syringe } from "lucide-react";
+import {
+  ArrowLeft, User, Phone, Calendar, Clock, DollarSign,
+  Scissors, UserCheck, Zap, Syringe, Pencil, Users,
+  TrendingUp, Image as ImageIcon, Stethoscope, Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,13 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
-import { NewAppointmentSheet } from "./new-appointment-sheet";
 import { CheckoutSheet } from "@/components/invoices/checkout-sheet";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { ClientLeftoverBanner } from "./client-leftover-banner";
 import { LaserConsumptionSheet } from "./laser-consumption-sheet";
 import { InjectableConsumptionSheet } from "./injectable-consumption-sheet";
-import { useAppointment, useUpdateAppointment } from "@/lib/hooks/use-appointments";
+import { useAppointmentDetails, useUpdateAppointment, useDeleteAppointmentAttachment } from "@/lib/hooks/use-appointments";
 import { useService } from "@/lib/hooks/use-services";
 import { useConsumptionLogs } from "@/lib/hooks/use-consumption-tracking";
 import { Price } from "@/components/ui/price";
@@ -47,12 +51,17 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
   const tc = useTranslations("common");
   const tct = useTranslations("consumptionTracking");
   const router = useRouter();
-  const { data: appointment, isLoading, error } = useAppointment(appointmentId);
+  const { data, isLoading, error } = useAppointmentDetails(appointmentId);
   const updateAppointment = useUpdateAppointment();
-  const [editSheetOpen, setEditSheetOpen] = useState(false);
+  const deleteAttachment = useDeleteAppointmentAttachment();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [laserSheetOpen, setLaserSheetOpen] = useState(false);
   const [injectableSheetOpen, setInjectableSheetOpen] = useState(false);
+
+  const appointment = data?.appointment;
+  const kpis = data?.kpis;
+  const groupAppointments = data?.groupAppointments ?? [];
+  const attachments = data?.attachments ?? [];
 
   // Get service details for consumption type
   const { data: service } = useService(appointment?.serviceId || "");
@@ -71,10 +80,22 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
     updateAppointment.mutate({ id: appointmentId, data: { status: "completed" } });
   };
 
+  const handleDeleteAttachment = (attachmentId: string) => {
+    deleteAttachment.mutate(
+      { id: appointmentId, attachmentId },
+      { onSuccess: () => toast.success(tc("deleteSuccess")) }
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 animate-pulse rounded bg-muted" />
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
+          ))}
+        </div>
         <div className="h-64 animate-pulse rounded-lg bg-muted" />
       </div>
     );
@@ -99,6 +120,31 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
   const isInjectableService = service?.serviceType === "injectable";
   const hasConsumptionLog = consumptionLogs.length > 0;
 
+  const kpiCards = kpis
+    ? [
+        {
+          label: t("clientVisitCount"),
+          value: String(kpis.clientVisitCount),
+          icon: <Users className="h-5 w-5 text-gold" />,
+        },
+        {
+          label: t("clientTotalSpend"),
+          value: <Price value={kpis.clientTotalSpend} />,
+          icon: <DollarSign className="h-5 w-5 text-gold" />,
+        },
+        {
+          label: t("servicePopularity"),
+          value: String(kpis.servicePopularity),
+          icon: <TrendingUp className="h-5 w-5 text-gold" />,
+        },
+        {
+          label: t("employeeCompletionRate"),
+          value: `${kpis.employeeCompletionRate}%`,
+          icon: <UserCheck className="h-5 w-5 text-gold" />,
+        },
+      ]
+    : [];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -113,8 +159,11 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
               {t("checkout")}
             </Button>
           )}
-          <Button onClick={() => setEditSheetOpen(true)}>
-            {t("edit")}
+          <Button asChild>
+            <Link href={`/appointments/${appointmentId}/edit`}>
+              <Pencil className="h-4 w-4 me-2" />
+              {t("editAppointment")}
+            </Link>
           </Button>
         </div>
       </div>
@@ -122,6 +171,28 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
       {/* Client Leftover Banner */}
       {appointment.clientId && (
         <ClientLeftoverBanner clientId={appointment.clientId} />
+      )}
+
+      {/* KPI Grid */}
+      {kpiCards.length > 0 && (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {kpiCards.map((kpi) => (
+            <div
+              key={kpi.label}
+              className="rounded-lg border border-border bg-card p-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  {kpi.icon}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground truncate">{kpi.label}</p>
+                  <p className="text-lg font-semibold text-foreground font-english">{kpi.value}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Main Card */}
@@ -151,6 +222,9 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
         <div className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
           <DetailItem icon={Scissors} label={t("service")} value={appointment.service} />
           <DetailItem icon={UserCheck} label={t("employee")} value={appointment.employee} />
+          {appointment.doctor && (
+            <DetailItem icon={Stethoscope} label={t("doctor")} value={appointment.doctor} />
+          )}
           <DetailItem icon={Calendar} label={t("date")} value={appointment.date} isLtr />
           <DetailItem icon={Clock} label={t("time")} value={appointment.time} isLtr />
           <DetailItem icon={Clock} label={t("duration")} value={`${appointment.duration} ${t("minutes")}`} isLtr />
@@ -248,16 +322,77 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
         </div>
       </div>
 
+      {/* Group Appointments */}
+      {groupAppointments.length > 0 && (
+        <div className="rounded-lg border border-border bg-card p-6">
+          <h2 className="mb-4 text-sm font-semibold text-foreground">{t("groupAppointments")}</h2>
+          <div className="space-y-3">
+            {groupAppointments.map((ga) => (
+              <Link
+                key={ga.id}
+                href={`/appointments/${ga.id}`}
+                className="flex items-center justify-between rounded-md border border-border p-3 transition-colors hover:bg-secondary/20"
+              >
+                <div className="flex items-center gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{ga.service}</p>
+                    <p className="text-xs text-muted-foreground">{ga.employee}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-english text-muted-foreground">{ga.date} {ga.time}</span>
+                  <AppointmentStatusBadge status={ga.status} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Photo Gallery */}
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-foreground">{t("photosSection")}</h2>
+        </div>
+        {attachments.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noPhotos")}</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {attachments.map((att) => (
+              <div key={att.id} className="group relative rounded-lg border border-border overflow-hidden">
+                <div className="aspect-square bg-muted">
+                  {att.mimeType?.startsWith("image/") ? (
+                    <img src={att.url} alt={att.caption || att.filename || ""} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-2">
+                  {att.label && (
+                    <span className="text-xs font-medium text-muted-foreground capitalize">{t(`label${att.label.charAt(0).toUpperCase() + att.label.slice(1)}` as "labelBefore")}</span>
+                  )}
+                  {att.caption && (
+                    <p className="text-xs text-muted-foreground truncate">{att.caption}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteAttachment(att.id)}
+                  className="absolute top-2 end-2 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3 w-3 text-destructive" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Activity Timeline */}
       <div className="rounded-lg border border-border bg-card p-6">
         <ActivityTimeline entityType="appointment" entityId={appointmentId} />
       </div>
-
-      <NewAppointmentSheet
-        open={editSheetOpen}
-        onOpenChange={setEditSheetOpen}
-        editItem={appointment}
-      />
 
       <CheckoutSheet
         open={checkoutOpen}

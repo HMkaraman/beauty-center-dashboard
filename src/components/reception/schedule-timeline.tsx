@@ -34,7 +34,7 @@ function minutesToTime(mins: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-const STATUS_COLORS: Record<string, string> = {
+export const STATUS_COLORS: Record<string, string> = {
   confirmed: "bg-slate-400",
   pending: "bg-slate-400",
   waiting: "bg-amber-500",

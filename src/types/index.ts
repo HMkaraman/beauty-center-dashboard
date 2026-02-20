@@ -731,6 +731,41 @@ export type Locale = "ar" | "en";
 
 export type AppointmentStatus = "confirmed" | "pending" | "cancelled" | "completed" | "no-show" | "waiting" | "in-progress";
 
+export interface AppointmentAttachment {
+  id: string;
+  appointmentId: string;
+  url: string;
+  filename?: string;
+  mimeType?: string;
+  label?: "before" | "after" | "during" | "general";
+  caption?: string;
+  createdAt: string;
+}
+
+export interface AppointmentRecurrence {
+  id: string;
+  groupId: string;
+  frequency: "daily" | "weekly" | "biweekly" | "monthly";
+  interval: number;
+  endDate?: string;
+  occurrences?: number;
+}
+
+export interface AppointmentKPIs {
+  clientVisitCount: number;
+  clientTotalSpend: number;
+  servicePopularity: number;
+  employeeCompletionRate: number;
+}
+
+export interface AppointmentDetailResponse {
+  appointment: Appointment;
+  kpis: AppointmentKPIs;
+  groupAppointments: Appointment[];
+  attachments: AppointmentAttachment[];
+  recurrence: AppointmentRecurrence | null;
+}
+
 export interface Appointment {
   id: string;
   clientId?: string;

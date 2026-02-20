@@ -10,7 +10,7 @@ import {
 import { db } from "@/db/db";
 import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
-import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
 import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 
@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const status = url.searchParams.get("status");
     const date = url.searchParams.get("date");
+    const dateFrom = url.searchParams.get("dateFrom");
+    const dateTo = url.searchParams.get("dateTo");
 
     const conditions = [eq(appointments.tenantId, tenantId)];
 
@@ -44,6 +46,14 @@ export async function GET(req: NextRequest) {
 
     if (date) {
       conditions.push(eq(appointments.date, date));
+    }
+
+    if (dateFrom) {
+      conditions.push(gte(appointments.date, dateFrom));
+    }
+
+    if (dateTo) {
+      conditions.push(lte(appointments.date, dateTo));
     }
 
     const whereClause = and(...conditions);

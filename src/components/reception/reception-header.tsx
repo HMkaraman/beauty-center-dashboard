@@ -2,17 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowLeft, Clock, Calendar, CalendarDays, Users, Activity, Banknote, CalendarSearch } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, CalendarDays, Users, Activity, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useReceptionStats } from "@/lib/hooks/use-reception";
 import Link from "next/link";
 import { Price } from "@/components/ui/price";
 
-interface ReceptionHeaderProps {
-  onCheckAvailability?: () => void;
-}
-
-export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
+export function ReceptionHeader() {
   const t = useTranslations("reception");
   const locale = useLocale();
   const { data: stats } = useReceptionStats();
@@ -87,14 +83,6 @@ export function ReceptionHeader({ onCheckAvailability }: ReceptionHeaderProps) {
               <span className="font-english"><Price value={stats?.todayRevenue ?? 0} /></span>
             </div>
           </div>
-
-          {/* Check Availability button */}
-          {onCheckAvailability && (
-            <Button variant="outline" size="sm" onClick={onCheckAvailability}>
-              <CalendarSearch className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("checkAvailability")}</span>
-            </Button>
-          )}
         </div>
       </div>
     </header>

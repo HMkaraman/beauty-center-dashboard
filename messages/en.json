@@ -1481,7 +1481,17 @@
     "appointments": "Appointments",
     "prevWeek": "Previous week",
     "nextWeek": "Next week",
-    "editAppointment": "Edit"
+    "editAppointment": "Edit",
+    "scheduleView": "Schedule",
+    "boardView": "Board",
+    "dayView": "Day",
+    "weekView": "Week",
+    "monthView": "Month",
+    "todayButton": "Today",
+    "appointmentsCount": "{count} appointments",
+    "noData": "No data",
+    "conflictWarning": "This time conflicts with {client}'s appointment",
+    "durationTooShort": "Minimum duration is 15 minutes"
   },
   "serviceCategories": {
     "title": "Service Categories",

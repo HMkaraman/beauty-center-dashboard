@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-export const serviceSchema = z.object({
+// Base object schema without refinements (supports .partial() for PATCH)
+export const serviceBaseSchema = z.object({
   name: z.string().min(1, "Name is required"),
   nameEn: z.string().optional(),
   category: z.string().min(1, "Category is required"),
   categoryId: z.string().optional(),
-  duration: z.number().positive("Duration must be a positive number"),
+  duration: z.number().int().min(1, "Duration must be at least 1 minute"),
   price: z.number().nonnegative("Price must be zero or greater"),
   status: z.enum(["active", "inactive"]),
   description: z.string().optional(),
@@ -15,7 +16,10 @@ export const serviceSchema = z.object({
   laserMaxShots: z.number().int().positive().nullable().optional(),
   injectableUnit: z.enum(["units", "cc"]).nullable().optional(),
   injectableExpiryDays: z.number().int().positive().nullable().optional(),
-}).refine((data) => {
+});
+
+// Full schema with cross-field refinements (for POST/create)
+export const serviceSchema = serviceBaseSchema.refine((data) => {
   if (data.serviceType === "laser") {
     return data.laserMinShots != null && data.laserMaxShots != null;
   }

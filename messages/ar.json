@@ -1481,7 +1481,17 @@
     "appointments": "المواعيد",
     "prevWeek": "الأسبوع السابق",
     "nextWeek": "الأسبوع التالي",
-    "editAppointment": "تعديل"
+    "editAppointment": "تعديل",
+    "scheduleView": "الجدول",
+    "boardView": "اللوحة",
+    "dayView": "يوم",
+    "weekView": "أسبوع",
+    "monthView": "شهر",
+    "todayButton": "اليوم",
+    "appointmentsCount": "{count} مواعيد",
+    "noData": "لا توجد بيانات",
+    "conflictWarning": "يتعارض هذا الوقت مع موعد {client}",
+    "durationTooShort": "الحد الأدنى للمدة 15 دقيقة"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",

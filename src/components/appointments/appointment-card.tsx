@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
       className="rounded-lg border border-border bg-card p-4 md:hidden"
     >
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
+        <Link href={`/appointments/${data.id}`} className="flex items-center gap-3 hover:opacity-80">
           <Avatar size="sm">
             <AvatarFallback>{data.clientName.charAt(0)}</AvatarFallback>
           </Avatar>
@@ -60,7 +61,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
             <p className="font-medium text-foreground">{data.clientName}</p>
             <p className="text-xs font-english text-muted-foreground">{data.clientPhone}</p>
           </div>
-        </div>
+        </Link>
         <div className="flex items-center gap-2">
           <AppointmentStatusBadge status={data.status} />
           <DropdownMenu>
@@ -74,7 +75,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
               {(data.status === "confirmed" || data.status === "pending") && (
                 <DropdownMenuItem onClick={() => onCheckout?.(data)}>{t("checkout")}</DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => onEdit?.(data)}>{t("edit")}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`/appointments/${data.id}/edit`)}>{t("edit")}</DropdownMenuItem>
               {onStatusChange && (
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>

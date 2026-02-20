@@ -5,6 +5,11 @@ export { useServices, useService, useServiceDetails, useServiceInventory, useSer
 export {
   useAppointments,
   useAppointment,
+  useAppointmentDetails,
+  useAppointmentAttachments,
+  useAddAppointmentAttachment,
+  useDeleteAppointmentAttachment,
+  useCreateRecurringAppointments,
   useCreateAppointment,
   useUpdateAppointment,
   useDeleteAppointment,

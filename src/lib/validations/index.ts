@@ -2,7 +2,7 @@ export { loginSchema, type LoginFormData } from "./auth";
 export { clientSchema, type ClientFormData } from "./clients";
 export { employeeSchema, type EmployeeFormData } from "./employees";
 export { doctorSchema, type DoctorFormData } from "./doctors";
-export { serviceSchema, type ServiceFormData } from "./services";
+export { serviceSchema, serviceBaseSchema, type ServiceFormData } from "./services";
 export { appointmentSchema, type AppointmentFormData } from "./appointments";
 export {
   invoiceItemSchema,

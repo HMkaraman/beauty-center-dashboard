@@ -40,3 +40,26 @@ export const appointments = pgTable("appointments", {
 
 export type AppointmentRecord = typeof appointments.$inferSelect;
 export type NewAppointment = typeof appointments.$inferInsert;
+
+export const appointmentAttachments = pgTable("appointment_attachments", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  appointmentId: text("appointment_id").notNull().references(() => appointments.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  filename: text("filename"),
+  mimeType: text("mime_type"),
+  label: varchar("label", { length: 50 }),
+  caption: text("caption"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const appointmentRecurrences = pgTable("appointment_recurrences", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  groupId: text("group_id").notNull(),
+  frequency: varchar("frequency", { length: 20 }).notNull(),
+  interval: integer("interval").notNull().default(1),
+  endDate: varchar("end_date", { length: 10 }),
+  occurrences: integer("occurrences"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

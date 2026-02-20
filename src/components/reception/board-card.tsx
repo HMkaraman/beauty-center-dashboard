@@ -14,7 +14,7 @@ interface BoardCardProps {
   showStatusSelect?: boolean;
 }
 
-const statusActions: Record<string, { action: string; labelKey: string; color: string }> = {
+export const statusActions: Record<string, { action: string; labelKey: string; color: string }> = {
   confirmed: { action: "waiting", labelKey: "clientArrived", color: "bg-amber-500 hover:bg-amber-600" },
   pending: { action: "waiting", labelKey: "clientArrived", color: "bg-amber-500 hover:bg-amber-600" },
   waiting: { action: "in-progress", labelKey: "startService", color: "bg-blue-500 hover:bg-blue-600" },

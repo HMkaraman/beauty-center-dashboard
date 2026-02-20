@@ -32,6 +32,24 @@ export function useTodayAppointments() {
   });
 }
 
+export function useAppointmentsByRange(
+  params: { dateFrom: string; dateTo: string },
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: ["reception", "appointments-range", params.dateFrom, params.dateTo],
+    queryFn: () => {
+      const sp = new URLSearchParams();
+      sp.set("dateFrom", params.dateFrom);
+      sp.set("dateTo", params.dateTo);
+      sp.set("limit", "500");
+      return apiFetch<PaginatedResponse<Appointment>>(`/appointments?${sp}`);
+    },
+    enabled: options?.enabled !== false && !!params.dateFrom && !!params.dateTo,
+    refetchInterval: 30 * 1000,
+  });
+}
+
 export function useReceptionStats() {
   return useQuery({
     queryKey: ["reception", "stats"],

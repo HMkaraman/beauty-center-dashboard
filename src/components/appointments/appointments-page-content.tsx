@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Search, Trash2, CheckCircle, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { Search, Trash2, CheckCircle, XCircle, Clock, AlertTriangle, ExternalLink } from "lucide-react";
 import { useRowSelection } from "@/hooks/use-row-selection";
 import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -119,10 +120,18 @@ export function AppointmentsPageContent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">{t("appointmentsList")}</h2>
-          <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm">
-            <DynamicIcon name="Plus" className="h-4 w-4" />
-            {t("newAppointment")}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/appointments/new">
+                <ExternalLink className="h-4 w-4" />
+                {t("openFullForm")}
+              </Link>
+            </Button>
+            <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm">
+              <DynamicIcon name="Plus" className="h-4 w-4" />
+              {t("newAppointment")}
+            </Button>
+          </div>
         </div>
 
         <div className="relative">

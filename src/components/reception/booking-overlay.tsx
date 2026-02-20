@@ -24,6 +24,8 @@ interface ClientValue {
 interface BookingOverlayProps {
   open: boolean;
   onClose: () => void;
+  preselectedProvider?: { id: string; type: "employee" | "doctor"; name: string } | null;
+  preselectedTime?: string | null;
 }
 
 const STEPS = ["client-services", "provider-time", "confirm"] as const;
@@ -35,7 +37,7 @@ const STEP_LABELS: Record<Step, string> = {
   confirm: "stepConfirm",
 };
 
-export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
+export function BookingOverlay({ open, onClose, preselectedProvider, preselectedTime }: BookingOverlayProps) {
   const t = useTranslations("reception");
   const tc = useTranslations("common");
   const locale = useLocale();
@@ -65,21 +67,32 @@ export function BookingOverlay({ open, onClose }: BookingOverlayProps) {
   };
 
   const goToProviderTime = () => {
+    const defaultTime = preselectedTime ?? new Date().toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     const newAssignments = selectedServices.map((service) => {
       const existing = assignments.find((a) => a.service.serviceId === service.serviceId);
       if (existing) return existing;
-      return {
+      const assignment: ServiceAssignment = {
         service,
         employeeId: "",
         employeeName: "",
         doctorId: "",
         doctorName: "",
-        time: new Date().toLocaleTimeString("en-US", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        time: defaultTime,
       };
+      if (preselectedProvider) {
+        if (preselectedProvider.type === "employee") {
+          assignment.employeeId = preselectedProvider.id;
+          assignment.employeeName = preselectedProvider.name;
+        } else {
+          assignment.doctorId = preselectedProvider.id;
+          assignment.doctorName = preselectedProvider.name;
+        }
+      }
+      return assignment;
     });
     setAssignments(newAssignments);
     setStep("provider-time");

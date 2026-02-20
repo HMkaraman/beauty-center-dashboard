@@ -2,6 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -72,7 +73,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
             <tr key={appointment.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
               {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(appointment.id) ?? false} onCheckedChange={() => onToggle(appointment.id)} /></td>}
               <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
+                <Link href={`/appointments/${appointment.id}`} className="flex items-center gap-3 hover:opacity-80">
                   <Avatar size="sm">
                     <AvatarFallback>{appointment.clientName.charAt(0)}</AvatarFallback>
                   </Avatar>
@@ -80,7 +81,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
                     <p className="font-medium text-foreground">{appointment.clientName}</p>
                     <p className="text-xs font-english text-muted-foreground">{appointment.clientPhone}</p>
                   </div>
-                </div>
+                </Link>
               </td>
               <td className="px-4 py-3 text-muted-foreground">{appointment.service}</td>
               <td className="px-4 py-3 text-muted-foreground">{appointment.employee}</td>
@@ -103,7 +104,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
                     {(appointment.status === "confirmed" || appointment.status === "pending") && (
                       <DropdownMenuItem onClick={() => onCheckout?.(appointment)}>{t("checkout")}</DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => onEdit?.(appointment)}>{t("edit")}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/appointments/${appointment.id}/edit`)}>{t("edit")}</DropdownMenuItem>
                     {onStatusChange && (
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>

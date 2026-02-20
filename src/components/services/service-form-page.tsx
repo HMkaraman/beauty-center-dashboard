@@ -164,15 +164,15 @@ export function ServiceFormPage({ serviceId }: ServiceFormPageProps) {
         description: description || undefined,
         image: imageUrl,
         categoryId: categoryId || undefined,
-        category,
-        duration: Number(duration) || 0,
-        price: Number(price) || 0,
+        category: category || undefined,
+        duration: duration ? Number(duration) : undefined,
+        price: price ? Number(price) : 0,
         status,
         serviceType: serviceType || null,
-        laserMinShots: serviceType === "laser" ? Number(laserMinShots) || null : null,
-        laserMaxShots: serviceType === "laser" ? Number(laserMaxShots) || null : null,
+        laserMinShots: serviceType === "laser" && laserMinShots ? Number(laserMinShots) : null,
+        laserMaxShots: serviceType === "laser" && laserMaxShots ? Number(laserMaxShots) : null,
         injectableUnit: serviceType === "injectable" ? injectableUnit || null : null,
-        injectableExpiryDays: serviceType === "injectable" ? Number(injectableExpiryDays) || null : null,
+        injectableExpiryDays: serviceType === "injectable" && injectableExpiryDays ? Number(injectableExpiryDays) : null,
       };
 
       let finalServiceId = serviceId;
