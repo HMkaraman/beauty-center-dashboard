@@ -59,7 +59,7 @@ export default async function RootLayout({
         className={`${notoKufiArabic.variable} ${outfit.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Providers>
+        <Providers dir={dir}>
           <NextIntlClientProvider messages={messages}>
             {children}
             <Toaster
