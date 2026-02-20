@@ -140,6 +140,8 @@
     "doctorConflictWarning": "هذا الطبيب لديه موعد متعارض في {time} ({service})",
     "outsideEmployeeHours": "هذا الوقت خارج ساعات عمل الموظفة ({start} - {end})",
     "outsideDoctorHours": "هذا الوقت خارج ساعات عمل الطبيب ({start} - {end})",
+    "centerClosed": "المركز مغلق في هذا اليوم",
+    "outsideCenterHours": "هذا الوقت خارج ساعات عمل المركز ({start} - {end})",
     "nextAvailable": "أقرب وقت متاح: {time}",
     "clientConflictWarning": "هذا العميل لديه موعد بالفعل في {time} ({service})",
     "recurringPartialSuccess": "تم إنشاء {created} مواعيد، تم تخطي {skipped} بسبب التعارضات",

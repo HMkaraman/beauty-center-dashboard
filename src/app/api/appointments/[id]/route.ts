@@ -12,7 +12,7 @@ import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { deductInventoryForService } from "@/lib/business-logic/inventory";
-import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
+import { checkConflict, checkCenterWorkingHours, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -78,6 +78,23 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       validated.doctorId !== undefined;
 
     if (schedulingChanged) {
+      // Check center working hours
+      const centerHours = await checkCenterWorkingHours({
+        tenantId: session.user.tenantId,
+        date: validated.date ?? existing.date,
+        time: validated.time ?? existing.time,
+        duration: validated.duration ?? existing.duration,
+      });
+
+      if (!centerHours.withinSchedule) {
+        if (centerHours.centerClosed) {
+          return badRequest("The center is closed on this day");
+        }
+        return badRequest(
+          `This time is outside the center's working hours (${centerHours.schedule?.startTime} - ${centerHours.schedule?.endTime})`
+        );
+      }
+
       const mergedDoctorId = validated.doctorId ?? existing.doctorId;
 
       const conflict = await checkConflict({

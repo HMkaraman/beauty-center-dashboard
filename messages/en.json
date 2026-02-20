@@ -140,6 +140,8 @@
     "doctorConflictWarning": "This doctor has a conflicting appointment at {time} ({service})",
     "outsideEmployeeHours": "This time is outside the employee's working hours ({start} - {end})",
     "outsideDoctorHours": "This time is outside the doctor's working hours ({start} - {end})",
+    "centerClosed": "The center is closed on this day",
+    "outsideCenterHours": "This time is outside the center's working hours ({start} - {end})",
     "nextAvailable": "Next available: {time}",
     "clientConflictWarning": "This client already has an appointment at {time} ({service})",
     "recurringPartialSuccess": "{created} appointments created, {skipped} skipped due to conflicts",

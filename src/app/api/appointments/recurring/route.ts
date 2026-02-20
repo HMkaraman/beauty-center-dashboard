@@ -10,6 +10,7 @@ import { db } from "@/db/db";
 import { appointments, appointmentRecurrences } from "@/db/schema";
 import {
   checkConflict,
+  checkCenterWorkingHours,
   checkEmployeeWorkingHours,
   checkDoctorWorkingHours,
 } from "@/lib/business-logic/scheduling";
@@ -80,6 +81,24 @@ export async function POST(req: NextRequest) {
     const skipped: Array<{ date: string; reason: string }> = [];
 
     for (const date of dates) {
+      // Check center working hours
+      const centerHours = await checkCenterWorkingHours({
+        tenantId,
+        date,
+        time: appointmentData.time,
+        duration: appointmentData.duration,
+      });
+
+      if (!centerHours.withinSchedule) {
+        skipped.push({
+          date,
+          reason: centerHours.centerClosed
+            ? "Center is closed on this day"
+            : `Outside center working hours (${centerHours.schedule?.startTime}–${centerHours.schedule?.endTime})`,
+        });
+        continue;
+      }
+
       // Check employee/doctor conflict
       if (appointmentData.employeeId || appointmentData.doctorId) {
         const conflict = await checkConflict({

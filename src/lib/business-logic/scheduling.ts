@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { appointments, doctorSchedules, employeeSchedules } from "@/db/schema";
+import { appointments, doctorSchedules, employeeSchedules, workingHours } from "@/db/schema";
 import { eq, and, ne, sql } from "drizzle-orm";
 
 // Convert "HH:MM" time string to minutes since midnight
@@ -414,5 +414,57 @@ export async function checkEmployeeWorkingHours(params: {
   return {
     withinSchedule,
     schedule: { startTime: schedule.startTime, endTime: schedule.endTime },
+  };
+}
+
+// Check if appointment time is within the center's working hours for that day
+export async function checkCenterWorkingHours(params: {
+  tenantId: string;
+  date: string;
+  time: string;
+  duration: number;
+}): Promise<{
+  withinSchedule: boolean;
+  centerClosed?: boolean;
+  schedule?: { startTime: string; endTime: string };
+}> {
+  const dayOfWeek = getDayOfWeek(params.date);
+
+  const [wh] = await db
+    .select()
+    .from(workingHours)
+    .where(
+      and(
+        eq(workingHours.tenantId, params.tenantId),
+        eq(workingHours.dayOfWeek, dayOfWeek)
+      )
+    )
+    .limit(1);
+
+  // No working hours defined — don't block
+  if (!wh) {
+    return { withinSchedule: true };
+  }
+
+  // Center is closed on this day
+  if (!wh.isOpen) {
+    return {
+      withinSchedule: false,
+      centerClosed: true,
+      schedule: { startTime: wh.startTime, endTime: wh.endTime },
+    };
+  }
+
+  const apptStart = timeToMinutes(params.time);
+  const apptEnd = apptStart + params.duration;
+  const schedStart = timeToMinutes(wh.startTime);
+  const schedEnd = timeToMinutes(wh.endTime);
+
+  const withinSchedule = apptStart >= schedStart && apptEnd <= schedEnd;
+
+  return {
+    withinSchedule,
+    centerClosed: false,
+    schedule: { startTime: wh.startTime, endTime: wh.endTime },
   };
 }

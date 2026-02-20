@@ -11,7 +11,7 @@ import { db } from "@/db/db";
 import { appointments } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
-import { checkConflict, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
+import { checkConflict, checkCenterWorkingHours, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 
 export async function GET(req: NextRequest) {
@@ -105,6 +105,23 @@ export async function POST(req: NextRequest) {
     }
 
     const validated = result.data;
+
+    // Check center working hours first
+    const centerHours = await checkCenterWorkingHours({
+      tenantId: session.user.tenantId,
+      date: validated.date,
+      time: validated.time,
+      duration: validated.duration,
+    });
+
+    if (!centerHours.withinSchedule) {
+      if (centerHours.centerClosed) {
+        return badRequest("The center is closed on this day");
+      }
+      return badRequest(
+        `This time is outside the center's working hours (${centerHours.schedule?.startTime} - ${centerHours.schedule?.endTime})`
+      );
+    }
 
     // Check for scheduling conflicts before creating
     const conflict = await checkConflict({
