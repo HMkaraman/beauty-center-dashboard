@@ -10,7 +10,8 @@ interface BoardCardProps {
   appointment: Appointment;
   onAction: (id: string, action: string) => void;
   className?: string;
-  showMobileActions?: boolean;
+  canEdit?: boolean;
+  showStatusSelect?: boolean;
 }
 
 const statusActions: Record<string, { action: string; labelKey: string; color: string }> = {
@@ -20,9 +21,11 @@ const statusActions: Record<string, { action: string; labelKey: string; color: s
   "in-progress": { action: "completed", labelKey: "completeService", color: "bg-green-500 hover:bg-green-600" },
 };
 
-export function BoardCard({ appointment, onAction, className, showMobileActions }: BoardCardProps) {
+export function BoardCard({ appointment, onAction, className, canEdit, showStatusSelect }: BoardCardProps) {
   const t = useTranslations("reception");
   const actionInfo = statusActions[appointment.status];
+  const showEdit = canEdit && appointment.status !== "completed";
+  const showMoveSelect = showStatusSelect && appointment.status !== "completed";
 
   return (
     <div className={`rounded-lg border border-border bg-card p-3 space-y-2 ${className ?? ""}`}>
@@ -56,47 +59,58 @@ export function BoardCard({ appointment, onAction, className, showMobileActions 
       </div>
 
       {actionInfo && (
-        <Button
-          size="sm"
-          className={`w-full text-white text-xs h-7 ${actionInfo.color}`}
-          onClick={() => onAction(appointment.id, actionInfo.action)}
-        >
-          {t(actionInfo.labelKey)}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            className={`flex-1 text-white text-xs h-7 ${actionInfo.color}`}
+            onClick={() => onAction(appointment.id, actionInfo.action)}
+          >
+            {t(actionInfo.labelKey)}
+          </Button>
+          {showEdit && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs h-7 shrink-0"
+              onClick={() => onAction(appointment.id, "editAppointment")}
+            >
+              <Pencil className="h-3 w-3" />
+              {t("editAppointment")}
+            </Button>
+          )}
+        </div>
       )}
 
       {appointment.status === "completed" && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="w-full text-xs h-7"
-          onClick={() => onAction(appointment.id, "editInvoice")}
-        >
-          <FileEdit className="h-3 w-3" />
-          {t("editInvoice")}
-        </Button>
-      )}
-
-      {showMobileActions && (
         <div className="flex gap-2">
-          {appointment.status !== "completed" && (
-            <div className="flex-1">
-              <StatusSelect
-                currentStatus={appointment.status}
-                onMove={(newStatus) => onAction(appointment.id, newStatus)}
-              />
-            </div>
-          )}
           <Button
             size="sm"
             variant="outline"
-            className="text-xs h-7 shrink-0"
-            onClick={() => onAction(appointment.id, "editAppointment")}
+            className="flex-1 text-xs h-7"
+            onClick={() => onAction(appointment.id, "editInvoice")}
           >
-            <Pencil className="h-3 w-3" />
-            {t("editAppointment")}
+            <FileEdit className="h-3 w-3" />
+            {t("editInvoice")}
           </Button>
+          {canEdit && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs h-7 shrink-0"
+              onClick={() => onAction(appointment.id, "editAppointment")}
+            >
+              <Pencil className="h-3 w-3" />
+              {t("editAppointment")}
+            </Button>
+          )}
         </div>
+      )}
+
+      {showMoveSelect && (
+        <StatusSelect
+          currentStatus={appointment.status}
+          onMove={(newStatus) => onAction(appointment.id, newStatus)}
+        />
       )}
     </div>
   );

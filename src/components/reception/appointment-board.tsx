@@ -18,6 +18,7 @@ import { DroppableColumn } from "./droppable-column";
 import { DraggableCard } from "./draggable-card";
 import { BoardCard } from "./board-card";
 import { MobileAppointmentList } from "./mobile-appointment-list";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Appointment } from "@/types";
 
 interface AppointmentBoardProps {
@@ -69,6 +70,8 @@ const COLUMN_TO_STATUS: Record<string, string> = {
 
 export function AppointmentBoard({ appointments, onAction }: AppointmentBoardProps) {
   const t = useTranslations("reception");
+  const { can } = usePermissions();
+  const canEdit = can("appointments:write");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSourceColumn, setActiveSourceColumn] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
@@ -185,6 +188,7 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
         <MobileAppointmentList
           appointments={effectiveAppointments}
           onAction={onAction}
+          canEdit={canEdit}
         />
       </div>
 
@@ -233,12 +237,14 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
                           <BoardCard
                             appointment={appointment}
                             onAction={onAction}
+                            canEdit={canEdit}
                           />
                         ) : (
                           <DraggableCard
                             appointment={appointment}
                             columnKey={col.key}
                             onAction={onAction}
+                            canEdit={canEdit}
                           />
                         )}
                       </motion.div>

@@ -9,9 +9,10 @@ interface DraggableCardProps {
   appointment: Appointment;
   columnKey: string;
   onAction: (id: string, action: string) => void;
+  canEdit?: boolean;
 }
 
-export function DraggableCard({ appointment, columnKey, onAction }: DraggableCardProps) {
+export function DraggableCard({ appointment, columnKey, onAction, canEdit }: DraggableCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: appointment.id,
     data: { columnKey },
@@ -29,7 +30,7 @@ export function DraggableCard({ appointment, columnKey, onAction }: DraggableCar
       {...listeners}
       {...attributes}
     >
-      <BoardCard appointment={appointment} onAction={onAction} />
+      <BoardCard appointment={appointment} onAction={onAction} canEdit={canEdit} />
     </div>
   );
 }

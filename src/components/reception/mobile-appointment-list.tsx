@@ -9,6 +9,7 @@ import { Appointment } from "@/types";
 interface MobileAppointmentListProps {
   appointments: Appointment[];
   onAction: (id: string, action: string) => void;
+  canEdit?: boolean;
 }
 
 interface Section {
@@ -48,6 +49,7 @@ const sections: Section[] = [
 export function MobileAppointmentList({
   appointments,
   onAction,
+  canEdit,
 }: MobileAppointmentListProps) {
   const t = useTranslations("reception");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -104,7 +106,8 @@ export function MobileAppointmentList({
                       key={appt.id}
                       appointment={appt}
                       onAction={onAction}
-                      showMobileActions
+                      canEdit={canEdit}
+                      showStatusSelect
                     />
                   ))
                 )}
