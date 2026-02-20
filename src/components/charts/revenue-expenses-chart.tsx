@@ -12,7 +12,7 @@ import {
 import { useTranslations } from "next-intl";
 import { ChartCard } from "./chart-card";
 import { ChartDataPoint } from "@/types";
-import { CHART_COLORS } from "@/constants/colors";
+import { useChartColors } from "@/lib/hooks/use-chart-colors";
 import { useTranslatedChartData } from "@/hooks/useTranslatedChartData";
 import { formatCompactNumber } from "@/lib/formatters";
 
@@ -52,6 +52,7 @@ export function RevenueExpensesChart({ data }: RevenueExpensesChartProps) {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
   const translatedData = useTranslatedChartData(data);
+  const CHART_COLORS = useChartColors();
 
   return (
     <ChartCard title={t("revenueVsExpenses")}>

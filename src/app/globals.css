@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  color-scheme: dark;
   --background: #1A1614;
   --foreground: #F5EDE6;
   --card: #231F1C;
@@ -39,20 +40,38 @@
 }
 
 .light {
+  color-scheme: light;
   --background: #FAF7F5;
   --foreground: #1A1614;
   --card: #FFFFFF;
   --card-foreground: #1A1614;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1614;
   --primary: #C4956A;
   --primary-foreground: #FFFFFF;
   --secondary: #F0EBE7;
   --secondary-foreground: #1A1614;
   --muted: #F0EBE7;
   --muted-foreground: #6B5E54;
+  --accent: #C4956A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #E07B7B;
+  --destructive-foreground: #FFFFFF;
   --border: #E0D8D0;
   --input: #E0D8D0;
+  --ring: #C4956A;
+  --gold: #C4956A;
+  --gold-light: #D4A97A;
+  --green: #7ECB8B;
+  --red: #E07B7B;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #6B5E54;
+  --sidebar-active: #C4956A;
+  --chart-1: #C4956A;
+  --chart-2: #7ECB8B;
+  --chart-3: #E07B7B;
+  --chart-4: #8B7FF5;
+  --chart-5: #F5C26B;
 }
 
 @theme inline {

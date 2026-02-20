@@ -1,11 +1,14 @@
+"use client";
+
 import { KPICard } from "@/components/ui/kpi-card";
 import { MiniKPICard } from "@/components/ui/mini-kpi-card";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { ProfitabilityBanner } from "@/components/dashboard/profitability-banner";
 import { QuickActions } from "@/components/dashboard/quick-actions";
+import { useDashboardStats } from "@/lib/hooks/use-dashboard";
 import {
-  kpiData,
-  profitabilityData,
+  kpiData as mockKpiData,
+  profitabilityData as mockProfitabilityData,
   revenueExpensesData,
   revenueByServiceData,
   appointmentsTrendData,
@@ -13,8 +16,38 @@ import {
   miniKpiData,
   quickActions,
 } from "@/lib/mock-data";
+import type { KPIData, ProfitabilityData } from "@/types";
 
 export default function DashboardPage() {
+  const { data, isLoading } = useDashboardStats();
+
+  // Merge real data into KPI cards when available
+  const kpiData: KPIData[] = data
+    ? [
+        { ...mockKpiData[0], value: data.totalRevenue },
+        { ...mockKpiData[1], value: data.totalAppointments },
+        { ...mockKpiData[2], value: data.totalClients },
+        {
+          ...mockKpiData[3],
+          value: data.totalAppointments > 0
+            ? Math.round(data.totalRevenue / data.totalAppointments)
+            : 0,
+        },
+      ]
+    : mockKpiData;
+
+  const profitabilityData: ProfitabilityData = data
+    ? {
+        revenue: data.totalRevenue,
+        expenses: data.totalExpenses,
+        profit: data.totalRevenue - data.totalExpenses,
+        margin: data.totalRevenue > 0
+          ? Math.round(((data.totalRevenue - data.totalExpenses) / data.totalRevenue) * 100)
+          : 0,
+        previousMargin: mockProfitabilityData.previousMargin,
+      }
+    : mockProfitabilityData;
+
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
@@ -23,6 +56,11 @@ export default function DashboardPage() {
           <KPICard key={kpi.id} data={kpi} />
         ))}
       </div>
+
+      {/* Loading overlay for KPI area */}
+      {isLoading && (
+        <div className="absolute inset-0 pointer-events-none" />
+      )}
 
       {/* Profitability Banner */}
       <ProfitabilityBanner data={profitabilityData} />

@@ -64,7 +64,26 @@
     "thisWeek": "هذا الأسبوع",
     "thisMonth": "هذا الشهر",
     "thisQuarter": "هذا الربع",
-    "thisYear": "هذا العام"
+    "thisYear": "هذا العام",
+    "custom": "مخصص",
+    "from": "من",
+    "to": "إلى",
+    "apply": "تطبيق"
+  },
+  "commandPalette": {
+    "title": "لوحة الأوامر",
+    "placeholder": "ابحث في الصفحات، العملاء، الخدمات...",
+    "noResults": "لا توجد نتائج.",
+    "pages": "الصفحات",
+    "clients": "العملاء",
+    "services": "الخدمات",
+    "employees": "الموظفون"
+  },
+  "header": {
+    "notifications": "الإشعارات",
+    "noNotifications": "لا توجد إشعارات جديدة",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات"
   },
   "appointments": {
     "title": "المواعيد",
@@ -722,6 +741,8 @@
   "settings": {
     "title": "الإعدادات",
     "nav": {
+      "profile": "الملف الشخصي",
+      "profileDesc": "معلوماتك الشخصية",
       "general": "عام",
       "generalDesc": "اسم المركز، اللغة والمعلومات",
       "financial": "المالية",
@@ -836,7 +857,17 @@
     "createRole": "إنشاء دور",
     "selectAllPermissions": "تحديد كل الصلاحيات",
     "permissionsCount": "{selected} من {total} محددة",
-    "roleDetails": "تفاصيل الدور"
+    "roleDetails": "تفاصيل الدور",
+    "profile": {
+      "title": "إعدادات الملف الشخصي",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "photo": "الصورة",
+      "changePhoto": "تغيير الصورة",
+      "saveChanges": "حفظ التغييرات",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح"
+    }
   },
   "common": {
     "comingSoon": "قريباً",

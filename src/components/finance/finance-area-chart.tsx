@@ -12,7 +12,7 @@ import {
 import { useTranslations } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
-import { CHART_COLORS } from "@/constants/colors";
+import { useChartColors } from "@/lib/hooks/use-chart-colors";
 import { formatCompactNumber } from "@/lib/formatters";
 import { useTranslatedChartData } from "@/hooks/useTranslatedChartData";
 
@@ -45,6 +45,7 @@ function CustomTooltip({
 export function FinanceAreaChart({ data }: { data: ChartDataPoint[] }) {
   const t = useTranslations("finance");
   const translatedData = useTranslatedChartData(data);
+  const CHART_COLORS = useChartColors();
 
   return (
     <ChartCard title={t("revenueVsExpenses")}>

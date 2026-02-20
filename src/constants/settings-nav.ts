@@ -8,6 +8,13 @@ export interface SettingsNavItem {
 
 export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
   {
+    id: "profile",
+    labelKey: "settings.nav.profile",
+    descKey: "settings.nav.profileDesc",
+    icon: "User",
+    route: "/settings/profile",
+  },
+  {
     id: "general",
     labelKey: "settings.nav.general",
     descKey: "settings.nav.generalDesc",

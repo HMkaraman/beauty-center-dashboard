@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
-import { CHART_COLORS } from "@/constants/colors";
+import { useChartColors } from "@/lib/hooks/use-chart-colors";
 import { formatNumber } from "@/lib/formatters";
 import { useTranslatedChartData } from "@/hooks/useTranslatedChartData";
 
@@ -26,6 +26,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 export function MarketingReachChart({ data }: MarketingReachChartProps) {
   const t = useTranslations("marketing");
   const translatedData = useTranslatedChartData(data);
+  const CHART_COLORS = useChartColors();
 
   return (
     <ChartCard title={t("reachTrend")}>

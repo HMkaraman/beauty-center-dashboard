@@ -12,7 +12,7 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import { ChartCard } from "@/components/charts/chart-card";
 import { ChartDataPoint } from "@/types";
-import { CHART_COLORS } from "@/constants/colors";
+import { useChartColors } from "@/lib/hooks/use-chart-colors";
 import { Price } from "@/components/ui/price";
 
 interface EmployeesRevenueChartProps {
@@ -43,6 +43,7 @@ function CustomTooltip({
 
 export function EmployeesRevenueChart({ data }: EmployeesRevenueChartProps) {
   const t = useTranslations("employees");
+  const CHART_COLORS = useChartColors();
 
   return (
     <ChartCard title={t("topPerformers")}>

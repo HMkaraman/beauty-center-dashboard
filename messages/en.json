@@ -64,7 +64,26 @@
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "thisQuarter": "This Quarter",
-    "thisYear": "This Year"
+    "thisYear": "This Year",
+    "custom": "Custom",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply"
+  },
+  "commandPalette": {
+    "title": "Command Palette",
+    "placeholder": "Search pages, clients, services...",
+    "noResults": "No results found.",
+    "pages": "Pages",
+    "clients": "Clients",
+    "services": "Services",
+    "employees": "Employees"
+  },
+  "header": {
+    "notifications": "Notifications",
+    "noNotifications": "No new notifications",
+    "profile": "Profile",
+    "settings": "Settings"
   },
   "appointments": {
     "title": "Appointments",
@@ -722,6 +741,8 @@
   "settings": {
     "title": "Settings",
     "nav": {
+      "profile": "Profile",
+      "profileDesc": "Your personal information",
       "general": "General",
       "generalDesc": "Center name, language & info",
       "financial": "Financial",
@@ -836,7 +857,17 @@
     "createRole": "Create Role",
     "selectAllPermissions": "Select all permissions",
     "permissionsCount": "{selected} of {total} selected",
-    "roleDetails": "Role Details"
+    "roleDetails": "Role Details",
+    "profile": {
+      "title": "Profile Settings",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "photo": "Photo",
+      "changePhoto": "Change Photo",
+      "saveChanges": "Save Changes",
+      "updateSuccess": "Profile updated successfully"
+    }
   },
   "common": {
     "comingSoon": "Coming Soon",

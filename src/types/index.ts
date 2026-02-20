@@ -59,7 +59,7 @@ export interface TopEmployee {
   appointments: number;
 }
 
-export type TimePeriod = "today" | "thisWeek" | "thisMonth" | "thisQuarter" | "thisYear";
+export type TimePeriod = "today" | "thisWeek" | "thisMonth" | "thisQuarter" | "thisYear" | "custom";
 
 export interface DateRange {
   start: Date;
