@@ -14,6 +14,18 @@ export const tenantSettings = pgTable("tenant_settings", {
   exchangeRates: text("exchange_rates"),
   smsEnabled: integer("sms_enabled").default(0),
   emailEnabled: integer("email_enabled").default(0),
+  // GCC/MENA compliance fields
+  taxRegistrationNumber: varchar("tax_registration_number", { length: 50 }),
+  businessAddress: text("business_address"),
+  businessPhone: varchar("business_phone", { length: 20 }),
+  eInvoicingEnabled: integer("e_invoicing_enabled").default(0),
+  eInvoicingMode: varchar("e_invoicing_mode", { length: 20 }),
+  invoicePrefix: varchar("invoice_prefix", { length: 10 }).default("INV"),
+  nextCreditNoteNumber: integer("next_credit_note_number").default(1),
+  zatcaEnvironment: varchar("zatca_environment", { length: 20 }).default("sandbox"),
+  zatcaComplianceCsid: text("zatca_compliance_csid"),
+  zatcaProductionCsid: text("zatca_production_csid"),
+  zatcaPrivateKey: text("zatca_private_key"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

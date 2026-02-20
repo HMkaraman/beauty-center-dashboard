@@ -14,6 +14,7 @@ import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
 import {
   createIncomeTransaction,
   calculateEmployeeCommission,
+  calculateDoctorCommission,
 } from "@/lib/business-logic/finance";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 
@@ -104,27 +105,95 @@ export async function POST(req: NextRequest) {
 
     // Generate sequential invoice number from tenant settings
     const [settings] = await db
-      .select({ nextInvoiceNumber: tenantSettings.nextInvoiceNumber })
+      .select()
       .from(tenantSettings)
       .where(eq(tenantSettings.tenantId, tenantId));
 
-    let nextNum = settings?.nextInvoiceNumber ?? 1;
-    const invoiceNumber = `INV-${String(nextNum).padStart(5, "0")}`;
+    const invoiceType = validated.invoiceType || "standard";
+    const isCreditNote = invoiceType === "credit_note";
+    const isDebitNote = invoiceType === "debit_note";
+    let invoiceNumber: string;
 
-    // Increment the counter
-    if (settings) {
-      await db
-        .update(tenantSettings)
-        .set({ nextInvoiceNumber: nextNum + 1, updatedAt: new Date() })
-        .where(eq(tenantSettings.tenantId, tenantId));
+    if (isCreditNote) {
+      const nextCn = settings?.nextCreditNoteNumber ?? 1;
+      invoiceNumber = `CN-${String(nextCn).padStart(5, "0")}`;
+      if (settings) {
+        await db.update(tenantSettings).set({ nextCreditNoteNumber: nextCn + 1, updatedAt: new Date() }).where(eq(tenantSettings.tenantId, tenantId));
+      }
+    } else if (isDebitNote) {
+      const nextNum = settings?.nextInvoiceNumber ?? 1;
+      invoiceNumber = `DN-${String(nextNum).padStart(5, "0")}`;
+      if (settings) {
+        await db.update(tenantSettings).set({ nextInvoiceNumber: nextNum + 1, updatedAt: new Date() }).where(eq(tenantSettings.tenantId, tenantId));
+      }
     } else {
-      await db.insert(tenantSettings).values({
-        tenantId,
-        nextInvoiceNumber: 2,
-      });
+      const nextNum = settings?.nextInvoiceNumber ?? 1;
+      const prefix = settings?.invoicePrefix || "INV";
+      invoiceNumber = `${prefix}-${String(nextNum).padStart(5, "0")}`;
+      if (settings) {
+        await db.update(tenantSettings).set({ nextInvoiceNumber: nextNum + 1, updatedAt: new Date() }).where(eq(tenantSettings.tenantId, tenantId));
+      } else {
+        await db.insert(tenantSettings).values({ tenantId, nextInvoiceNumber: 2 });
+      }
     }
 
-    // Insert invoice and items in a conceptual transaction
+    // Determine invoice type code for ZATCA
+    const invoiceTypeCode = isCreditNote ? "381" : isDebitNote ? "383" : "388";
+
+    // Generate e-invoicing artifacts if enabled
+    let qrCode: string | undefined;
+    let xmlContent: string | undefined;
+    let zatcaStatus: string | undefined;
+    const eInvoicingEnabled = settings?.eInvoicingEnabled === 1;
+
+    if (eInvoicingEnabled && settings?.taxRegistrationNumber) {
+      const { generateZatcaQrCode } = await import("@/lib/zatca/qr-code");
+      const { generateZatcaXml } = await import("@/lib/zatca/xml-generator");
+
+      const now = new Date();
+      qrCode = generateZatcaQrCode({
+        sellerName: settings.businessName || "",
+        vatNumber: settings.taxRegistrationNumber,
+        timestamp: now.toISOString(),
+        totalWithVat: String(validated.total),
+        vatAmount: String(validated.taxAmount),
+      });
+
+      xmlContent = generateZatcaXml({
+        uuid: crypto.randomUUID(),
+        invoiceNumber,
+        issueDate: validated.date,
+        issueTime: now.toTimeString().split(" ")[0],
+        invoiceTypeCode,
+        sellerName: settings.businessName || "",
+        sellerTrn: settings.taxRegistrationNumber,
+        sellerAddress: settings.businessAddress || undefined,
+        sellerPhone: settings.businessPhone || undefined,
+        buyerName: validated.buyerName,
+        buyerTrn: validated.buyerTrn,
+        buyerAddress: validated.buyerAddress,
+        subtotal: validated.subtotal,
+        discountTotal: validated.discountTotal || 0,
+        taxableAmount: validated.subtotal - (validated.discountTotal || 0),
+        taxAmount: validated.taxAmount,
+        total: validated.total,
+        currency: validated.currency || settings.currency || "SAR",
+        items: validated.items.map((item) => ({
+          name: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discount: item.discount,
+          taxCategory: item.taxCategory || "S",
+          taxRate: item.taxRate ?? validated.taxRate,
+          taxAmount: item.taxAmount ?? 0,
+          lineTotal: item.total,
+        })),
+      });
+
+      zatcaStatus = "pending";
+    }
+
+    // Insert invoice and items
     const [newInvoice] = await db
       .insert(invoices)
       .values({
@@ -142,19 +211,35 @@ export async function POST(req: NextRequest) {
         status: validated.status,
         paymentMethod: validated.paymentMethod,
         notes: validated.notes,
+        invoiceType: invoiceType,
+        invoiceTypeCode,
+        originalInvoiceId: validated.originalInvoiceId,
+        buyerTrn: validated.buyerTrn,
+        buyerName: validated.buyerName,
+        buyerAddress: validated.buyerAddress,
+        currency: validated.currency,
+        discountTotal: validated.discountTotal != null ? String(validated.discountTotal) : undefined,
+        qrCode,
+        xmlContent,
+        zatcaStatus,
+        issuedAt: new Date(),
       })
       .returning();
 
     // Insert invoice items
     if (validated.items.length > 0) {
       await db.insert(invoiceItems).values(
-        validated.items.map((item: { description: string; quantity: number; unitPrice: number; discount: number; total: number }) => ({
+        validated.items.map((item: { description: string; quantity: number; unitPrice: number; discount: number; total: number; serviceId?: string; taxCategory?: string; taxRate?: number; taxAmount?: number }) => ({
           invoiceId: newInvoice.id,
           description: item.description,
           quantity: item.quantity,
           unitPrice: String(item.unitPrice),
           discount: String(item.discount),
           total: String(item.total),
+          serviceId: item.serviceId,
+          taxCategory: item.taxCategory || "S",
+          taxRate: item.taxRate != null ? String(item.taxRate) : undefined,
+          taxAmount: item.taxAmount != null ? String(item.taxAmount) : undefined,
         }))
       );
     }
@@ -174,7 +259,7 @@ export async function POST(req: NextRequest) {
 
       if (validated.appointmentId) {
         const [appointment] = await db
-          .select({ employeeId: appointments.employeeId })
+          .select({ employeeId: appointments.employeeId, doctorId: appointments.doctorId })
           .from(appointments)
           .where(eq(appointments.id, validated.appointmentId));
 
@@ -182,6 +267,16 @@ export async function POST(req: NextRequest) {
           await calculateEmployeeCommission({
             tenantId,
             employeeId: appointment.employeeId,
+            invoiceId: newInvoice.id,
+            invoiceTotal,
+            date: validated.date,
+          });
+        }
+
+        if (appointment?.doctorId) {
+          await calculateDoctorCommission({
+            tenantId,
+            doctorId: appointment.doctorId,
             invoiceId: newInvoice.id,
             invoiceTotal,
             date: validated.date,

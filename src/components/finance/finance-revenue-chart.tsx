@@ -36,10 +36,22 @@ export function FinanceRevenueChart({ data }: FinanceRevenueChartProps) {
   const t = useTranslations("finance");
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
-  const translatedData = data.map((d) => ({
-    ...d,
-    name: t(d.name.replace("finance.", "")),
-  }));
+  const translatedData = data.map((d) => {
+    // If the name looks like an i18n key (e.g. "finance.services"), translate it
+    // Otherwise use the name as-is (e.g. DB service names)
+    const key = d.name.replace("finance.", "");
+    let name: string;
+    try {
+      name = t(key);
+      // next-intl returns the key if not found, so check if it's different
+      if (name === key && !d.name.startsWith("finance.")) {
+        name = d.name;
+      }
+    } catch {
+      name = d.name;
+    }
+    return { ...d, name };
+  });
 
   return (
     <ChartCard title={t("revenueByCategory")}>

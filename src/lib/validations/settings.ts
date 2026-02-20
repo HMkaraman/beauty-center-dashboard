@@ -9,6 +9,14 @@ export const tenantSettingsSchema = z.object({
   exchangeRates: z.string().optional(),
   smsEnabled: z.boolean().optional(),
   emailEnabled: z.boolean().optional(),
+  // GCC/MENA compliance fields
+  taxRegistrationNumber: z.string().max(50).optional(),
+  businessAddress: z.string().optional(),
+  businessPhone: z.string().max(20).optional(),
+  eInvoicingEnabled: z.boolean().optional(),
+  eInvoicingMode: z.enum(["zatca", "uae_fta", "none"]).optional(),
+  invoicePrefix: z.string().max(10).optional(),
+  zatcaEnvironment: z.enum(["sandbox", "production"]).optional(),
 });
 
 export const workingHoursSchema = z.object({

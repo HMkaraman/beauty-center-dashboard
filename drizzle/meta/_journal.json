@@ -71,6 +71,13 @@
       "when": 1771521306148,
       "tag": "0009_wooden_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771572857148,
+      "tag": "0010_flowery_wallow",
+      "breakpoints": true
     }
   ]
 }

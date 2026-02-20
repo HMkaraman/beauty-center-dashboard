@@ -79,6 +79,14 @@ export async function PATCH(req: NextRequest) {
     if (validated.exchangeRates !== undefined) updateValues.exchangeRates = validated.exchangeRates;
     if (validated.smsEnabled !== undefined) updateValues.smsEnabled = validated.smsEnabled ? 1 : 0;
     if (validated.emailEnabled !== undefined) updateValues.emailEnabled = validated.emailEnabled ? 1 : 0;
+    // GCC/MENA compliance fields
+    if (validated.taxRegistrationNumber !== undefined) updateValues.taxRegistrationNumber = validated.taxRegistrationNumber;
+    if (validated.businessAddress !== undefined) updateValues.businessAddress = validated.businessAddress;
+    if (validated.businessPhone !== undefined) updateValues.businessPhone = validated.businessPhone;
+    if (validated.eInvoicingEnabled !== undefined) updateValues.eInvoicingEnabled = validated.eInvoicingEnabled ? 1 : 0;
+    if (validated.eInvoicingMode !== undefined) updateValues.eInvoicingMode = validated.eInvoicingMode;
+    if (validated.invoicePrefix !== undefined) updateValues.invoicePrefix = validated.invoicePrefix;
+    if (validated.zatcaEnvironment !== undefined) updateValues.zatcaEnvironment = validated.zatcaEnvironment;
 
     let result;
     if (existing) {

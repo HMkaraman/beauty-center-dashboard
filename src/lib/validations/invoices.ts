@@ -6,6 +6,10 @@ export const invoiceItemSchema = z.object({
   unitPrice: z.number().nonnegative("Unit price must be zero or greater"),
   discount: z.number().nonnegative("Discount must be zero or greater").default(0),
   total: z.number().nonnegative("Total must be zero or greater"),
+  serviceId: z.string().optional(),
+  taxCategory: z.enum(["S", "Z", "E", "O"]).optional(),
+  taxRate: z.number().nonnegative().optional(),
+  taxAmount: z.number().nonnegative().optional(),
 });
 
 export const invoiceSchema = z.object({
@@ -18,10 +22,18 @@ export const invoiceSchema = z.object({
   taxRate: z.number(),
   taxAmount: z.number(),
   total: z.number(),
-  status: z.enum(["paid", "unpaid", "void"]),
+  status: z.enum(["paid", "unpaid", "void", "partially_paid"]),
   paymentMethod: z.enum(["cash", "card", "bank_transfer"]).optional(),
   notes: z.string().optional(),
   clientId: z.string().optional(),
+  // GCC/MENA e-invoicing fields
+  invoiceType: z.enum(["standard", "simplified", "credit_note", "debit_note"]).optional(),
+  originalInvoiceId: z.string().optional(),
+  buyerTrn: z.string().max(50).optional(),
+  buyerName: z.string().max(255).optional(),
+  buyerAddress: z.string().optional(),
+  currency: z.string().max(10).optional(),
+  discountTotal: z.number().nonnegative().optional(),
 });
 
 export type InvoiceItemFormData = z.infer<typeof invoiceItemSchema>;

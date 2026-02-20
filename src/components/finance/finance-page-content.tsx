@@ -34,6 +34,18 @@ const InvoicesPageContent = dynamic(
   { ssr: false }
 );
 
+const FinanceReportsTab = dynamic(
+  () =>
+    import("./finance-reports-tab").then((mod) => mod.FinanceReportsTab),
+  { ssr: false }
+);
+
+const FinanceAccountsTab = dynamic(
+  () =>
+    import("./finance-accounts-tab").then((mod) => mod.FinanceAccountsTab),
+  { ssr: false }
+);
+
 export function FinancePageContent() {
   const t = useTranslations("finance");
 
@@ -44,6 +56,8 @@ export function FinancePageContent() {
         <TabsTrigger value="transactions">{t("tabs.transactions")}</TabsTrigger>
         <TabsTrigger value="expenses">{t("tabs.expenses")}</TabsTrigger>
         <TabsTrigger value="invoices">{t("tabs.invoices")}</TabsTrigger>
+        <TabsTrigger value="reports">{t("reports.title")}</TabsTrigger>
+        <TabsTrigger value="accounts">{t("accounts.title")}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="overview">
@@ -60,6 +74,14 @@ export function FinancePageContent() {
 
       <TabsContent value="invoices">
         <InvoicesPageContent />
+      </TabsContent>
+
+      <TabsContent value="reports">
+        <FinanceReportsTab />
+      </TabsContent>
+
+      <TabsContent value="accounts">
+        <FinanceAccountsTab />
       </TabsContent>
     </Tabs>
   );

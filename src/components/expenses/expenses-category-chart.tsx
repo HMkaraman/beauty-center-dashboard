@@ -36,10 +36,19 @@ export function ExpensesCategoryChart({ data }: ExpensesCategoryChartProps) {
   const locale = useLocale();
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
-  const translatedData = data.map((d) => ({
-    ...d,
-    name: t(d.name.replace("expenses.", "")),
-  }));
+  const translatedData = data.map((d) => {
+    const key = d.name.replace("expenses.", "");
+    let name: string;
+    try {
+      name = t(key);
+      if (name === key && !d.name.startsWith("expenses.")) {
+        name = d.name;
+      }
+    } catch {
+      name = d.name;
+    }
+    return { ...d, name };
+  });
 
   return (
     <ChartCard title={t("byCategory")}>

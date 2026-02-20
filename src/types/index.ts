@@ -352,8 +352,9 @@ export interface Report {
 }
 
 // Invoices
-export type InvoiceStatus = "paid" | "unpaid" | "void";
+export type InvoiceStatus = "paid" | "unpaid" | "void" | "partially_paid";
 export type InvoicePaymentMethod = "cash" | "card" | "bank_transfer";
+export type InvoiceType = "standard" | "simplified" | "credit_note" | "debit_note";
 
 export interface InvoiceItem {
   description: string;
@@ -361,6 +362,10 @@ export interface InvoiceItem {
   unitPrice: number;
   discount: number;
   total: number;
+  serviceId?: string;
+  taxCategory?: string;
+  taxRate?: number;
+  taxAmount?: number;
 }
 
 export interface Invoice {
@@ -378,6 +383,139 @@ export interface Invoice {
   status: InvoiceStatus;
   paymentMethod?: InvoicePaymentMethod;
   notes?: string;
+  // GCC/MENA e-invoicing fields
+  uuid?: string;
+  invoiceType?: InvoiceType;
+  originalInvoiceId?: string;
+  buyerTrn?: string;
+  buyerName?: string;
+  buyerAddress?: string;
+  qrCode?: string;
+  zatcaStatus?: string;
+  currency?: string;
+  discountTotal?: number;
+}
+
+// Finance Overview
+export interface FinanceOverview {
+  revenue: number;
+  revenueChange: number;
+  expenses: number;
+  expensesChange: number;
+  netProfit: number;
+  netProfitChange: number;
+  margin: number;
+  taxCollected: number;
+  outstandingAmount: number;
+  outstandingCount: number;
+  invoiceCount: number;
+  revenueByService: DonutSegment[];
+  monthlyTrend: ChartDataPoint[];
+  expenseBreakdown: DonutSegment[];
+  period: { startDate: string; endDate: string };
+}
+
+// P&L Report
+export interface PLReportLine {
+  code: string;
+  name: string;
+  nameEn: string;
+  amount: number;
+}
+
+export interface PLReport {
+  period: { startDate: string; endDate: string };
+  revenue: { lines: PLReportLine[]; total: number };
+  taxCollected: number;
+  totalRevenue: number;
+  expenses: { lines: PLReportLine[]; total: number };
+  netProfit: number;
+  margin: number;
+}
+
+// Tax Summary
+export interface TaxCategoryBreakdown {
+  category: string;
+  categoryLabel: { ar: string; en: string };
+  taxRate: number;
+  taxableAmount: number;
+  vatAmount: number;
+  itemCount: number;
+}
+
+export interface TaxSummary {
+  period: { startDate: string; endDate: string };
+  outputVat: { taxableAmount: number; vatAmount: number; invoiceCount: number };
+  netVatPayable: number;
+  byCategory: TaxCategoryBreakdown[];
+  monthly: { month: string; taxableAmount: number; vatAmount: number; invoiceCount: number }[];
+}
+
+// Payment tracking
+export interface Payment {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  referenceNumber?: string;
+  notes?: string;
+  receiptNumber?: string;
+  createdAt: string;
+}
+
+// Expense Categories
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  nameEn?: string;
+  code?: string;
+  parentId?: string;
+  isDefault: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+// Chart of Accounts
+export interface Account {
+  id: string;
+  code: string;
+  name: string;
+  nameEn?: string;
+  type: string;
+  parentCode?: string;
+  isSystem: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+// Daily Settlement
+export interface DailySettlement {
+  id: string;
+  date: string;
+  openingBalance: number;
+  cashSales: number;
+  cardSales: number;
+  bankTransferSales: number;
+  cashExpenses: number;
+  expectedCash: number;
+  actualCash?: number;
+  discrepancy?: number;
+  status: string;
+  notes?: string;
+}
+
+// Financial Period
+export interface FinancialPeriod {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  snapshotRevenue?: number;
+  snapshotExpenses?: number;
+  snapshotProfit?: number;
+  closedAt?: string;
 }
 
 // Healing Journeys

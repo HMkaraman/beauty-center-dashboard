@@ -15,6 +15,7 @@ import {
   createIncomeTransaction,
   createReversalTransaction,
   calculateEmployeeCommission,
+  calculateDoctorCommission,
 } from "@/lib/business-logic/finance";
 import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
 
@@ -137,10 +138,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         clientName: updated.clientName,
       });
 
-      // If invoice is linked to an appointment, calculate employee commission
+      // If invoice is linked to an appointment, calculate employee + doctor commission
       if (updated.appointmentId) {
         const [appointment] = await db
-          .select({ employeeId: appointments.employeeId })
+          .select({ employeeId: appointments.employeeId, doctorId: appointments.doctorId })
           .from(appointments)
           .where(eq(appointments.id, updated.appointmentId));
 
@@ -148,6 +149,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
           await calculateEmployeeCommission({
             tenantId,
             employeeId: appointment.employeeId,
+            invoiceId: id,
+            invoiceTotal,
+            date: invoiceDate,
+          });
+        }
+
+        if (appointment?.doctorId) {
+          await calculateDoctorCommission({
+            tenantId,
+            doctorId: appointment.doctorId,
             invoiceId: id,
             invoiceTotal,
             date: invoiceDate,
