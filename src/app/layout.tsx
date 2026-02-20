@@ -9,13 +9,13 @@ import "./globals.css";
 const notoKufiArabic = Noto_Kufi_Arabic({
   variable: "--font-noto-kufi-arabic",
   subsets: ["arabic"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
 });
 
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
 });
 
 export const viewport: Viewport = {

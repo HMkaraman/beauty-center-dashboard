@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -42,8 +42,6 @@
     "next-intl": "^4.8.2",
     "postcss": "^8.5.6",
     "postgres": "^3.4.8",
-    "preact": "^10.28.3",
-    "preact-render-to-string": "^6.6.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",

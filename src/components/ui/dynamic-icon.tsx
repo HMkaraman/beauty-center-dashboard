@@ -1,122 +1,26 @@
-import {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  UserCog,
-  Stethoscope,
-  Sparkles,
-  Wallet,
-  Receipt,
-  Package,
-  BarChart3,
-  Megaphone,
-  Settings,
-  DollarSign,
-  UserPlus,
-  TrendingUp,
-  CalendarPlus,
-  Construction,
-  Bell,
-  Search,
-  Menu,
-  ChevronLeft,
-  ChevronRight,
-  Globe,
-  MoreHorizontal,
-  Eye,
-  EyeOff,
-  ArrowUpRight,
-  ArrowDownRight,
-  CalendarCheck,
-  CalendarX,
-  Clock,
-  Plus,
-  Moon,
-  Sun,
-  HardDrive,
-  Scissors,
-  CheckCircle,
-  UserCheck,
-  Star,
-  ClipboardList,
-  AlertTriangle,
-  PackageX,
-  Calendar,
-  TrendingDown,
-  Percent,
-  Target,
-  FileText,
-  Download,
-  Share2,
-  Palette,
-  Shield,
-  LayoutGrid,
-  MonitorSmartphone,
-  type LucideProps,
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import type { LucideProps } from "lucide-react";
 
-const iconMap: Record<string, React.ComponentType<LucideProps>> = {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  UserCog,
-  Stethoscope,
-  Sparkles,
-  Wallet,
-  Receipt,
-  Package,
-  BarChart3,
-  Megaphone,
-  Settings,
-  DollarSign,
-  UserPlus,
-  TrendingUp,
-  CalendarPlus,
-  Construction,
-  Bell,
-  Search,
-  Menu,
-  ChevronLeft,
-  ChevronRight,
-  Globe,
-  MoreHorizontal,
-  Eye,
-  EyeOff,
-  ArrowUpRight,
-  ArrowDownRight,
-  CalendarCheck,
-  CalendarX,
-  Clock,
-  Plus,
-  Moon,
-  Sun,
-  HardDrive,
-  Scissors,
-  CheckCircle,
-  UserCheck,
-  Star,
-  ClipboardList,
-  AlertTriangle,
-  PackageX,
-  Calendar,
-  TrendingDown,
-  Percent,
-  Target,
-  FileText,
-  Download,
-  Share2,
-  Palette,
-  Shield,
-  LayoutGrid,
-  MonitorSmartphone,
-};
+const lazyIcon = (name: string) =>
+  dynamic(() => import("lucide-react").then((mod) => {
+    const Icon = mod[name as keyof typeof mod] as React.ComponentType<LucideProps>;
+    return Icon ? { default: Icon } : { default: () => null };
+  }));
+
+const iconCache = new Map<string, ReturnType<typeof lazyIcon>>();
+
+function getIcon(name: string) {
+  if (!iconCache.has(name)) {
+    iconCache.set(name, lazyIcon(name));
+  }
+  return iconCache.get(name)!;
+}
 
 interface DynamicIconProps extends LucideProps {
   name: string;
 }
 
 export function DynamicIcon({ name, ...props }: DynamicIconProps) {
-  const Icon = iconMap[name];
-  if (!Icon) return null;
+  const Icon = getIcon(name);
   return <Icon {...props} />;
 }

@@ -1,11 +1,38 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { FinanceOverviewTab } from "./finance-overview-tab";
-import { FinanceTransactionsTab } from "./finance-transactions-tab";
-import { ExpensesPageContent } from "@/components/expenses/expenses-page-content";
-import { InvoicesPageContent } from "@/components/invoices/invoices-page-content";
+
+const FinanceOverviewTab = dynamic(
+  () =>
+    import("./finance-overview-tab").then((mod) => mod.FinanceOverviewTab),
+  { ssr: false }
+);
+
+const FinanceTransactionsTab = dynamic(
+  () =>
+    import("./finance-transactions-tab").then(
+      (mod) => mod.FinanceTransactionsTab
+    ),
+  { ssr: false }
+);
+
+const ExpensesPageContent = dynamic(
+  () =>
+    import("@/components/expenses/expenses-page-content").then(
+      (mod) => mod.ExpensesPageContent
+    ),
+  { ssr: false }
+);
+
+const InvoicesPageContent = dynamic(
+  () =>
+    import("@/components/invoices/invoices-page-content").then(
+      (mod) => mod.InvoicesPageContent
+    ),
+  { ssr: false }
+);
 
 export function FinancePageContent() {
   const t = useTranslations("finance");
