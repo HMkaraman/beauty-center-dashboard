@@ -1380,7 +1380,16 @@
     "nextAvailable": "التالي المتاح: {time}",
     "noMoreSlots": "محجوز بالكامل",
     "notWorkingShort": "يوم إجازة",
-    "workingToday": "{count} يعملون اليوم"
+    "workingToday": "{count} يعملون اليوم",
+    "moveTo": "نقل إلى...",
+    "freeTime": "الوقت المتاح",
+    "nextFree": "التالي المتاح",
+    "today": "اليوم",
+    "hours": "س",
+    "freeMins": "{mins} دقيقة متاحة",
+    "appointments": "المواعيد",
+    "prevWeek": "الأسبوع السابق",
+    "nextWeek": "الأسبوع التالي"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",

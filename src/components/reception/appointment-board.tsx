@@ -17,6 +17,7 @@ import {
 import { DroppableColumn } from "./droppable-column";
 import { DraggableCard } from "./draggable-card";
 import { BoardCard } from "./board-card";
+import { MobileAppointmentList } from "./mobile-appointment-list";
 import { Appointment } from "@/types";
 
 interface AppointmentBoardProps {
@@ -178,74 +179,87 @@ export function AppointmentBoard({ appointments, onAction }: AppointmentBoardPro
   }, []);
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
-    >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {columns.map((col) => (
-          <DroppableColumn
-            key={col.key}
-            columnKey={col.key}
-            labelKey={col.labelKey}
-            color={col.color}
-            count={grouped[col.key]?.length ?? 0}
-            isValidDrop={isValidDrop(activeSourceColumn, col.key)}
-            isOver={overColumn === col.key && activeSourceColumn !== col.key}
-          >
-            <AnimatePresence mode="popLayout">
-              {grouped[col.key]?.length === 0 ? (
-                <motion.p
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-xs text-muted-foreground text-center py-8"
-                >
-                  {t("noAppointments")}
-                </motion.p>
-              ) : (
-                grouped[col.key]?.map((appointment) => (
-                  <motion.div
-                    key={appointment.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0 } }}
-                    transition={{ layout: { type: "spring", stiffness: 500, damping: 35 }, opacity: { duration: 0.15 } }}
-                  >
-                    {col.key === "completed" ? (
-                      <BoardCard
-                        appointment={appointment}
-                        onAction={onAction}
-                      />
-                    ) : (
-                      <DraggableCard
-                        appointment={appointment}
-                        columnKey={col.key}
-                        onAction={onAction}
-                      />
-                    )}
-                  </motion.div>
-                ))
-              )}
-            </AnimatePresence>
-          </DroppableColumn>
-        ))}
+    <>
+      {/* Mobile: grouped list with status selects */}
+      <div className="block sm:hidden">
+        <MobileAppointmentList
+          appointments={effectiveAppointments}
+          onAction={onAction}
+        />
       </div>
 
-      <DragOverlay>
-        {activeAppointment ? (
-          <BoardCard
-            appointment={activeAppointment}
-            onAction={() => {}}
-            className="shadow-lg ring-2 ring-primary/30 rotate-2"
-          />
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+      {/* Desktop/tablet: drag-and-drop Kanban board */}
+      <div className="hidden sm:block">
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {columns.map((col) => (
+              <DroppableColumn
+                key={col.key}
+                columnKey={col.key}
+                labelKey={col.labelKey}
+                color={col.color}
+                count={grouped[col.key]?.length ?? 0}
+                isValidDrop={isValidDrop(activeSourceColumn, col.key)}
+                isOver={overColumn === col.key && activeSourceColumn !== col.key}
+              >
+                <AnimatePresence mode="popLayout">
+                  {grouped[col.key]?.length === 0 ? (
+                    <motion.p
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs text-muted-foreground text-center py-8"
+                    >
+                      {t("noAppointments")}
+                    </motion.p>
+                  ) : (
+                    grouped[col.key]?.map((appointment) => (
+                      <motion.div
+                        key={appointment.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0 } }}
+                        transition={{ layout: { type: "spring", stiffness: 500, damping: 35 }, opacity: { duration: 0.15 } }}
+                      >
+                        {col.key === "completed" ? (
+                          <BoardCard
+                            appointment={appointment}
+                            onAction={onAction}
+                          />
+                        ) : (
+                          <DraggableCard
+                            appointment={appointment}
+                            columnKey={col.key}
+                            onAction={onAction}
+                          />
+                        )}
+                      </motion.div>
+                    ))
+                  )}
+                </AnimatePresence>
+              </DroppableColumn>
+            ))}
+          </div>
+
+          <DragOverlay>
+            {activeAppointment ? (
+              <BoardCard
+                appointment={activeAppointment}
+                onAction={() => {}}
+                className="shadow-lg ring-2 ring-primary/30 rotate-2"
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+    </>
   );
 }

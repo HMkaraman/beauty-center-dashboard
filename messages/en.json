@@ -1380,7 +1380,16 @@
     "nextAvailable": "Next available: {time}",
     "noMoreSlots": "Fully booked",
     "notWorkingShort": "Day off",
-    "workingToday": "{count} working today"
+    "workingToday": "{count} working today",
+    "moveTo": "Move to...",
+    "freeTime": "Free Time",
+    "nextFree": "Next Free",
+    "today": "Today",
+    "hours": "h",
+    "freeMins": "{mins} min free",
+    "appointments": "Appointments",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week"
   },
   "serviceCategories": {
     "title": "Service Categories",
