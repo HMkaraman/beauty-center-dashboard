@@ -831,7 +831,12 @@
     "selectAll": "تحديد الكل",
     "roleOwner": "المالك",
     "roleReceptionist": "موظف الاستقبال",
-    "roleAccountant": "محاسب"
+    "roleAccountant": "محاسب",
+    "backToTeam": "العودة للفريق",
+    "createRole": "إنشاء دور",
+    "selectAllPermissions": "تحديد كل الصلاحيات",
+    "permissionsCount": "{selected} من {total} محددة",
+    "roleDetails": "تفاصيل الدور"
   },
   "common": {
     "comingSoon": "قريباً",

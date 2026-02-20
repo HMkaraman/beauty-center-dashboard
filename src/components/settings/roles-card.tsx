@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Copy, Shield } from "lucide-react";
@@ -17,40 +18,18 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { useRoles, useDeleteRole } from "@/lib/hooks/use-roles";
-import { RoleEditorDialog } from "./role-editor-dialog";
-import type { RoleType } from "@/types";
 
 export function RolesCard() {
+  const router = useRouter();
   const t = useTranslations("settings");
   const tc = useTranslations("common");
   const { data } = useRoles();
   const roles = data?.data ?? [];
   const deleteRole = useDeleteRole();
 
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [editItem, setEditItem] = useState<RoleType | null>(null);
-  const [duplicateFrom, setDuplicateFrom] = useState<RoleType | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const roleToDelete = deleteId ? roles.find((r) => r.id === deleteId) : null;
-
-  const handleEdit = (role: RoleType) => {
-    setEditItem(role);
-    setDuplicateFrom(null);
-    setSheetOpen(true);
-  };
-
-  const handleDuplicate = (role: RoleType) => {
-    setEditItem(null);
-    setDuplicateFrom(role);
-    setSheetOpen(true);
-  };
-
-  const handleAdd = () => {
-    setEditItem(null);
-    setDuplicateFrom(null);
-    setSheetOpen(true);
-  };
 
   const confirmDelete = () => {
     if (deleteId) {
@@ -71,7 +50,7 @@ export function RolesCard() {
           <Shield className="h-4 w-4" />
           {t("roles")}
         </h3>
-        <Button size="sm" onClick={handleAdd}>
+        <Button size="sm" onClick={() => router.push("/settings/team/roles/new")}>
           <Plus className="h-4 w-4" />
           {t("addRole")}
         </Button>
@@ -128,7 +107,7 @@ export function RolesCard() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDuplicate(role)}
+                    onClick={() => router.push(`/settings/team/roles/${role.id}?duplicate=true`)}
                     title={t("duplicateRole")}
                   >
                     <Copy className="h-4 w-4" />
@@ -136,7 +115,7 @@ export function RolesCard() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleEdit(role)}
+                    onClick={() => router.push(`/settings/team/roles/${role.id}`)}
                     title={t("editRole")}
                   >
                     <Pencil className="h-4 w-4" />
@@ -162,13 +141,6 @@ export function RolesCard() {
           ))}
         </div>
       )}
-
-      <RoleEditorDialog
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        editItem={editItem}
-        duplicateFrom={duplicateFrom}
-      />
 
       <AlertDialog
         open={!!deleteId && !!roleToDelete && !roleToDelete.isSystem}

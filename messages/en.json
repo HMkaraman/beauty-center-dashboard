@@ -831,7 +831,12 @@
     "selectAll": "Select all",
     "roleOwner": "Owner",
     "roleReceptionist": "Receptionist",
-    "roleAccountant": "Accountant"
+    "roleAccountant": "Accountant",
+    "backToTeam": "Back to Team",
+    "createRole": "Create Role",
+    "selectAllPermissions": "Select all permissions",
+    "permissionsCount": "{selected} of {total} selected",
+    "roleDetails": "Role Details"
   },
   "common": {
     "comingSoon": "Coming Soon",
