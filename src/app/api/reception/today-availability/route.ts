@@ -242,7 +242,7 @@ export async function GET() {
           if (
             nowMins >= apptStart &&
             nowMins < apptEnd &&
-            (appt.status === "in-progress" || appt.status === "waiting" || appt.status === "confirmed")
+            (appt.status === "in-progress" || appt.status === "waiting" || appt.status === "confirmed" || appt.status === "pending")
           ) {
             currentStatus = "busy";
             currentAppointment = {

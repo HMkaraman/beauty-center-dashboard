@@ -4,7 +4,7 @@ import { db } from "@/db/db";
 import { tenants, services, employees, clients, appointments } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { success, notFound, badRequest, serverError } from "@/lib/api-utils";
-import { checkConflict } from "@/lib/business-logic/scheduling";
+import { checkConflict, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 
 const bookingSchema = z.object({
   clientName: z.string().min(1, "Client name is required"),
@@ -100,6 +100,19 @@ export async function POST(
       return badRequest(
         `This time slot is no longer available. The employee has a conflicting appointment at ${conflict.conflictingAppointment?.time}.`
       );
+    }
+
+    // 6b. Check employee working hours
+    const hoursCheck = await checkEmployeeWorkingHours({
+      tenantId: tenant.id,
+      employeeId: validated.employeeId,
+      date: validated.date,
+      time: validated.time,
+      duration: service.duration,
+    });
+
+    if (!hoursCheck.withinSchedule) {
+      return badRequest("This time is outside working hours");
     }
 
     // 7. Create appointment with status "pending"

@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { Appointment, AppointmentStatus } from "@/types";
+import type { Appointment, AppointmentStatus, AppointmentAttachment, AppointmentDetailResponse } from "@/types";
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -46,4 +46,17 @@ export const appointmentsApi = {
     if (params.excludeId) sp.set("excludeId", params.excludeId);
     return apiFetch<{ dates: string[] }>(`/appointments/available-slots?${sp}`);
   },
+  getDetails: (id: string) =>
+    apiFetch<AppointmentDetailResponse>(`/appointments/${id}/details`),
+  getAttachments: (id: string) =>
+    apiFetch<AppointmentAttachment[]>(`/appointments/${id}/attachments`),
+  addAttachment: (id: string, data: { url: string; filename?: string; mimeType?: string; label?: string; caption?: string }) =>
+    apiFetch<AppointmentAttachment>(`/appointments/${id}/attachments`, { method: "POST", body: JSON.stringify(data) }),
+  deleteAttachment: (id: string, attachmentId: string) =>
+    apiFetch(`/appointments/${id}/attachments`, { method: "DELETE", body: JSON.stringify({ attachmentId }) }),
+  createRecurring: (data: {
+    appointment: Partial<Appointment>;
+    recurrence: { frequency: string; interval?: number; endDate?: string; occurrences?: number };
+  }) =>
+    apiFetch<{ groupId: string; created: Appointment[]; createdCount: number; skipped: Array<{ date: string; reason: string }>; skippedCount: number; totalRequested: number }>("/appointments/recurring", { method: "POST", body: JSON.stringify(data) }),
 };

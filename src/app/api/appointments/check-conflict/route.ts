@@ -8,6 +8,7 @@ import {
 } from "@/lib/api-utils";
 import {
   checkConflict,
+  checkClientConflict,
   findNextAvailableSlot,
   checkEmployeeWorkingHours,
   checkDoctorWorkingHours,
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!session) return unauthorized();
 
     const body = await req.json();
-    const { employeeId, employee, doctorId, date, time, duration, excludeId } = body;
+    const { employeeId, employee, doctorId, clientId, date, time, duration, excludeId } = body;
 
     if (!date || !time || !duration) {
       return badRequest("date, time, and duration are required");
@@ -78,11 +79,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check client conflict (advisory)
+    let clientConflictWarning: { time: string; service: string } | null = null;
+
+    if (clientId) {
+      const clientCheck = await checkClientConflict({
+        tenantId: session.user.tenantId,
+        clientId,
+        date,
+        time,
+        duration: duration || 60,
+        excludeId,
+      });
+      if (clientCheck.hasClientConflict && clientCheck.conflictingAppointment) {
+        clientConflictWarning = {
+          time: clientCheck.conflictingAppointment.time,
+          service: clientCheck.conflictingAppointment.service,
+        };
+      }
+    }
+
     return success({
       ...conflict,
       nextAvailableSlot: nextSlot,
       employeeHoursWarning,
       doctorHoursWarning,
+      clientConflictWarning,
     });
   } catch (error) {
     console.error("POST /api/appointments/check-conflict error:", error);

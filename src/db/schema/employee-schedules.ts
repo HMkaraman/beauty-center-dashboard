@@ -7,7 +7,7 @@ export const employeeSchedules = pgTable("employee_schedules", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   tenantId: text("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
   employeeId: text("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
-  dayOfWeek: integer("day_of_week").notNull(), // 0=Sunday, 6=Saturday
+  dayOfWeek: integer("day_of_week").notNull(), // 0=Saturday, 1=Sunday, 2=Monday, 3=Tuesday, 4=Wednesday, 5=Thursday, 6=Friday
   startTime: varchar("start_time", { length: 5 }).notNull(), // "09:00"
   endTime: varchar("end_time", { length: 5 }).notNull(), // "17:00"
   isAvailable: integer("is_available").default(1).notNull(),

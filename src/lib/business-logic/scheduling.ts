@@ -128,6 +128,60 @@ export async function checkConflict(params: {
   return { hasConflict: false };
 }
 
+// Check if same client has overlapping appointments on the same date
+export async function checkClientConflict(params: {
+  tenantId: string;
+  clientId: string;
+  date: string;
+  time: string;
+  duration: number;
+  excludeId?: string;
+}): Promise<{
+  hasClientConflict: boolean;
+  conflictingAppointment?: {
+    time: string;
+    duration: number;
+    service: string;
+  };
+}> {
+  const newStart = timeToMinutes(params.time);
+  const newEnd = newStart + params.duration;
+
+  const conditions = [
+    eq(appointments.tenantId, params.tenantId),
+    eq(appointments.clientId, params.clientId),
+    eq(appointments.date, params.date),
+    sql`${appointments.status} NOT IN ('cancelled', 'no-show')`,
+  ];
+
+  if (params.excludeId) {
+    conditions.push(ne(appointments.id, params.excludeId));
+  }
+
+  const existing = await db
+    .select({
+      time: appointments.time,
+      duration: appointments.duration,
+      service: appointments.service,
+    })
+    .from(appointments)
+    .where(and(...conditions));
+
+  for (const appt of existing) {
+    const existStart = timeToMinutes(appt.time);
+    const existEnd = existStart + appt.duration;
+
+    if (newStart < existEnd && newEnd > existStart) {
+      return {
+        hasClientConflict: true,
+        conflictingAppointment: appt,
+      };
+    }
+  }
+
+  return { hasClientConflict: false };
+}
+
 // Find next available slot for an employee/doctor on a date
 // Respects employee and doctor working hours schedules
 export async function findNextAvailableSlot(params: {
