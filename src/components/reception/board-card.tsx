@@ -1,14 +1,16 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Clock, User, Stethoscope, FileEdit } from "lucide-react";
+import { Clock, User, Stethoscope, FileEdit, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StatusSelect } from "./status-select";
 import { Appointment } from "@/types";
 
 interface BoardCardProps {
   appointment: Appointment;
   onAction: (id: string, action: string) => void;
   className?: string;
+  showMobileActions?: boolean;
 }
 
 const statusActions: Record<string, { action: string; labelKey: string; color: string }> = {
@@ -18,7 +20,7 @@ const statusActions: Record<string, { action: string; labelKey: string; color: s
   "in-progress": { action: "completed", labelKey: "completeService", color: "bg-green-500 hover:bg-green-600" },
 };
 
-export function BoardCard({ appointment, onAction, className }: BoardCardProps) {
+export function BoardCard({ appointment, onAction, className, showMobileActions }: BoardCardProps) {
   const t = useTranslations("reception");
   const actionInfo = statusActions[appointment.status];
 
@@ -73,6 +75,28 @@ export function BoardCard({ appointment, onAction, className }: BoardCardProps) 
           <FileEdit className="h-3 w-3" />
           {t("editInvoice")}
         </Button>
+      )}
+
+      {showMobileActions && (
+        <div className="flex gap-2">
+          {appointment.status !== "completed" && (
+            <div className="flex-1">
+              <StatusSelect
+                currentStatus={appointment.status}
+                onMove={(newStatus) => onAction(appointment.id, newStatus)}
+              />
+            </div>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs h-7 shrink-0"
+            onClick={() => onAction(appointment.id, "editAppointment")}
+          >
+            <Pencil className="h-3 w-3" />
+            {t("editAppointment")}
+          </Button>
+        </div>
       )}
     </div>
   );

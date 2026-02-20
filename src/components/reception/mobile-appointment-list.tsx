@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { BoardCard } from "./board-card";
-import { StatusSelect } from "./status-select";
 import { Appointment } from "@/types";
 
 interface MobileAppointmentListProps {
@@ -101,15 +100,12 @@ export function MobileAppointmentList({
                   </p>
                 ) : (
                   items.map((appt) => (
-                    <div key={appt.id} className="space-y-1.5">
-                      <BoardCard appointment={appt} onAction={onAction} />
-                      {appt.status !== "completed" && (
-                        <StatusSelect
-                          currentStatus={appt.status}
-                          onMove={(newStatus) => onAction(appt.id, newStatus)}
-                        />
-                      )}
-                    </div>
+                    <BoardCard
+                      key={appt.id}
+                      appointment={appt}
+                      onAction={onAction}
+                      showMobileActions
+                    />
                   ))
                 )}
               </div>

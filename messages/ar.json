@@ -1389,7 +1389,8 @@
     "freeMins": "{mins} دقيقة متاحة",
     "appointments": "المواعيد",
     "prevWeek": "الأسبوع السابق",
-    "nextWeek": "الأسبوع التالي"
+    "nextWeek": "الأسبوع التالي",
+    "editAppointment": "تعديل"
   },
   "serviceCategories": {
     "title": "فئات الخدمات",

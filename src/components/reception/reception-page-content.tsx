@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
@@ -18,6 +19,7 @@ import { Appointment } from "@/types";
 
 export function ReceptionPageContent() {
   const t = useTranslations("reception");
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: todayData, isLoading } = useTodayAppointments();
   const appointments = todayData?.data ?? [];
@@ -38,6 +40,12 @@ export function ReceptionPageContent() {
     if (action === "editInvoice") {
       setCheckoutAppointment(appointment);
       setCheckoutOpen(true);
+      return;
+    }
+
+    // Edit appointment — navigate to appointment detail page
+    if (action === "editAppointment") {
+      router.push(`/appointments/${id}`);
       return;
     }
 
