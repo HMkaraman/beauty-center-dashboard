@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   CalendarPlus,
@@ -59,10 +59,9 @@ function getRelativeTime(dateStr: string, locale: string) {
 interface NotificationItemProps {
   notification: InAppNotification;
   onMarkRead?: (id: string) => void;
-  compact?: boolean;
 }
 
-export function NotificationItem({ notification, onMarkRead, compact }: NotificationItemProps) {
+export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
   const locale = useLocale();
   const router = useRouter();
   const isUnread = notification.isRead === 0;
@@ -102,10 +101,18 @@ export function NotificationItem({ notification, onMarkRead, compact }: Notifica
             <span className="flex-shrink-0 h-2 w-2 rounded-full bg-primary mt-1.5" />
           )}
         </div>
-        {body && !compact && (
+        {body && (
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{body}</p>
         )}
-        <p className="text-xs text-muted-foreground mt-1">{timeAgo}</p>
+        <div className="flex items-center gap-2 mt-1">
+          {notification.actorName && (
+            <span className="text-xs text-muted-foreground/70">{notification.actorName}</span>
+          )}
+          {notification.actorName && (
+            <span className="text-xs text-muted-foreground/40">·</span>
+          )}
+          <span className="text-xs text-muted-foreground/70">{timeAgo}</span>
+        </div>
       </div>
       {isUnread && onMarkRead && (
         <button

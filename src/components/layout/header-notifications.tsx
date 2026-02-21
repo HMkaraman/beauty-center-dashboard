@@ -130,7 +130,6 @@ export function HeaderNotifications() {
                         key={n.id}
                         notification={n}
                         onMarkRead={handleMarkRead}
-                        compact
                       />
                     ))}
                   </div>
