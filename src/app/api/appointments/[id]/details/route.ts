@@ -33,7 +33,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     if (!appointment) return notFound("Appointment not found");
 
-    // 2. Compute KPIs
+    // 2. Check if an invoice exists for this appointment
+    const [invoiceCheck] = await db
+      .select({ id: invoices.id })
+      .from(invoices)
+      .where(and(eq(invoices.appointmentId, id), eq(invoices.tenantId, tenantId)))
+      .limit(1);
+    const hasInvoice = !!invoiceCheck;
+
+    // 3. Compute KPIs
 
     // Client visit count
     const clientAppointments = appointment.clientId
@@ -162,6 +170,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       appointment: {
         ...appointment,
         price: parseFloat(appointment.price),
+        hasInvoice,
       },
       kpis,
       groupAppointments: groupAppointments

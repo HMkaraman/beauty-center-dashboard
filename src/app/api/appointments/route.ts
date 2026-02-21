@@ -8,9 +8,9 @@ import {
   getPaginationParams,
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
-import { appointments } from "@/db/schema";
+import { appointments, invoices } from "@/db/schema";
 import { appointmentSchema } from "@/lib/validations";
-import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, gte, lte, getTableColumns } from "drizzle-orm";
 import { checkConflict, checkCenterWorkingHours, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
 import { triggerNotification } from "@/lib/notification-events";
@@ -59,9 +59,14 @@ export async function GET(req: NextRequest) {
 
     const whereClause = and(...conditions);
 
+    const appointmentCols = getTableColumns(appointments);
+
     const [data, totalResult] = await Promise.all([
       db
-        .select()
+        .select({
+          ...appointmentCols,
+          hasInvoice: sql<boolean>`EXISTS (SELECT 1 FROM ${invoices} WHERE ${invoices.appointmentId} = ${appointments.id})`,
+        })
         .from(appointments)
         .where(whereClause)
         .orderBy(desc(appointments.date), desc(appointments.time))
@@ -79,6 +84,7 @@ export async function GET(req: NextRequest) {
       data: data.map((row) => ({
         ...row,
         price: parseFloat(row.price),
+        hasInvoice: !!row.hasInvoice,
       })),
       pagination: {
         page,

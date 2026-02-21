@@ -72,7 +72,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => router.push(`/appointments/${data.id}`)}>{t("view")}</DropdownMenuItem>
-              {(data.status === "confirmed" || data.status === "pending") && (
+              {!data.hasInvoice && data.status !== "cancelled" && data.status !== "no-show" && (
                 <DropdownMenuItem onClick={() => onCheckout?.(data)}>{t("checkout")}</DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => router.push(`/appointments/${data.id}/edit`)}>{t("edit")}</DropdownMenuItem>

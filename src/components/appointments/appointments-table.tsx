@@ -101,7 +101,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => router.push(`/appointments/${appointment.id}`)}>{t("view")}</DropdownMenuItem>
-                    {(appointment.status === "confirmed" || appointment.status === "pending") && (
+                    {!appointment.hasInvoice && appointment.status !== "cancelled" && appointment.status !== "no-show" && (
                       <DropdownMenuItem onClick={() => onCheckout?.(appointment)}>{t("checkout")}</DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={() => router.push(`/appointments/${appointment.id}/edit`)}>{t("edit")}</DropdownMenuItem>

@@ -115,7 +115,7 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
     );
   }
 
-  const canCheckout = appointment.status === "confirmed" || appointment.status === "pending";
+  const canCheckout = !appointment.hasInvoice && appointment.status !== "cancelled" && appointment.status !== "no-show";
   const isLaserService = service?.serviceType === "laser";
   const isInjectableService = service?.serviceType === "injectable";
   const hasConsumptionLog = consumptionLogs.length > 0;

@@ -818,6 +818,7 @@ export interface Appointment {
   notes?: string;
   price: number;
   groupId?: string;
+  hasInvoice?: boolean;
 }
 
 // Roles & Permissions
