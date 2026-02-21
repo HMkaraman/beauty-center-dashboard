@@ -24,7 +24,7 @@ const NOTIFICATION_EVENTS: Record<string, NotificationEventConfig> = {
     bodyTemplateEn: "{{clientName}} - {{service}} on {{date}} at {{time}}",
     targetRoles: ["owner", "admin", "manager", "receptionist"],
     targetAssigned: true,
-    actionUrlTemplate: "/appointments",
+    actionUrlTemplate: "/appointments/{{entityId}}",
   },
   appointment_status_changed: {
     category: "appointment",
@@ -36,7 +36,7 @@ const NOTIFICATION_EVENTS: Record<string, NotificationEventConfig> = {
     bodyTemplateEn: "{{clientName}} - {{service}}: {{status}}",
     targetRoles: ["owner", "admin", "manager", "receptionist"],
     targetAssigned: true,
-    actionUrlTemplate: "/appointments",
+    actionUrlTemplate: "/appointments/{{entityId}}",
   },
   appointment_deleted: {
     category: "appointment",
@@ -57,7 +57,7 @@ const NOTIFICATION_EVENTS: Record<string, NotificationEventConfig> = {
     bodyTemplateAr: "{{itemName}} - الكمية: {{quantity}} (الحد الأدنى: {{reorderLevel}})",
     bodyTemplateEn: "{{itemName}} - Quantity: {{quantity}} (Reorder level: {{reorderLevel}})",
     targetRoles: ["owner", "admin", "manager"],
-    actionUrlTemplate: "/inventory",
+    actionUrlTemplate: "/inventory/{{entityId}}/edit",
   },
   invoice_created: {
     category: "financial",
@@ -79,7 +79,7 @@ const NOTIFICATION_EVENTS: Record<string, NotificationEventConfig> = {
     bodyTemplateAr: "{{clientName}}",
     bodyTemplateEn: "{{clientName}}",
     targetRoles: ["owner", "admin", "manager", "receptionist"],
-    actionUrlTemplate: "/clients",
+    actionUrlTemplate: "/clients/{{entityId}}",
   },
   employee_schedule_changed: {
     category: "staff",
@@ -117,10 +117,11 @@ export function triggerNotification(params: TriggerNotificationParams): void {
     return;
   }
 
-  const body = renderTemplate(config.bodyTemplateAr, params.context);
-  const bodyEn = renderTemplate(config.bodyTemplateEn, params.context);
+  const templateContext = { ...params.context, entityId: params.entityId || "" };
+  const body = renderTemplate(config.bodyTemplateAr, templateContext);
+  const bodyEn = renderTemplate(config.bodyTemplateEn, templateContext);
   const actionUrl = config.actionUrlTemplate
-    ? renderTemplate(config.actionUrlTemplate, params.context)
+    ? renderTemplate(config.actionUrlTemplate, templateContext)
     : undefined;
 
   // Fire-and-forget
