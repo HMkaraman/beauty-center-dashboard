@@ -99,6 +99,13 @@
       "when": 1771605867012,
       "tag": "0013_majestic_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1771700000000,
+      "tag": "0014_inventory_enhancements",
+      "breakpoints": true
     }
   ]
 }

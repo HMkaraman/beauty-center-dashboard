@@ -11,7 +11,7 @@ export {
   type InvoiceFormData,
 } from "./invoices";
 export { expenseSchema, type ExpenseFormData } from "./expenses";
-export { inventoryItemSchema, type InventoryItemFormData } from "./inventory";
+export { inventoryItemSchema, inventoryCategorySchema, type InventoryItemFormData, type InventoryCategoryFormData } from "./inventory";
 export { transactionSchema, type TransactionFormData } from "./finance";
 export { campaignSchema, type CampaignFormData } from "./marketing";
 export {

@@ -320,15 +320,49 @@ export interface DoctorDetailResponse {
 
 // Inventory
 export type InventoryStatus = "in-stock" | "low-stock" | "out-of-stock";
+export type ProductType = "injectable" | "skincare" | "consumable" | "retail" | "equipment" | "device_supply" | "medication" | "chemical";
+export type StorageCondition = "ambient" | "refrigerated" | "frozen";
+export type UnitOfMeasure = "units" | "ml" | "cc" | "syringe" | "vial" | "piece" | "box" | "g" | "bottle" | "tube" | "ampule" | "sachet";
+
+export interface InventoryCategory {
+  id: string;
+  name: string;
+  nameEn?: string;
+  description?: string;
+  color?: string;
+  isActive: number;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface InventoryItem {
   id: string;
   name: string;
+  nameEn?: string;
   sku: string;
+  barcode?: string;
+  description?: string;
+  image?: string;
+  brand?: string;
+  categoryId?: string;
+  categoryName?: string;
   category: string;
+  productType?: ProductType;
+  unitOfMeasure?: UnitOfMeasure;
+  unitsPerPackage?: number;
   quantity: number;
   unitPrice: number;
+  costPrice?: number;
   totalValue: number;
+  reorderLevel?: number;
+  expiryDate?: string;
+  batchNumber?: string;
+  isRetail: number;
+  isActive: number;
+  supplierName?: string;
+  storageConditions?: StorageCondition;
+  notes?: string;
   status: InventoryStatus;
 }
 

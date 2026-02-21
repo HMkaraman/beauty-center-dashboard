@@ -790,16 +790,16 @@ export const inventoryStockTrendData: ChartDataPoint[] = [
 ];
 
 export const inventoryListData: InventoryItem[] = [
-  { id: "inv1", name: "كريم ترطيب للبشرة", sku: "SKN-001", category: "منتجات العناية بالبشرة", quantity: 45, unitPrice: 120, totalValue: 5400, status: "in-stock" },
-  { id: "inv2", name: "سيروم فيتامين سي", sku: "SKN-002", category: "منتجات العناية بالبشرة", quantity: 8, unitPrice: 250, totalValue: 2000, status: "low-stock" },
-  { id: "inv3", name: "شامبو كيراتين", sku: "HAR-001", category: "منتجات الشعر", quantity: 32, unitPrice: 85, totalValue: 2720, status: "in-stock" },
-  { id: "inv4", name: "صبغة شعر - أشقر", sku: "HAR-002", category: "منتجات الشعر", quantity: 0, unitPrice: 65, totalValue: 0, status: "out-of-stock" },
-  { id: "inv5", name: "قفازات طبية", sku: "CON-001", category: "مستهلكات", quantity: 500, unitPrice: 2, totalValue: 1000, status: "in-stock" },
-  { id: "inv6", name: "جهاز ليزر ديود", sku: "EQP-001", category: "أجهزة", quantity: 2, unitPrice: 15000, totalValue: 30000, status: "in-stock" },
-  { id: "inv7", name: "مقص احترافي", sku: "TLS-001", category: "أدوات", quantity: 5, unitPrice: 350, totalValue: 1750, status: "low-stock" },
-  { id: "inv8", name: "كريم واقي شمس", sku: "SKN-003", category: "منتجات العناية بالبشرة", quantity: 28, unitPrice: 95, totalValue: 2660, status: "in-stock" },
-  { id: "inv9", name: "جل أظافر", sku: "NAL-001", category: "مستهلكات", quantity: 0, unitPrice: 45, totalValue: 0, status: "out-of-stock" },
-  { id: "inv10", name: "بروتين شعر", sku: "HAR-003", category: "منتجات الشعر", quantity: 4, unitPrice: 180, totalValue: 720, status: "low-stock" },
+  { id: "inv1", name: "كريم ترطيب للبشرة", sku: "SKN-001", category: "منتجات العناية بالبشرة", quantity: 45, unitPrice: 120, totalValue: 5400, status: "in-stock", isRetail: 1, isActive: 1 },
+  { id: "inv2", name: "سيروم فيتامين سي", sku: "SKN-002", category: "منتجات العناية بالبشرة", quantity: 8, unitPrice: 250, totalValue: 2000, status: "low-stock", isRetail: 1, isActive: 1 },
+  { id: "inv3", name: "شامبو كيراتين", sku: "HAR-001", category: "منتجات الشعر", quantity: 32, unitPrice: 85, totalValue: 2720, status: "in-stock", isRetail: 1, isActive: 1 },
+  { id: "inv4", name: "صبغة شعر - أشقر", sku: "HAR-002", category: "منتجات الشعر", quantity: 0, unitPrice: 65, totalValue: 0, status: "out-of-stock", isRetail: 0, isActive: 1 },
+  { id: "inv5", name: "قفازات طبية", sku: "CON-001", category: "مستهلكات", quantity: 500, unitPrice: 2, totalValue: 1000, status: "in-stock", isRetail: 0, isActive: 1 },
+  { id: "inv6", name: "جهاز ليزر ديود", sku: "EQP-001", category: "أجهزة", quantity: 2, unitPrice: 15000, totalValue: 30000, status: "in-stock", isRetail: 0, isActive: 1 },
+  { id: "inv7", name: "مقص احترافي", sku: "TLS-001", category: "أدوات", quantity: 5, unitPrice: 350, totalValue: 1750, status: "low-stock", isRetail: 0, isActive: 1 },
+  { id: "inv8", name: "كريم واقي شمس", sku: "SKN-003", category: "منتجات العناية بالبشرة", quantity: 28, unitPrice: 95, totalValue: 2660, status: "in-stock", isRetail: 1, isActive: 1 },
+  { id: "inv9", name: "جل أظافر", sku: "NAL-001", category: "مستهلكات", quantity: 0, unitPrice: 45, totalValue: 0, status: "out-of-stock", isRetail: 0, isActive: 1 },
+  { id: "inv10", name: "بروتين شعر", sku: "HAR-003", category: "منتجات الشعر", quantity: 4, unitPrice: 180, totalValue: 720, status: "low-stock", isRetail: 1, isActive: 1 },
 ];
 
 export const inventoryCategories = [
