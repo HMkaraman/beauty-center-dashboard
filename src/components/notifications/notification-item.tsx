@@ -89,9 +89,12 @@ export function NotificationItem({ notification, onMarkRead, onArchive }: Notifi
   };
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
-      className={`group w-full text-start flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-muted/50 ${
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
+      className={`group w-full text-start flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-muted/50 cursor-pointer ${
         isUnread ? "bg-primary/5" : ""
       }`}
     >
@@ -146,6 +149,6 @@ export function NotificationItem({ notification, onMarkRead, onArchive }: Notifi
           </button>
         )}
       </div>
-    </button>
+    </div>
   );
 }

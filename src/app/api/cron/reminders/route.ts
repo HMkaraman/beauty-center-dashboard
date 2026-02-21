@@ -75,7 +75,8 @@ export async function GET(req: NextRequest) {
             time: appointment.time,
             reminderLabel: "Tomorrow / غداً",
           },
-          targetUserIds: appointment.employeeId ? [appointment.employeeId] : undefined,
+          // Note: employeeId is not a userId, so we don't pass targetUserIds here.
+          // The event's targetRoles will cover all relevant staff.
         });
       } catch (e) {
         console.error("In-app reminder notification error:", e);
