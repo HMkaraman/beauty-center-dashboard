@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { inAppNotificationsApi } from "@/lib/api/in-app-notifications";
 
-export function useInAppNotifications(params?: { category?: string; page?: number; limit?: number; unreadOnly?: boolean }) {
+export function useInAppNotifications(params?: { category?: string; page?: number; limit?: number; unreadOnly?: boolean; archived?: boolean }) {
   return useQuery({
     queryKey: ["in-app-notifications", params],
     queryFn: () => inAppNotificationsApi.list(params),
@@ -23,6 +23,7 @@ export function useMarkRead() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["in-app-notifications"] });
       queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-counts-by-category"] });
     },
   });
 }
@@ -34,6 +35,7 @@ export function useMarkAllRead() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["in-app-notifications"] });
       queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-counts-by-category"] });
     },
   });
 }
@@ -53,5 +55,37 @@ export function useUpdateNotificationPreferences() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
     },
+  });
+}
+
+export function useArchiveNotification() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => inAppNotificationsApi.archive(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-counts-by-category"] });
+    },
+  });
+}
+
+export function useArchiveAll() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => inAppNotificationsApi.archiveAll(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["in-app-notifications-unread-counts-by-category"] });
+    },
+  });
+}
+
+export function useUnreadCountsByCategory() {
+  return useQuery({
+    queryKey: ["in-app-notifications-unread-counts-by-category"],
+    queryFn: () => inAppNotificationsApi.unreadCountsByCategory(),
+    refetchInterval: 30_000,
   });
 }

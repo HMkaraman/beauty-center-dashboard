@@ -1783,6 +1783,14 @@
     "scheduleChanged": "Schedule Changed",
     "preferencesUpdated": "Preferences updated",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "appointmentReminder": "Appointment Reminder",
+    "clientNoShow": "Client No-Show",
+    "archive": "Archive",
+    "archiveAll": "Archive All Read",
+    "archived": "Archived",
+    "noArchivedNotifications": "No archived notifications",
+    "tomorrow": "Tomorrow",
+    "inOneHour": "In 1 hour"
   }
 }

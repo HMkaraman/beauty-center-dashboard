@@ -239,6 +239,24 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       });
     }
 
+    // No-show alert
+    if (validated.status === "no-show" && existing.status !== "no-show") {
+      triggerNotification({
+        eventKey: "appointment_no_show",
+        tenantId: session.user.tenantId,
+        actorId: session.user.id,
+        actorName: session.user.name,
+        entityType: "appointment",
+        entityId: id,
+        context: {
+          clientName: updated.clientName,
+          service: updated.service,
+          date: updated.date,
+          time: updated.time,
+        },
+      });
+    }
+
     return success({
       ...updated,
       price: parseFloat(updated.price),

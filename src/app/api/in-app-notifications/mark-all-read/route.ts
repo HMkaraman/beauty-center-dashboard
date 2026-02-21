@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import {
   getAuthSession,
   unauthorized,
+  badRequest,
   success,
   serverError,
 } from "@/lib/api-utils";
@@ -16,6 +17,11 @@ export async function PATCH(req: NextRequest) {
 
     const url = new URL(req.url);
     const category = url.searchParams.get("category");
+
+    const VALID_CATEGORIES = ["appointment", "inventory", "financial", "staff", "client", "system", "marketing"];
+    if (category && !VALID_CATEGORIES.includes(category)) {
+      return badRequest("Invalid category");
+    }
 
     if (category) {
       // Get notification IDs that match the category

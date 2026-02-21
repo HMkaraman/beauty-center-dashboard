@@ -5,6 +5,7 @@ export interface InAppNotification {
   notificationId: string;
   isRead: number;
   readAt: string | null;
+  isArchived: number;
   createdAt: string;
   category: string;
   priority: string;
@@ -34,15 +35,18 @@ interface UnreadCountResponse {
   count: number;
 }
 
+type UnreadCountsByCategoryResponse = Record<string, number>;
+
 export type NotificationPreferences = Record<string, { inAppEnabled: boolean }>;
 
 export const inAppNotificationsApi = {
-  list: (params?: { category?: string; page?: number; limit?: number; unreadOnly?: boolean }) => {
+  list: (params?: { category?: string; page?: number; limit?: number; unreadOnly?: boolean; archived?: boolean }) => {
     const searchParams = new URLSearchParams();
     if (params?.category) searchParams.set("category", params.category);
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
     if (params?.unreadOnly) searchParams.set("unreadOnly", "true");
+    if (params?.archived) searchParams.set("archived", "true");
     const qs = searchParams.toString();
     return apiFetch<PaginatedResponse>(`/in-app-notifications${qs ? `?${qs}` : ""}`);
   },
@@ -61,6 +65,19 @@ export const inAppNotificationsApi = {
       method: "PATCH",
     });
   },
+
+  archive: (id: string) =>
+    apiFetch<{ message: string }>(`/in-app-notifications/${id}/archive`, {
+      method: "PATCH",
+    }),
+
+  archiveAll: () =>
+    apiFetch<{ message: string }>("/in-app-notifications/archive-all", {
+      method: "PATCH",
+    }),
+
+  unreadCountsByCategory: () =>
+    apiFetch<UnreadCountsByCategoryResponse>("/in-app-notifications/unread-counts-by-category"),
 
   getPreferences: () =>
     apiFetch<NotificationPreferences>("/in-app-notifications/preferences"),

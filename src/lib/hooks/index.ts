@@ -59,5 +59,8 @@ export {
   useMarkAllRead,
   useNotificationPreferences,
   useUpdateNotificationPreferences,
+  useArchiveNotification,
+  useArchiveAll,
+  useUnreadCountsByCategory,
 } from "./use-in-app-notifications";
 export { useFormValidation } from "./use-form-validation";

@@ -4,6 +4,7 @@ import { db } from "@/db/db";
 import { appointments, tenantSettings, tenants, notifications, clients } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { sendNotification } from "@/lib/notifications";
+import { triggerNotification } from "@/lib/notification-events";
 import { appointmentReminder } from "@/lib/notifications/templates";
 import { NextResponse } from "next/server";
 
@@ -57,6 +58,28 @@ export async function GET(req: NextRequest) {
         time: appointment.time,
         businessName,
       });
+
+      // Fire in-app reminder notification
+      try {
+        triggerNotification({
+          eventKey: "appointment_reminder",
+          tenantId: appointment.tenantId,
+          actorId: "system",
+          actorName: "System",
+          entityType: "appointment",
+          entityId: appointment.id,
+          context: {
+            clientName: appointment.clientName,
+            service: appointment.service,
+            date: appointment.date,
+            time: appointment.time,
+            reminderLabel: "Tomorrow / غداً",
+          },
+          targetUserIds: appointment.employeeId ? [appointment.employeeId] : undefined,
+        });
+      } catch (e) {
+        console.error("In-app reminder notification error:", e);
+      }
 
       // Send SMS if enabled and phone is available
       if (settings?.smsEnabled && appointment.clientPhone) {

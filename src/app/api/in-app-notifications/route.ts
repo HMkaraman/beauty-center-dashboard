@@ -8,7 +8,7 @@ import {
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
 import { userNotifications, inAppNotifications } from "@/db/schema";
-import { eq, and, desc, count, sql } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,8 +19,16 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const category = url.searchParams.get("category");
     const unreadOnly = url.searchParams.get("unreadOnly") === "true";
+    const archived = url.searchParams.get("archived") === "true";
 
     const conditions = [eq(userNotifications.userId, session.user.id)];
+
+    // By default exclude archived; if ?archived=true show only archived
+    if (archived) {
+      conditions.push(eq(userNotifications.isArchived, 1));
+    } else {
+      conditions.push(eq(userNotifications.isArchived, 0));
+    }
 
     if (category) {
       conditions.push(
@@ -41,6 +49,7 @@ export async function GET(req: NextRequest) {
           notificationId: userNotifications.notificationId,
           isRead: userNotifications.isRead,
           readAt: userNotifications.readAt,
+          isArchived: userNotifications.isArchived,
           createdAt: userNotifications.createdAt,
           category: inAppNotifications.category,
           priority: inAppNotifications.priority,

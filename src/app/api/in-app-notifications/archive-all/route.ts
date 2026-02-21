@@ -6,27 +6,27 @@ import {
 } from "@/lib/api-utils";
 import { db } from "@/db/db";
 import { userNotifications } from "@/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
-export async function GET() {
+export async function PATCH() {
   try {
     const session = await getAuthSession();
     if (!session) return unauthorized();
 
-    const [result] = await db
-      .select({ count: count() })
-      .from(userNotifications)
+    await db
+      .update(userNotifications)
+      .set({ isArchived: 1 })
       .where(
         and(
           eq(userNotifications.userId, session.user.id),
-          eq(userNotifications.isRead, 0),
+          eq(userNotifications.isRead, 1),
           eq(userNotifications.isArchived, 0)
         )
       );
 
-    return success({ count: result?.count ?? 0 });
+    return success({ message: "All read notifications archived" });
   } catch (error) {
-    console.error("GET /api/in-app-notifications/unread-count error:", error);
+    console.error("PATCH /api/in-app-notifications/archive-all error:", error);
     return serverError();
   }
 }

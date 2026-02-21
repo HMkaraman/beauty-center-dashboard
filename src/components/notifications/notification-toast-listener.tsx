@@ -20,6 +20,7 @@ export function NotificationToastListener() {
   const { data: unreadData } = useUnreadCount();
   const lastCountRef = useRef<number | null>(null);
   const lastCheckedAtRef = useRef<string>(new Date().toISOString());
+  const toastedIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const currentCount = unreadData?.count ?? 0;
@@ -42,16 +43,25 @@ export function NotificationToastListener() {
     try {
       const result = await inAppNotificationsApi.list({ limit: 5, unreadOnly: true });
       const newNotifications = result.data.filter(
-        (n) => new Date(n.createdAt) > new Date(lastCheckedAtRef.current)
+        (n) =>
+          !toastedIdsRef.current.has(n.id) &&
+          new Date(n.createdAt) > new Date(lastCheckedAtRef.current)
       );
 
       for (const n of newNotifications) {
+        toastedIdsRef.current.add(n.id);
         showToast(n);
       }
 
+      // Cap the set to prevent unbounded growth
+      if (toastedIdsRef.current.size > 50) {
+        const entries = Array.from(toastedIdsRef.current);
+        toastedIdsRef.current = new Set(entries.slice(-50));
+      }
+
       lastCheckedAtRef.current = new Date().toISOString();
-    } catch {
-      // Silently fail
+    } catch (error) {
+      console.error("Failed to fetch notifications for toast:", error);
     }
   }
 

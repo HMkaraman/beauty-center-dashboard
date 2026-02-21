@@ -1783,6 +1783,14 @@
     "scheduleChanged": "تم تغيير الجدول",
     "preferencesUpdated": "تم تحديث الإعدادات",
     "previous": "السابق",
-    "next": "التالي"
+    "next": "التالي",
+    "appointmentReminder": "تذكير بموعد",
+    "clientNoShow": "عميل لم يحضر",
+    "archive": "أرشفة",
+    "archiveAll": "أرشفة المقروءة",
+    "archived": "الأرشيف",
+    "noArchivedNotifications": "لا توجد إشعارات مؤرشفة",
+    "tomorrow": "غداً",
+    "inOneHour": "بعد ساعة"
   }
 }

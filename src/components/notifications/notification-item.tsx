@@ -12,6 +12,9 @@ import {
   Clock,
   Bell,
   Check,
+  AlarmClock,
+  AlertTriangle,
+  Archive,
 } from "lucide-react";
 import type { InAppNotification } from "@/lib/api/in-app-notifications";
 
@@ -23,6 +26,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Receipt,
   UserPlus,
   Clock,
+  AlarmClock,
+  AlertTriangle,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -59,9 +64,10 @@ function getRelativeTime(dateStr: string, locale: string) {
 interface NotificationItemProps {
   notification: InAppNotification;
   onMarkRead?: (id: string) => void;
+  onArchive?: (id: string) => void;
 }
 
-export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
+export function NotificationItem({ notification, onMarkRead, onArchive }: NotificationItemProps) {
   const locale = useLocale();
   const router = useRouter();
   const isUnread = notification.isRead === 0;
@@ -85,7 +91,7 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
   return (
     <button
       onClick={handleClick}
-      className={`w-full text-start flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-muted/50 ${
+      className={`group w-full text-start flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-muted/50 ${
         isUnread ? "bg-primary/5" : ""
       }`}
     >
@@ -114,18 +120,32 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
           <span className="text-xs text-muted-foreground/70">{timeAgo}</span>
         </div>
       </div>
-      {isUnread && onMarkRead && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onMarkRead(notification.id);
-          }}
-          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted transition-opacity"
-          title="Mark as read"
-        >
-          <Check className="h-3.5 w-3.5 text-muted-foreground" />
-        </button>
-      )}
+      <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        {isUnread && onMarkRead && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMarkRead(notification.id);
+            }}
+            className="p-1 rounded hover:bg-muted"
+            title="Mark as read"
+          >
+            <Check className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        )}
+        {onArchive && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onArchive(notification.id);
+            }}
+            className="p-1 rounded hover:bg-muted"
+            title="Archive"
+          >
+            <Archive className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        )}
+      </div>
     </button>
   );
 }

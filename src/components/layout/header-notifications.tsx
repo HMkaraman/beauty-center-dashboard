@@ -17,6 +17,8 @@ import {
   useUnreadCount,
   useMarkRead,
   useMarkAllRead,
+  useArchiveNotification,
+  useUnreadCountsByCategory,
 } from "@/lib/hooks";
 
 const CATEGORIES = ["all", "appointment", "inventory", "financial", "system"] as const;
@@ -38,6 +40,8 @@ export function HeaderNotifications() {
 
   const markRead = useMarkRead();
   const markAllRead = useMarkAllRead();
+  const archiveNotification = useArchiveNotification();
+  const { data: unreadCounts } = useUnreadCountsByCategory();
 
   const notifications = notificationsData?.data ?? [];
 
@@ -47,6 +51,16 @@ export function HeaderNotifications() {
 
   const handleMarkAllRead = () => {
     markAllRead.mutate(category);
+  };
+
+  const handleArchive = (id: string) => {
+    archiveNotification.mutate(id);
+  };
+
+  const getUnreadBadge = (cat: string) => {
+    if (!unreadCounts) return 0;
+    if (cat === "all") return Object.values(unreadCounts).reduce((sum, c) => sum + c, 0);
+    return unreadCounts[cat] ?? 0;
   };
 
   const handleViewAll = () => {
@@ -85,18 +99,20 @@ export function HeaderNotifications() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="px-2">
           <TabsList className="w-full">
-            <TabsTrigger value="all" className="text-xs flex-1">
-              {t("all")}
-            </TabsTrigger>
-            <TabsTrigger value="appointment" className="text-xs flex-1">
-              {t("categoryAppointment")}
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="text-xs flex-1">
-              {t("categoryInventory")}
-            </TabsTrigger>
-            <TabsTrigger value="financial" className="text-xs flex-1">
-              {t("categoryFinancial")}
-            </TabsTrigger>
+            {CATEGORIES.map((cat) => {
+              const label = cat === "all" ? t("all") : t(`category${cat.charAt(0).toUpperCase()}${cat.slice(1)}` as Parameters<typeof t>[0]);
+              const count = getUnreadBadge(cat);
+              return (
+                <TabsTrigger key={cat} value={cat} className="text-xs flex-1 relative">
+                  {label}
+                  {count > 0 && (
+                    <span className="ms-1 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold text-destructive-foreground">
+                      {count > 99 ? "99+" : count}
+                    </span>
+                  )}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
           {CATEGORIES.map((tab) => (
@@ -130,6 +146,7 @@ export function HeaderNotifications() {
                         key={n.id}
                         notification={n}
                         onMarkRead={handleMarkRead}
+                        onArchive={handleArchive}
                       />
                     ))}
                   </div>
