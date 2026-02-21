@@ -17,6 +17,8 @@ export const tenantSettingsSchema = z.object({
   eInvoicingMode: z.enum(["zatca", "uae_fta", "none"]).optional(),
   invoicePrefix: z.string().max(10).optional(),
   zatcaEnvironment: z.enum(["sandbox", "production"]).optional(),
+  logoUrl: z.string().optional(),
+  invoiceDesign: z.string().optional(),
 });
 
 export const workingHoursSchema = z.object({

@@ -87,6 +87,8 @@ export async function PATCH(req: NextRequest) {
     if (validated.eInvoicingMode !== undefined) updateValues.eInvoicingMode = validated.eInvoicingMode;
     if (validated.invoicePrefix !== undefined) updateValues.invoicePrefix = validated.invoicePrefix;
     if (validated.zatcaEnvironment !== undefined) updateValues.zatcaEnvironment = validated.zatcaEnvironment;
+    if (validated.logoUrl !== undefined) updateValues.logoUrl = validated.logoUrl;
+    if (validated.invoiceDesign !== undefined) updateValues.invoiceDesign = validated.invoiceDesign;
 
     let result;
     if (existing) {

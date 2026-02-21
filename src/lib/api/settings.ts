@@ -33,6 +33,8 @@ export interface Settings {
   eInvoicingEnabled?: number | boolean;
   eInvoicingMode?: string;
   zatcaEnvironment?: string;
+  logoUrl?: string;
+  invoiceDesign?: string | null;
 }
 
 export interface WorkingHours {

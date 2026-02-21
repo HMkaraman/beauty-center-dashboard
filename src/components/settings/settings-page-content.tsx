@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { GeneralSettingsCard } from "./general-settings-card";
+import { LogoUploadCard } from "./logo-upload-card";
 import { BusinessInfoCard } from "./business-info-card";
 import { WorkingHoursCard } from "./working-hours-card";
 import { NotificationsCard } from "./notifications-card";
@@ -14,6 +15,7 @@ export function SettingsPageContent() {
   return (
     <div className="space-y-6">
       <GeneralSettingsCard />
+      <LogoUploadCard />
       <BusinessInfoCard />
       <WorkingHoursCard />
       <NotificationsCard />

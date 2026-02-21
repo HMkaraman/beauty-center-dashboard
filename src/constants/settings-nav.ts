@@ -29,6 +29,13 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
     route: "/settings/financial",
   },
   {
+    id: "invoiceDesign",
+    labelKey: "settings.nav.invoiceDesign",
+    descKey: "settings.nav.invoiceDesignDesc",
+    icon: "FileText",
+    route: "/settings/invoice-design",
+  },
+  {
     id: "schedule",
     labelKey: "settings.nav.schedule",
     descKey: "settings.nav.scheduleDesc",

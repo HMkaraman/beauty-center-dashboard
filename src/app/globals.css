@@ -127,195 +127,46 @@
 }
 
 /* ============================================
+   Invoice Print Fonts (@font-face for Tajawal & Cairo)
+   ============================================ */
+@font-face {
+  font-family: "Tajawal";
+  src: url("/fonts/tajawal/Tajawal-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tajawal";
+  src: url("/fonts/tajawal/Tajawal-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/cairo/Cairo-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/cairo/Cairo-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
    Invoice Print Styles
    ============================================ */
 
-/* Base print class — forces white/black on screen preview AND print */
+/* Base print class — receipts only (A4 uses inline styles) */
 .inv-print {
-  font-family: Arial, sans-serif;
   font-size: 12px;
   color: #000 !important;
   background: #fff !important;
-}
-
-/* --- A4 Header --- */
-.inv-print-header {
-  text-align: center;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #333;
-  padding-bottom: 15px;
-}
-.inv-print-biz-name {
-  font-size: 20px;
-  margin: 0 0 4px;
-  color: #000 !important;
-}
-.inv-print-biz-name-en {
-  font-size: 14px;
-  margin: 0 0 8px;
-  direction: ltr;
-  color: #000 !important;
-}
-.inv-print-text-sm {
-  margin: 2px 0;
-  color: #000 !important;
-}
-.inv-print-ltr {
-  direction: ltr;
-}
-.inv-print-trn {
-  margin: 6px 0 0;
-  font-weight: bold;
-  color: #000 !important;
-}
-
-/* --- Document Type Badge --- */
-.inv-print-type-badge {
-  text-align: center;
-  margin: 15px 0;
-  padding: 8px;
-  background: #f8f8f8 !important;
-  border: 1px solid #ddd;
-}
-.inv-print-type-ar {
-  font-size: 16px;
-  color: #000 !important;
-}
-.inv-print-type-en {
-  font-size: 12px;
-  direction: ltr;
-  color: #000 !important;
-}
-
-/* --- Invoice Meta --- */
-.inv-print-meta {
-  width: 100%;
-  margin-bottom: 15px;
-  font-size: 11px;
-}
-.inv-print-meta-cell {
-  width: 50%;
-  color: #000 !important;
-}
-.inv-print-text-left {
-  text-align: left;
-}
-.inv-print-text-center {
-  text-align: center;
-}
-.inv-print-uuid {
-  font-size: 9px;
-  color: #666 !important;
-}
-
-/* --- Buyer Info --- */
-.inv-print-buyer {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  color: #000 !important;
-}
-.inv-print-buyer-table {
-  width: 100%;
-  margin-top: 5px;
-  font-size: 11px;
-}
-
-/* --- Client Info --- */
-.inv-print-client {
-  margin-bottom: 15px;
-  font-size: 11px;
-  color: #000 !important;
-}
-
-/* --- Items Table --- */
-.inv-print-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 15px;
-}
-.inv-print-table-header {
-  background: #f8f8f8 !important;
-  border-bottom: 2px solid #333;
-}
-.inv-print-th {
-  padding: 6px;
-  text-align: right;
-  border-left: 1px solid #ddd;
-  color: #000 !important;
-  font-weight: bold;
-}
-.inv-print-th:last-child {
-  border-left: none;
-}
-.inv-print-th-en {
-  font-size: 9px;
-  font-weight: normal;
-}
-.inv-print-row {
-  border-bottom: 1px solid #ddd;
-}
-.inv-print-td {
-  padding: 5px;
-  border-left: 1px solid #eee;
-  color: #000 !important;
-}
-.inv-print-td:last-child {
-  border-left: none;
-}
-
-/* --- Tax Breakdown --- */
-.inv-print-tax-section {
-  margin-bottom: 15px;
-  color: #000 !important;
-}
-.inv-print-tax-table {
-  width: 50%;
-  border-collapse: collapse;
-  margin-top: 5px;
-  margin-right: auto;
-}
-.inv-print-tax-th {
-  padding: 4px 8px;
-  text-align: right;
-  color: #000 !important;
-  font-weight: bold;
-}
-.inv-print-tax-td {
-  padding: 4px 8px;
-  color: #000 !important;
-}
-
-/* --- Totals --- */
-.inv-print-totals-wrap {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-.inv-print-totals {
-  width: 40%;
-  border-collapse: collapse;
-}
-.inv-print-totals-row {
-  border-bottom: 1px solid #eee;
-}
-.inv-print-totals-label {
-  padding: 4px 8px;
-  color: #000 !important;
-}
-.inv-print-totals-value {
-  padding: 4px 8px;
-  text-align: left;
-  color: #000 !important;
-}
-.inv-print-grand-total {
-  border-top: 2px solid #333;
-  font-weight: bold;
-  font-size: 14px;
-}
-.inv-print-grand-total .inv-print-totals-label,
-.inv-print-grand-total .inv-print-totals-value {
-  padding: 6px 8px;
 }
 
 /* --- QR Code --- */
@@ -324,38 +175,33 @@
   margin-bottom: 15px;
 }
 
-/* --- Notes --- */
-.inv-print-notes {
-  margin-bottom: 15px;
-  padding: 8px;
-  border: 1px solid #eee;
-  font-size: 11px;
-  color: #000 !important;
-}
-
-/* --- Footer --- */
-.inv-print-footer {
-  text-align: center;
-  font-size: 10px;
-  color: #888 !important;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
-}
-
 /* --- Dashed Separator (receipts) --- */
 .inv-print-separator {
   border-top: 1px dashed #000;
   margin: 4px 0;
 }
-.inv-print-separator-lg {
-  margin: 6px 0;
+.inv-print-separator-star {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin: 4px 0;
+  color: #000 !important;
 }
 
 /* ============================================
-   Receipt Shared Styles
+   Receipt Shared Styles — POS Thermal Look
    ============================================ */
 .inv-receipt {
   margin: 0 auto;
+  font-family: "Courier New", Courier, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.inv-receipt-logo {
+  display: block;
+  max-width: 50mm;
+  max-height: 20mm;
+  margin: 0 auto 4px;
+  object-fit: contain;
 }
 .inv-receipt-header {
   text-align: center;
@@ -390,29 +236,33 @@
   color: #000 !important;
 }
 .inv-receipt-item {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-size: 10px;
   color: #000 !important;
 }
 .inv-receipt-item-line {
   display: flex;
   justify-content: space-between;
+  font-variant-numeric: tabular-nums;
 }
 .inv-receipt-totals {
   font-size: 10px;
   color: #000 !important;
+  font-variant-numeric: tabular-nums;
 }
 .inv-receipt-totals-row {
   display: flex;
   justify-content: space-between;
+  padding: 1px 0;
 }
 .inv-receipt-grand-total {
   display: flex;
   justify-content: space-between;
   font-weight: bold;
-  font-size: 13px;
-  border-top: 1px solid #000;
-  padding-top: 4px;
+  font-size: 14px;
+  border-top: 3px double #000;
+  border-bottom: 3px double #000;
+  padding: 4px 0;
   margin-top: 4px;
   color: #000 !important;
 }
@@ -436,6 +286,10 @@
 .inv-receipt-58 {
   max-width: 48mm;
   font-size: 9px;
+}
+.inv-receipt-58 .inv-receipt-logo {
+  max-width: 35mm;
+  max-height: 15mm;
 }
 .inv-receipt-58 .inv-receipt-biz-name {
   font-size: 11px;
@@ -473,14 +327,29 @@
 }
 
 /* ============================================
+   Print View Visibility
+   ============================================ */
+/* Hide print views on screen — our own rules, no Tailwind conflict */
+.print-only,
+.print-a4-view,
+.print-receipt-80-view,
+.print-receipt-58-view {
+  display: none !important;
+}
+
+/* ============================================
    Print Media Overrides
    ============================================ */
 @media print {
+  /* Hide everything except print views */
   nav,
   aside,
   header,
   [data-sidebar],
   [data-mobile-nav],
+  [data-radix-portal],
+  [data-radix-popper-content-wrapper],
+  [role="dialog"],
   .no-print {
     display: none !important;
   }
@@ -502,23 +371,6 @@
 
   .print-only {
     display: block !important;
-  }
-
-  /* Force white/black on all inv-print descendants */
-  .inv-print,
-  .inv-print * {
-    background: #fff !important;
-    color: #000 !important;
-  }
-  .inv-print-table-header,
-  .inv-print-type-badge {
-    background: #f8f8f8 !important;
-  }
-  .inv-print-footer {
-    color: #888 !important;
-  }
-  .inv-print-uuid {
-    color: #666 !important;
   }
 
   .print-a4 .print-a4-view {

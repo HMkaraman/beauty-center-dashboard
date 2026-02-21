@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Pencil, Printer, ChevronDown } from "lucide-react";
@@ -13,6 +13,7 @@ import { InvoicePrintView } from "./invoice-print-view";
 import { NewInvoiceSheet } from "./new-invoice-sheet";
 import { QrCodeImage } from "./qr-code-image";
 import { Price } from "@/components/ui/price";
+import { parseInvoiceDesign } from "@/lib/invoice-design";
 
 interface InvoiceDetailPageProps {
   invoiceId: string;
@@ -35,32 +36,39 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
   const router = useRouter();
   const { data: invoice, isLoading: invoiceLoading } = useInvoice(invoiceId);
   const { data: settings, isLoading: settingsLoading } = useSettings();
-  const cleanupRef = useRef<(() => void) | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [pendingPrint, setPendingPrint] = useState<PrintMode | null>(null);
 
-  const handlePrint = useCallback((mode: PrintMode) => {
-    // Clean up any previous handler
-    if (cleanupRef.current) {
-      cleanupRef.current();
-      cleanupRef.current = null;
-    }
+  const design = parseInvoiceDesign(settings?.invoiceDesign);
 
-    document.documentElement.classList.add(mode);
+  // Decouple print from Radix dropdown — Radix's DismissableLayer sets
+  // pointer-events:none on <body> during close, which kills window.print()
+  // on Edge/Chromium. By using useEffect, we wait for the dropdown to fully
+  // unmount before triggering print.
+  useEffect(() => {
+    if (!pendingPrint) return;
+
+    document.documentElement.classList.add(pendingPrint);
 
     const cleanup = () => {
-      document.documentElement.classList.remove(mode);
-      cleanupRef.current = null;
+      document.documentElement.classList.remove(pendingPrint);
+      setPendingPrint(null);
     };
 
     const onAfterPrint = () => cleanup();
     window.addEventListener("afterprint", onAfterPrint, { once: true });
-    cleanupRef.current = () => {
-      window.removeEventListener("afterprint", onAfterPrint);
-      cleanup();
-    };
 
-    setTimeout(() => window.print(), 100);
-  }, []);
+    // Double rAF ensures the browser has painted after Radix cleanup
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.print();
+      });
+    });
+
+    return () => {
+      window.removeEventListener("afterprint", onAfterPrint);
+    };
+  }, [pendingPrint]);
 
   if (invoiceLoading || settingsLoading) {
     return (
@@ -126,13 +134,13 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handlePrint("print-a4")}>
+              <DropdownMenuItem onSelect={() => setPendingPrint("print-a4")}>
                 {t("printA4")}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handlePrint("print-receipt-80")}>
+              <DropdownMenuItem onSelect={() => setPendingPrint("print-receipt-80")}>
                 {t("printReceipt80")}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handlePrint("print-receipt-58")}>
+              <DropdownMenuItem onSelect={() => setPendingPrint("print-receipt-58")}>
                 {t("printReceipt58")}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -308,7 +316,7 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
       </div>
 
       {/* Print Views (hidden on screen, visible on print) */}
-      {settings && <InvoicePrintView invoice={invoice} settings={settings} />}
+      {settings && <InvoicePrintView invoice={invoice} settings={settings} design={design} />}
 
       <NewInvoiceSheet open={editOpen} onOpenChange={setEditOpen} editItem={invoice} />
     </>

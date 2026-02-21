@@ -1,0 +1,1 @@
+ALTER TABLE "tenant_settings" ADD COLUMN "invoice_design" text;

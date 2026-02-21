@@ -26,6 +26,8 @@ export const tenantSettings = pgTable("tenant_settings", {
   zatcaComplianceCsid: text("zatca_compliance_csid"),
   zatcaProductionCsid: text("zatca_production_csid"),
   zatcaPrivateKey: text("zatca_private_key"),
+  logoUrl: text("logo_url"),
+  invoiceDesign: text("invoice_design"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
