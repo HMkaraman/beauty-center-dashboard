@@ -14,6 +14,7 @@ import { eq, and } from "drizzle-orm";
 import { deductInventoryForService } from "@/lib/business-logic/inventory";
 import { checkConflict, checkCenterWorkingHours, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities } from "@/lib/activity-logger";
+import { triggerNotification } from "@/lib/notification-events";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -219,6 +220,25 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       relatedEntities,
     });
 
+    // Notify on status change
+    if (validated.status && validated.status !== existing.status) {
+      triggerNotification({
+        eventKey: "appointment_status_changed",
+        tenantId: session.user.tenantId,
+        actorId: session.user.id,
+        actorName: session.user.name,
+        entityType: "appointment",
+        entityId: id,
+        context: {
+          clientName: updated.clientName,
+          service: updated.service,
+          status: updated.status,
+          date: updated.date,
+          time: updated.time,
+        },
+      });
+    }
+
     return success({
       ...updated,
       price: parseFloat(updated.price),
@@ -256,6 +276,20 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
         employeeId: deleted.employeeId,
         doctorId: deleted.doctorId,
       }),
+    });
+
+    triggerNotification({
+      eventKey: "appointment_deleted",
+      tenantId: session.user.tenantId,
+      actorId: session.user.id,
+      actorName: session.user.name,
+      entityType: "appointment",
+      entityId: id,
+      context: {
+        clientName: deleted.clientName,
+        service: deleted.service,
+        date: deleted.date,
+      },
     });
 
     return success({ message: "Appointment deleted successfully" });

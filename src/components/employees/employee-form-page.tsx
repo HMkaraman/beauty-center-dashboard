@@ -8,6 +8,7 @@ import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField } from "@/components/ui/form-field";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { employeeRoles } from "@/lib/mock-data";
 import { useEmployee, useCreateEmployee, useUpdateEmployee } from "@/lib/hooks/use-employees";
@@ -62,8 +63,18 @@ export function EmployeeFormPage({ employeeId }: EmployeeFormPageProps) {
   const [notes, setNotes] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedId = useRef<string | null>(null);
+
+  const clearFormError = (field: string) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   // Populate form when editing
   useEffect(() => {
@@ -114,10 +125,21 @@ export function EmployeeFormPage({ employeeId }: EmployeeFormPageProps) {
   };
 
   const handleSubmit = async () => {
-    if (!name || !role) {
+    const errors: Record<string, string> = {};
+    if (!name) errors.name = tc("requiredField");
+    if (!role) errors.role = tc("requiredField");
+    if (!phone) errors.phone = tc("requiredField");
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       toast.error(tc("requiredField"));
+      const firstKey = Object.keys(errors)[0];
+      setTimeout(() => {
+        document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
       return;
     }
+    setFormErrors({});
 
     setIsSaving(true);
 
@@ -195,20 +217,17 @@ export function EmployeeFormPage({ employeeId }: EmployeeFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("personalInfo")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("employeeName")} *</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
+        <FormField label={t("employeeName")} required error={formErrors.name}>
+          <Input name="name" value={name} onChange={(e) => { setName(e.target.value); clearFormError("name"); }} aria-invalid={!!formErrors.name} />
+        </FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("employeePhone")} *</label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="font-english" dir="ltr" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("employeeEmail")}</label>
+          <FormField label={t("employeePhone")} required error={formErrors.phone}>
+            <Input name="phone" value={phone} onChange={(e) => { setPhone(e.target.value); clearFormError("phone"); }} className="font-english" dir="ltr" aria-invalid={!!formErrors.phone} />
+          </FormField>
+          <FormField label={t("employeeEmail")}>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} className="font-english" dir="ltr" />
-          </div>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -301,10 +320,9 @@ export function EmployeeFormPage({ employeeId }: EmployeeFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("employment")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("role")} *</label>
-          <Select value={role} onValueChange={setRole}>
-            <SelectTrigger className="w-full">
+        <FormField label={t("role")} required error={formErrors.role}>
+          <Select value={role} onValueChange={(v) => { setRole(v); clearFormError("role"); }}>
+            <SelectTrigger className="w-full" aria-invalid={!!formErrors.role} data-field="role">
               <SelectValue placeholder={t("selectRole")} />
             </SelectTrigger>
             <SelectContent>
@@ -313,7 +331,7 @@ export function EmployeeFormPage({ employeeId }: EmployeeFormPageProps) {
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </FormField>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">{t("specialties")}</label>

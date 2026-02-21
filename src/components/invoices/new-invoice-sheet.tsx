@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField } from "@/components/ui/form-field";
 import { useServices } from "@/lib/hooks/use-services";
 import { useCreateInvoice, useUpdateInvoice } from "@/lib/hooks/use-invoices";
 import { Invoice } from "@/types";
@@ -46,6 +47,7 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
   const [status, setStatus] = useState("paid");
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (editItem) {
@@ -99,8 +101,15 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
   }, [items, taxRate]);
 
   const handleSubmit = () => {
-    if (!clientName) { toast.error(tc("requiredField")); return; }
-    if (!items.some((i) => i.description)) { toast.error(tc("requiredField")); return; }
+    const errors: Record<string, string> = {};
+    if (!clientName) errors.clientName = tc("requiredField");
+    if (!items.some((i) => i.description)) errors.items = tc("requiredField");
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(tc("requiredField"));
+      return;
+    }
+    setFormErrors({});
 
     const nextNum = editItem ? editItem.invoiceNumber : `INV-${String(Date.now()).slice(-3)}`;
     const invoiceData: Omit<Invoice, "id"> = {
@@ -137,10 +146,14 @@ export function NewInvoiceSheet({ open, onOpenChange, editItem }: NewInvoiceShee
         </SheetHeader>
 
         <div className="flex-1 space-y-4 px-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("clientName")}</label>
-            <Input value={clientName} onChange={(e) => setClientName(e.target.value)} />
-          </div>
+          <FormField label={t("clientName")} required error={formErrors.clientName}>
+            <Input
+              name="clientName"
+              value={clientName}
+              onChange={(e) => { setClientName(e.target.value); setFormErrors((p) => { const n = { ...p }; delete n.clientName; return n; }); }}
+              aria-invalid={!!formErrors.clientName}
+            />
+          </FormField>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("clientPhone")}</label>
             <Input value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} className="font-english" dir="ltr" />

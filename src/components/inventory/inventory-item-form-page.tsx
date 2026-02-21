@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FormField } from "@/components/ui/form-field";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   useInventoryItem,
@@ -97,8 +98,18 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
   const [notes, setNotes] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedId = useRef<string | null>(null);
+
+  const clearFormError = (field: string) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   // Populate form when editing — keyed on existingItem.id to run exactly once per item
   useEffect(() => {
@@ -145,10 +156,21 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
   };
 
   const handleSubmit = async () => {
-    if (!name || !sku || !categoryId) {
+    const errors: Record<string, string> = {};
+    if (!name) errors.name = tc("requiredField");
+    if (!sku) errors.sku = tc("requiredField");
+    if (!categoryId) errors.categoryId = tc("requiredField");
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       toast.error(tc("requiredField"));
+      const firstKey = Object.keys(errors)[0];
+      setTimeout(() => {
+        document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
       return;
     }
+    setFormErrors({});
 
     setIsSaving(true);
 
@@ -230,10 +252,9 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("basicDetails")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("name")} *</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
+        <FormField label={t("name")} required error={formErrors.name}>
+          <Input name="name" value={name} onChange={(e) => { setName(e.target.value); clearFormError("name"); }} aria-invalid={!!formErrors.name} />
+        </FormField>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">{t("nameEn")}</label>
@@ -246,10 +267,9 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("sku")} *</label>
-            <Input value={sku} onChange={(e) => setSku(e.target.value)} className="font-english" dir="ltr" />
-          </div>
+          <FormField label={t("sku")} required error={formErrors.sku}>
+            <Input name="sku" value={sku} onChange={(e) => { setSku(e.target.value); clearFormError("sku"); }} className="font-english" dir="ltr" aria-invalid={!!formErrors.sku} />
+          </FormField>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t("barcode")}</label>
             <Input value={barcode} onChange={(e) => setBarcode(e.target.value)} className="font-english" dir="ltr" />
@@ -323,11 +343,10 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("classification")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("category")} *</label>
+        <FormField label={t("category")} required error={formErrors.categoryId}>
           {categories.length > 0 ? (
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="w-full">
+            <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); clearFormError("categoryId"); }}>
+              <SelectTrigger className="w-full" aria-invalid={!!formErrors.categoryId} data-field="categoryId">
                 <SelectValue placeholder={t("selectCategory")} />
               </SelectTrigger>
               <SelectContent>
@@ -343,7 +362,7 @@ export function InventoryItemFormPage({ itemId }: InventoryItemFormPageProps) {
               placeholder={t("selectCategory")}
             />
           )}
-        </div>
+        </FormField>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">{t("productType")}</label>

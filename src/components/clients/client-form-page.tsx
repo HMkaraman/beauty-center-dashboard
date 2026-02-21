@@ -8,7 +8,10 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField } from "@/components/ui/form-field";
 import { useClient, useCreateClient, useUpdateClient } from "@/lib/hooks/use-clients";
+import { useFormValidation } from "@/lib/hooks/use-form-validation";
+import { clientSchema } from "@/lib/validations";
 
 interface ClientFormPageProps {
   clientId?: string;
@@ -41,6 +44,7 @@ export function ClientFormPage({ clientId }: ClientFormPageProps) {
 
   const [isSaving, setIsSaving] = useState(false);
   const initializedId = useRef<string | null>(null);
+  const { validate, hasError, getError, clearError } = useFormValidation(clientSchema);
 
   // Populate form when editing
   useEffect(() => {
@@ -59,7 +63,19 @@ export function ClientFormPage({ clientId }: ClientFormPageProps) {
   }, [isEdit, existingClient]);
 
   const handleSubmit = async () => {
-    if (!name || !phone) {
+    const formData = {
+      name,
+      phone,
+      email: email || undefined,
+      dateOfBirth: dateOfBirth || undefined,
+      address: address || undefined,
+      city: city || undefined,
+      country: country || undefined,
+      notes: notes || undefined,
+      status: isEdit ? status as "active" | "inactive" : "active" as const,
+    };
+
+    if (!validate(formData)) {
       toast.error(tc("requiredField"));
       return;
     }
@@ -125,20 +141,36 @@ export function ClientFormPage({ clientId }: ClientFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("personalInfo")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("clientName")} *</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
+        <FormField label={t("clientName")} required error={getError("name")}>
+          <Input
+            name="name"
+            value={name}
+            onChange={(e) => { setName(e.target.value); clearError("name"); }}
+            aria-invalid={hasError("name")}
+          />
+        </FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("clientPhone")} *</label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="font-english" dir="ltr" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("clientEmail")}</label>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} className="font-english" dir="ltr" />
-          </div>
+          <FormField label={t("clientPhone")} required error={getError("phone")}>
+            <Input
+              name="phone"
+              value={phone}
+              onChange={(e) => { setPhone(e.target.value); clearError("phone"); }}
+              className="font-english"
+              dir="ltr"
+              aria-invalid={hasError("phone")}
+            />
+          </FormField>
+          <FormField label={t("clientEmail")} error={getError("email")}>
+            <Input
+              name="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); clearError("email"); }}
+              className="font-english"
+              dir="ltr"
+              aria-invalid={hasError("email")}
+            />
+          </FormField>
         </div>
 
         <div className="space-y-2">

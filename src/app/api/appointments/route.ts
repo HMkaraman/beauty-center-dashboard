@@ -13,6 +13,7 @@ import { appointmentSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
 import { checkConflict, checkCenterWorkingHours, checkDoctorWorkingHours, checkEmployeeWorkingHours } from "@/lib/business-logic/scheduling";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
+import { triggerNotification } from "@/lib/notification-events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -226,6 +227,34 @@ export async function POST(req: NextRequest) {
         employeeId: created.employeeId,
         doctorId: created.doctorId,
       }),
+    });
+
+    // Notify relevant users about the new appointment
+    const targetUserIds: string[] = [];
+    if (created.employeeId) {
+      // Find user linked to this employee
+      const { users: usersTable } = await import("@/db/schema");
+      const linkedUsers = await db
+        .select({ id: usersTable.id })
+        .from(usersTable)
+        .where(eq(usersTable.employeeId, created.employeeId));
+      for (const u of linkedUsers) targetUserIds.push(u.id);
+    }
+
+    triggerNotification({
+      eventKey: "appointment_created",
+      tenantId: session.user.tenantId,
+      actorId: session.user.id,
+      actorName: session.user.name,
+      entityType: "appointment",
+      entityId: created.id,
+      context: {
+        clientName: created.clientName,
+        service: created.service,
+        date: created.date,
+        time: created.time,
+      },
+      targetUserIds: targetUserIds.length > 0 ? targetUserIds : undefined,
     });
 
     return success(

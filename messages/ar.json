@@ -1751,5 +1751,38 @@
       "title": "الإدارة",
       "access": "صلاحية الإدارة الكاملة"
     }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "markAllRead": "تحديد الكل كمقروء",
+    "noNotifications": "لا توجد إشعارات جديدة",
+    "viewAll": "عرض الكل",
+    "all": "الكل",
+    "categoryAppointment": "المواعيد",
+    "categoryInventory": "المخزون",
+    "categoryFinancial": "المالية",
+    "categoryStaff": "الموظفين",
+    "categoryClient": "العملاء",
+    "categorySystem": "النظام",
+    "categoryMarketing": "التسويق",
+    "preferences": "إعدادات الإشعارات",
+    "preferencesDescription": "اختر الإشعارات التي تريد استقبالها",
+    "inApp": "داخل التطبيق",
+    "enabled": "مفعل",
+    "disabled": "معطل",
+    "justNow": "الآن",
+    "minutesAgo": "منذ {count} دقيقة",
+    "hoursAgo": "منذ {count} ساعة",
+    "daysAgo": "منذ {count} يوم",
+    "newAppointment": "موعد جديد",
+    "appointmentCancelled": "تم إلغاء الموعد",
+    "appointmentStatusChanged": "تم تغيير حالة الموعد",
+    "lowStockAlert": "تنبيه نقص المخزون",
+    "invoiceCreated": "فاتورة جديدة",
+    "newClientRegistered": "عميل جديد",
+    "scheduleChanged": "تم تغيير الجدول",
+    "preferencesUpdated": "تم تحديث الإعدادات",
+    "previous": "السابق",
+    "next": "التالي"
   }
 }

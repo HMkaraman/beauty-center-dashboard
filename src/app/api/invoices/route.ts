@@ -17,6 +17,7 @@ import {
   calculateDoctorCommission,
 } from "@/lib/business-logic/finance";
 import { logActivity, buildRelatedEntities, buildCreateChanges } from "@/lib/activity-logger";
+import { triggerNotification } from "@/lib/notification-events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -321,6 +322,20 @@ export async function POST(req: NextRequest) {
         paymentMethod: validated.paymentMethod,
       }),
       relatedEntities: buildRelatedEntities(invoiceRelatedRefs),
+    });
+
+    triggerNotification({
+      eventKey: "invoice_created",
+      tenantId,
+      actorId: session.user.id,
+      actorName: session.user.name,
+      entityType: "invoice",
+      entityId: newInvoice.id,
+      context: {
+        invoiceNumber,
+        clientName: validated.clientName,
+        total: String(validated.total),
+      },
     });
 
     return success(

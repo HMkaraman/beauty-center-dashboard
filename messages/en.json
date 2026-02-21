@@ -1751,5 +1751,38 @@
       "title": "Administration",
       "access": "Full admin access"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No new notifications",
+    "viewAll": "View all",
+    "all": "All",
+    "categoryAppointment": "Appointments",
+    "categoryInventory": "Inventory",
+    "categoryFinancial": "Financial",
+    "categoryStaff": "Staff",
+    "categoryClient": "Clients",
+    "categorySystem": "System",
+    "categoryMarketing": "Marketing",
+    "preferences": "Notification Preferences",
+    "preferencesDescription": "Choose which notifications you want to receive",
+    "inApp": "In-App",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago",
+    "newAppointment": "New Appointment",
+    "appointmentCancelled": "Appointment Cancelled",
+    "appointmentStatusChanged": "Appointment Status Changed",
+    "lowStockAlert": "Low Stock Alert",
+    "invoiceCreated": "New Invoice",
+    "newClientRegistered": "New Client",
+    "scheduleChanged": "Schedule Changed",
+    "preferencesUpdated": "Preferences updated",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

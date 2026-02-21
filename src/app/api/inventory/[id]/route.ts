@@ -12,6 +12,7 @@ import { inventoryItems, inventoryCategories } from "@/db/schema";
 import { inventoryItemSchema } from "@/lib/validations";
 import { eq, and } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
+import { triggerNotification } from "@/lib/notification-events";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -145,6 +146,27 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       oldRecord: existing as unknown as Record<string, unknown>,
       newData: validated as unknown as Record<string, unknown>,
     });
+
+    // Low stock alert
+    if (
+      updated.reorderLevel != null &&
+      updated.quantity != null &&
+      updated.quantity <= updated.reorderLevel
+    ) {
+      triggerNotification({
+        eventKey: "inventory_low_stock",
+        tenantId,
+        actorId: session.user.id,
+        actorName: session.user.name,
+        entityType: "inventory_item",
+        entityId: id,
+        context: {
+          itemName: updated.name,
+          quantity: String(updated.quantity),
+          reorderLevel: String(updated.reorderLevel),
+        },
+      });
+    }
 
     return success({
       ...updated,

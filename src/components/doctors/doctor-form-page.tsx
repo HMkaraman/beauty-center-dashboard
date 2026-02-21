@@ -8,6 +8,7 @@ import { ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormField } from "@/components/ui/form-field";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { doctorSpecialties } from "@/lib/mock-data";
 import { useDoctor, useCreateDoctor, useUpdateDoctor } from "@/lib/hooks/use-doctors";
@@ -60,8 +61,18 @@ export function DoctorFormPage({ doctorId }: DoctorFormPageProps) {
   const [notes, setNotes] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initializedId = useRef<string | null>(null);
+
+  const clearFormError = (field: string) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   // Populate form when editing
   useEffect(() => {
@@ -114,10 +125,21 @@ export function DoctorFormPage({ doctorId }: DoctorFormPageProps) {
   };
 
   const handleSubmit = async () => {
-    if (!name || !specialty) {
+    const errors: Record<string, string> = {};
+    if (!name) errors.name = tc("requiredField");
+    if (!specialty) errors.specialty = tc("requiredField");
+    if (!phone) errors.phone = tc("requiredField");
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       toast.error(tc("requiredField"));
+      const firstKey = Object.keys(errors)[0];
+      setTimeout(() => {
+        document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
       return;
     }
+    setFormErrors({});
 
     setIsSaving(true);
 
@@ -194,20 +216,17 @@ export function DoctorFormPage({ doctorId }: DoctorFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("personalInfo")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("doctorName")} *</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
+        <FormField label={t("doctorName")} required error={formErrors.name}>
+          <Input name="name" value={name} onChange={(e) => { setName(e.target.value); clearFormError("name"); }} aria-invalid={!!formErrors.name} />
+        </FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("phone")} *</label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="font-english" dir="ltr" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">{t("email")}</label>
+          <FormField label={t("phone")} required error={formErrors.phone}>
+            <Input name="phone" value={phone} onChange={(e) => { setPhone(e.target.value); clearFormError("phone"); }} className="font-english" dir="ltr" aria-invalid={!!formErrors.phone} />
+          </FormField>
+          <FormField label={t("email")}>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} className="font-english" dir="ltr" />
-          </div>
+          </FormField>
         </div>
 
         <div className="space-y-2">
@@ -268,10 +287,9 @@ export function DoctorFormPage({ doctorId }: DoctorFormPageProps) {
       <div className="rounded-lg border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("professionalInfo")}</h2>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("specialty")} *</label>
-          <Select value={specialty} onValueChange={setSpecialty}>
-            <SelectTrigger className="w-full">
+        <FormField label={t("specialty")} required error={formErrors.specialty}>
+          <Select value={specialty} onValueChange={(v) => { setSpecialty(v); clearFormError("specialty"); }}>
+            <SelectTrigger className="w-full" aria-invalid={!!formErrors.specialty} data-field="specialty">
               <SelectValue placeholder={t("selectSpecialty")} />
             </SelectTrigger>
             <SelectContent>
@@ -280,7 +298,7 @@ export function DoctorFormPage({ doctorId }: DoctorFormPageProps) {
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </FormField>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">{t("licenseNumber")}</label>

@@ -46,3 +46,4 @@ export {
   type InjectableConsumptionFormData,
   type TouchUpFormData,
 } from "./consumption-tracking";
+export { notificationPreferenceSchema, type NotificationPreferenceFormData } from "./in-app-notifications";

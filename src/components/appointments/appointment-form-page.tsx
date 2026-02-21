@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FormField } from "@/components/ui/form-field";
 import { ClientCombobox } from "./client-combobox";
 import { ClientLeftoverBanner } from "./client-leftover-banner";
 import { AppointmentPhotoUploader } from "./appointment-photo-uploader";
@@ -240,17 +241,35 @@ export function AppointmentFormPage({ appointmentId }: AppointmentFormPageProps)
     return { count, start, end };
   })();
 
-  const handleSubmit = async () => {
-    if (!clientName) {
-      toast.error(tc("requiredField"));
-      return;
-    }
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  const clearFormError = (field: string) => {
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const handleSubmit = async () => {
+    const errors: Record<string, string> = {};
+    if (!clientName) errors.clientName = tc("requiredField");
     const primary = serviceRows[0];
-    if (!primary?.serviceId || !primary?.date || !primary?.time) {
+    if (!primary?.serviceId) errors.serviceId = tc("requiredField");
+    if (!primary?.date) errors.date = tc("requiredField");
+    if (!primary?.time) errors.time = tc("requiredField");
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       toast.error(tc("requiredField"));
+      const firstKey = Object.keys(errors)[0];
+      setTimeout(() => {
+        document.querySelector(`[data-field="${firstKey}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
       return;
     }
+    setFormErrors({});
 
     setIsSaving(true);
 
@@ -531,13 +550,14 @@ export function AppointmentFormPage({ appointmentId }: AppointmentFormPageProps)
 
         {clientId && <ClientLeftoverBanner clientId={clientId} />}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">{t("client")}</label>
-          <ClientCombobox
-            value={clientValue}
-            onChange={handleClientChange}
-          />
-        </div>
+        <FormField label={t("client")} required error={formErrors.clientName} htmlFor="clientName">
+          <div data-field="clientName">
+            <ClientCombobox
+              value={clientValue}
+              onChange={(v) => { handleClientChange(v); clearFormError("clientName"); }}
+            />
+          </div>
+        </FormField>
 
         {clientPhone && (
           <div className="space-y-2">
@@ -573,22 +593,23 @@ export function AppointmentFormPage({ appointmentId }: AppointmentFormPageProps)
               </div>
 
               {/* Service select */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t("service")}</label>
-                <Select
-                  value={row.serviceId}
-                  onValueChange={(v) => updateServiceRow(index, { serviceId: v, date: "", time: "" })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("selectService")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {servicesList.map((svc) => (
-                      <SelectItem key={svc.id} value={svc.id}>{svc.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField label={t("service")} required={index === 0} error={index === 0 ? formErrors.serviceId : undefined}>
+                <div data-field="serviceId">
+                  <Select
+                    value={row.serviceId}
+                    onValueChange={(v) => { updateServiceRow(index, { serviceId: v, date: "", time: "" }); if (index === 0) clearFormError("serviceId"); }}
+                  >
+                    <SelectTrigger className="w-full" aria-invalid={index === 0 && !!formErrors.serviceId}>
+                      <SelectValue placeholder={t("selectService")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {servicesList.map((svc) => (
+                        <SelectItem key={svc.id} value={svc.id}>{svc.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </FormField>
 
               {/* Employee select */}
               <div className="space-y-2">
@@ -651,8 +672,11 @@ export function AppointmentFormPage({ appointmentId }: AppointmentFormPageProps)
       </div>
 
       {/* Section C: Schedule */}
-      <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+      <div className={`rounded-lg border bg-card p-6 space-y-4 ${formErrors.date || formErrors.time ? "border-destructive" : "border-border"}`} data-field="date">
         <h2 className="text-sm font-semibold text-foreground">{t("scheduleSection")}</h2>
+        {(formErrors.date || formErrors.time) && (
+          <p className="text-xs text-destructive">{tc("requiredField")}</p>
+        )}
 
         {/* Available Dates */}
         {!manualTimeMode && canShowDates && (

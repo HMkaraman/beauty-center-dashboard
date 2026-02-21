@@ -12,6 +12,7 @@ import { clients, appointments, invoices } from "@/db/schema";
 import { clientSchema } from "@/lib/validations";
 import { eq, and, ilike, sql, desc, count, inArray } from "drizzle-orm";
 import { logActivity } from "@/lib/activity-logger";
+import { triggerNotification } from "@/lib/notification-events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -165,6 +166,18 @@ export async function POST(req: NextRequest) {
       entityId: created.id,
       action: "create",
       entityLabel: created.name,
+    });
+
+    triggerNotification({
+      eventKey: "client_created",
+      tenantId: session.user.tenantId,
+      actorId: session.user.id,
+      actorName: session.user.name,
+      entityType: "client",
+      entityId: created.id,
+      context: {
+        clientName: created.name,
+      },
     });
 
     return success(created, 201);
