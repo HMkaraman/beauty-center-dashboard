@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Search, Trash2, UserCheck, UserX, Clock, ExternalLink } from "lucide-react";
@@ -30,8 +31,8 @@ export function EmployeesPageContent() {
   const deleteEmployee = useDeleteEmployee();
   const bulkDeleteEmployees = useBulkDeleteEmployees();
   const bulkUpdateStatus = useBulkUpdateEmployeeStatus();
+  const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [editItem, setEditItem] = useState<Employee | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
@@ -46,7 +47,7 @@ export function EmployeesPageContent() {
   const ids = useMemo(() => filtered.map((e) => e.id), [filtered]);
   const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
-  const handleEdit = (item: Employee) => { setEditItem(item); setSheetOpen(true); };
+  const handleEdit = (item: Employee) => { router.push(`/employees/${item.id}/edit`); };
   const handleDelete = (id: string) => { setDeleteId(id); };
   const confirmDelete = () => { if (deleteId) { deleteEmployee.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } }); setDeleteId(null); } };
   const confirmBulkDelete = () => { bulkDeleteEmployees.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkDeleteSuccess", { count: res.deleted })); clearSelection(); setBulkDeleteOpen(false); } }); };
@@ -67,7 +68,7 @@ export function EmployeesPageContent() {
                 {t("openFullForm")}
               </Link>
             </Button>
-            <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm">
+            <Button onClick={() => setSheetOpen(true)} size="sm">
               <DynamicIcon name="Plus" className="h-4 w-4" />
               {t("newEmployee")}
             </Button>
@@ -85,7 +86,7 @@ export function EmployeesPageContent() {
         { id: "status-inactive", label: t("statusInactive"), variant: "outline", icon: <UserX className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("inactive") },
         { id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) },
       ]} />
-      <NewEmployeeSheet open={sheetOpen} onOpenChange={setSheetOpen} editItem={editItem} />
+      <NewEmployeeSheet open={sheetOpen} onOpenChange={setSheetOpen} />
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{tc("deleteConfirmTitle")}</AlertDialogTitle><AlertDialogDescription>{tc("deleteConfirmMessage")}</AlertDialogDescription></AlertDialogHeader>
           <AlertDialogFooter><AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel><AlertDialogAction onClick={confirmDelete}>{tc("confirmDelete")}</AlertDialogAction></AlertDialogFooter>

@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Search, Trash2, UserCheck, UserX } from "lucide-react";
+import Link from "next/link";
+import { Search, Trash2, UserCheck, UserX, ExternalLink } from "lucide-react";
 import { useRowSelection } from "@/hooks/use-row-selection";
 import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -31,9 +33,9 @@ export function ClientsPageContent() {
   const deleteClient = useDeleteClient();
   const bulkDeleteClients = useBulkDeleteClients();
   const bulkUpdateStatus = useBulkUpdateClientStatus();
+  const router = useRouter();
   const clients = data?.data ?? [];
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [editItem, setEditItem] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
@@ -43,7 +45,7 @@ export function ClientsPageContent() {
   const ids = useMemo(() => filtered.map((c) => c.id), [filtered]);
   const { selectedIds, selectedCount, isAllSelected, isSomeSelected, toggle, toggleAll, clearSelection } = useRowSelection(ids);
 
-  const handleEdit = (item: Client) => { setEditItem(item); setSheetOpen(true); };
+  const handleEdit = (item: Client) => { router.push(`/clients/${item.id}/edit`); };
   const handleDelete = (id: string) => { setDeleteId(id); };
   const confirmDelete = () => { if (deleteId) { deleteClient.mutate(deleteId, { onSuccess: () => { toast.success(tc("deleteSuccess")); setDeleteId(null); } }); } };
   const confirmBulkDelete = () => { bulkDeleteClients.mutate(selectedIds, { onSuccess: (res) => { toast.success(tc("bulkDeleteSuccess", { count: res.deleted })); clearSelection(); setBulkDeleteOpen(false); } }); };
@@ -62,9 +64,17 @@ export function ClientsPageContent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">{t("clientsList")}</h2>
-          <Button onClick={() => { setEditItem(null); setSheetOpen(true); }} size="sm">
-            <DynamicIcon name="Plus" className="h-4 w-4" />{t("newClient")}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/clients/new">
+                <ExternalLink className="h-4 w-4" />
+                {t("openFullForm")}
+              </Link>
+            </Button>
+            <Button onClick={() => setSheetOpen(true)} size="sm">
+              <DynamicIcon name="Plus" className="h-4 w-4" />{t("newClient")}
+            </Button>
+          </div>
         </div>
         <div className="relative">
           <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -86,7 +96,7 @@ export function ClientsPageContent() {
         { id: "status-inactive", label: t("statusInactive"), variant: "outline", icon: <UserX className="h-3.5 w-3.5" />, onClick: () => handleBulkStatus("inactive") },
         { id: "bulk-delete", label: tc("bulkDelete"), variant: "destructive", icon: <Trash2 className="h-3.5 w-3.5" />, onClick: () => setBulkDeleteOpen(true) },
       ]} />
-      <NewClientSheet open={sheetOpen} onOpenChange={setSheetOpen} editItem={editItem} />
+      <NewClientSheet open={sheetOpen} onOpenChange={setSheetOpen} />
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
