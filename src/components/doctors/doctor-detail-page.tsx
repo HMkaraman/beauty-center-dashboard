@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -7,9 +8,20 @@ import {
   ArrowLeft, Phone, Mail, Calendar, Clock, TrendingUp,
   DollarSign, XCircle, Users, Star, BarChart3, Award, Briefcase, GraduationCap, FileText,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { DoctorStatusBadge } from "./doctor-status-badge";
 import { DoctorPerformanceBadge } from "./doctor-performance-badge";
 import { DoctorInsightsPanel } from "./doctor-insights-panel";
@@ -17,10 +29,11 @@ import { DoctorDetailAppointmentsTable } from "./doctor-detail-appointments-tabl
 import { DoctorDetailCommissionsTable } from "./doctor-detail-commissions-table";
 import { DoctorAppointmentCard } from "./doctor-appointment-card";
 import { DoctorCommissionCard } from "./doctor-commission-card";
-import { useDoctorDetails } from "@/lib/hooks";
+import { useDoctorDetails, useUpdateAppointment, useDeleteAppointment } from "@/lib/hooks";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { DoctorScheduleCard } from "./doctor-schedule-card";
 import { Price } from "@/components/ui/price";
+import type { AppointmentStatus } from "@/types";
 
 interface DoctorDetailPageProps {
   doctorId: string;
@@ -28,8 +41,30 @@ interface DoctorDetailPageProps {
 
 export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
   const t = useTranslations("doctors");
+  const tc = useTranslations("common");
   const router = useRouter();
   const { data, isLoading, error } = useDoctorDetails(doctorId);
+  const updateAppointment = useUpdateAppointment();
+  const deleteAppointment = useDeleteAppointment();
+  const [deleteApptId, setDeleteApptId] = useState<string | null>(null);
+
+  const handleApptStatusChange = (id: string, status: AppointmentStatus) => {
+    updateAppointment.mutate(
+      { id, data: { status } },
+      { onSuccess: () => { toast.success(tc("updateSuccess")); } }
+    );
+  };
+
+  const handleApptDelete = (id: string) => {
+    setDeleteApptId(id);
+  };
+
+  const confirmApptDelete = () => {
+    if (deleteApptId) {
+      deleteAppointment.mutate(deleteApptId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } });
+      setDeleteApptId(null);
+    }
+  };
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -235,7 +270,7 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
         </TabsList>
 
         <TabsContent value="consultations">
-          <DoctorDetailAppointmentsTable data={recentAppointments} />
+          <DoctorDetailAppointmentsTable data={recentAppointments} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
           {/* Mobile cards */}
           <div className="space-y-3 md:hidden">
             {recentAppointments.length === 0 ? (
@@ -244,7 +279,7 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
               </div>
             ) : (
               recentAppointments.map((appt) => (
-                <DoctorAppointmentCard key={appt.id} data={appt} />
+                <DoctorAppointmentCard key={appt.id} data={appt} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
               ))
             )}
           </div>
@@ -276,6 +311,19 @@ export function DoctorDetailPage({ doctorId }: DoctorDetailPageProps) {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={!!deleteApptId} onOpenChange={(open) => !open && setDeleteApptId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("deleteConfirmMessage")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmApptDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

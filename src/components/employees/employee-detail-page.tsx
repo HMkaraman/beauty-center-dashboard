@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -8,9 +9,20 @@ import {
   DollarSign, XCircle, Users, Percent, BarChart3, Briefcase,
   IdCard, AlertCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { EmployeeStatusBadge } from "./employee-status-badge";
 import { EmployeePerformanceBadge } from "./employee-performance-badge";
 import { EmployeeInsightsPanel } from "./employee-insights-panel";
@@ -18,10 +30,11 @@ import { EmployeeDetailAppointmentsTable } from "./employee-detail-appointments-
 import { EmployeeDetailCommissionsTable } from "./employee-detail-commissions-table";
 import { EmployeeAppointmentCard } from "./employee-appointment-card";
 import { EmployeeCommissionCard } from "./employee-commission-card";
-import { useEmployeeDetails } from "@/lib/hooks";
+import { useEmployeeDetails, useUpdateAppointment, useDeleteAppointment } from "@/lib/hooks";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { EmployeeScheduleCard } from "./employee-schedule-card";
 import { Price } from "@/components/ui/price";
+import type { AppointmentStatus } from "@/types";
 
 interface EmployeeDetailPageProps {
   employeeId: string;
@@ -29,8 +42,30 @@ interface EmployeeDetailPageProps {
 
 export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
   const t = useTranslations("employees");
+  const tc = useTranslations("common");
   const router = useRouter();
   const { data, isLoading, error } = useEmployeeDetails(employeeId);
+  const updateAppointment = useUpdateAppointment();
+  const deleteAppointment = useDeleteAppointment();
+  const [deleteApptId, setDeleteApptId] = useState<string | null>(null);
+
+  const handleApptStatusChange = (id: string, status: AppointmentStatus) => {
+    updateAppointment.mutate(
+      { id, data: { status } },
+      { onSuccess: () => { toast.success(tc("updateSuccess")); } }
+    );
+  };
+
+  const handleApptDelete = (id: string) => {
+    setDeleteApptId(id);
+  };
+
+  const confirmApptDelete = () => {
+    if (deleteApptId) {
+      deleteAppointment.mutate(deleteApptId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } });
+      setDeleteApptId(null);
+    }
+  };
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -214,7 +249,7 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
         </TabsList>
 
         <TabsContent value="appointments">
-          <EmployeeDetailAppointmentsTable data={recentAppointments} />
+          <EmployeeDetailAppointmentsTable data={recentAppointments} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
           {/* Mobile cards */}
           <div className="space-y-3 md:hidden">
             {recentAppointments.length === 0 ? (
@@ -223,7 +258,7 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
               </div>
             ) : (
               recentAppointments.map((appt) => (
-                <EmployeeAppointmentCard key={appt.id} data={appt} />
+                <EmployeeAppointmentCard key={appt.id} data={appt} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
               ))
             )}
           </div>
@@ -255,6 +290,19 @@ export function EmployeeDetailPage({ employeeId }: EmployeeDetailPageProps) {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={!!deleteApptId} onOpenChange={(open) => !open && setDeleteApptId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("deleteConfirmMessage")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmApptDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

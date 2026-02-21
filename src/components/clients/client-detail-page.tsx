@@ -18,12 +18,22 @@ import { ClientAppointmentCard } from "./client-appointment-card";
 import { ClientInvoiceCard } from "./client-invoice-card";
 import { ClientHealingJourneysTable } from "./client-healing-journeys-table";
 import { ClientHealingJourneyCard } from "./client-healing-journey-card";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { NewHealingJourneySheet } from "./new-healing-journey-sheet";
 import { HealingJourneyUpdatesSheet } from "./healing-journey-updates-sheet";
-import { useClientDetails, useHealingJourneys, useDeleteHealingJourney } from "@/lib/hooks";
+import { useClientDetails, useHealingJourneys, useDeleteHealingJourney, useUpdateAppointment, useDeleteAppointment } from "@/lib/hooks";
 import { Price } from "@/components/ui/price";
-import type { HealingJourney } from "@/types";
+import type { HealingJourney, AppointmentStatus } from "@/types";
 
 interface ClientDetailPageProps {
   clientId: string;
@@ -31,15 +41,37 @@ interface ClientDetailPageProps {
 
 export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
   const t = useTranslations("clients");
+  const tc = useTranslations("common");
   const router = useRouter();
   const { data, isLoading, error } = useClientDetails(clientId);
   const { data: healingJourneys } = useHealingJourneys(clientId);
   const deleteJourney = useDeleteHealingJourney();
+  const updateAppointment = useUpdateAppointment();
+  const deleteAppointment = useDeleteAppointment();
+  const [deleteApptId, setDeleteApptId] = useState<string | null>(null);
 
   const [journeySheetOpen, setJourneySheetOpen] = useState(false);
   const [editingJourney, setEditingJourney] = useState<HealingJourney | null>(null);
   const [updatesSheetOpen, setUpdatesSheetOpen] = useState(false);
   const [viewingJourney, setViewingJourney] = useState<HealingJourney | null>(null);
+
+  const handleApptStatusChange = (id: string, status: AppointmentStatus) => {
+    updateAppointment.mutate(
+      { id, data: { status } },
+      { onSuccess: () => { toast.success(tc("updateSuccess")); } }
+    );
+  };
+
+  const handleApptDelete = (id: string) => {
+    setDeleteApptId(id);
+  };
+
+  const confirmApptDelete = () => {
+    if (deleteApptId) {
+      deleteAppointment.mutate(deleteApptId, { onSuccess: () => { toast.success(tc("deleteSuccess")); } });
+      setDeleteApptId(null);
+    }
+  };
 
   const handleViewJourney = (journey: HealingJourney) => {
     setViewingJourney(journey);
@@ -217,7 +249,7 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
         </TabsList>
 
         <TabsContent value="appointments">
-          <ClientDetailAppointmentsTable data={recentAppointments} />
+          <ClientDetailAppointmentsTable data={recentAppointments} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
           {/* Mobile cards */}
           <div className="space-y-3 md:hidden">
             {recentAppointments.length === 0 ? (
@@ -226,7 +258,7 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
               </div>
             ) : (
               recentAppointments.map((appt) => (
-                <ClientAppointmentCard key={appt.id} data={appt} />
+                <ClientAppointmentCard key={appt.id} data={appt} onStatusChange={handleApptStatusChange} onDelete={handleApptDelete} />
               ))
             )}
           </div>
@@ -287,6 +319,19 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={!!deleteApptId} onOpenChange={(open) => !open && setDeleteApptId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tc("deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{tc("deleteConfirmMessage")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tc("cancelAction")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmApptDelete}>{tc("confirmDelete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <NewHealingJourneySheet
         open={journeySheetOpen}
