@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Search, Ban } from "lucide-react";
 import { useRowSelection } from "@/hooks/use-row-selection";
@@ -31,6 +32,8 @@ import { Invoice } from "@/types";
 export function InvoicesPageContent() {
   const t = useTranslations("invoices");
   const tc = useTranslations("common");
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { data } = useInvoices({ search: searchQuery || undefined });
   const updateInvoice = useUpdateInvoice();
@@ -40,6 +43,13 @@ export function InvoicesPageContent() {
   const [viewItem, setViewItem] = useState<Invoice | null>(null);
   const [voidId, setVoidId] = useState<string | null>(null);
   const [bulkVoidOpen, setBulkVoidOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("newInvoice") === "true") {
+      setSheetOpen(true);
+      router.replace("/finance", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const filtered = items.filter((item) => {
     if (!searchQuery) return true;

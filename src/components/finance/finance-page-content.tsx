@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const FinanceOverviewTab = dynamic(
@@ -48,9 +49,11 @@ const FinanceAccountsTab = dynamic(
 
 export function FinancePageContent() {
   const t = useTranslations("finance");
+  const searchParams = useSearchParams();
+  const hasNewInvoice = searchParams.get("newInvoice") === "true";
 
   return (
-    <Tabs defaultValue="overview">
+    <Tabs defaultValue={hasNewInvoice ? "invoices" : "overview"}>
       <TabsList>
         <TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
         <TabsTrigger value="transactions">{t("tabs.transactions")}</TabsTrigger>

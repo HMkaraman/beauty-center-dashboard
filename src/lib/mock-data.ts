@@ -100,6 +100,7 @@ export const quickActions: QuickAction[] = [
   { id: "add-client", labelKey: "dashboard.addClient", icon: "UserPlus", color: "#7ECB8B", route: "/clients" },
   { id: "record-expense", labelKey: "dashboard.recordExpense", icon: "Receipt", color: "#E07B7B", route: "/finance" },
   { id: "view-reports", labelKey: "dashboard.viewReports", icon: "BarChart3", color: "#8B7FF5", route: "/reports" },
+  { id: "new-invoice", labelKey: "dashboard.newInvoice", icon: "FileText", color: "#F5C26B", route: "/finance?newInvoice=true" },
 ];
 
 // Appointments Page Data

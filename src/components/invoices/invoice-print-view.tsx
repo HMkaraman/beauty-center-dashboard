@@ -50,346 +50,336 @@ export function InvoicePrintView({ invoice, settings }: InvoicePrintViewProps) {
   return (
     <div className="hidden print-only">
       {/* A4 Layout */}
-      <div className="print-a4-view hidden" dir="rtl">
-        <div style={{ fontFamily: "Arial, sans-serif", fontSize: "12px", color: "#000" }}>
-          {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: "20px", borderBottom: "2px solid #333", paddingBottom: "15px" }}>
-            <h1 style={{ fontSize: "20px", margin: "0 0 4px" }}>{settings.businessName}</h1>
-            {settings.businessNameEn && (
-              <p style={{ fontSize: "14px", margin: "0 0 8px", direction: "ltr" }}>{settings.businessNameEn}</p>
-            )}
-            {settings.businessAddress && <p style={{ margin: "2px 0" }}>{settings.businessAddress}</p>}
-            {settings.businessPhone && <p style={{ margin: "2px 0", direction: "ltr" }}>{settings.businessPhone}</p>}
-            {(settings.taxRegistrationNumber || settings.taxNumber) && (
-              <p style={{ margin: "6px 0 0", fontWeight: "bold" }}>
-                الرقم الضريبي / TRN: {settings.taxRegistrationNumber || settings.taxNumber}
-              </p>
-            )}
-          </div>
+      <div className="print-a4-view hidden inv-print" dir="rtl">
+        {/* Header */}
+        <div className="inv-print-header">
+          <h1 className="inv-print-biz-name">{settings.businessName}</h1>
+          {settings.businessNameEn && (
+            <p className="inv-print-biz-name-en">{settings.businessNameEn}</p>
+          )}
+          {settings.businessAddress && <p className="inv-print-text-sm">{settings.businessAddress}</p>}
+          {settings.businessPhone && <p className="inv-print-text-sm inv-print-ltr">{settings.businessPhone}</p>}
+          {(settings.taxRegistrationNumber || settings.taxNumber) && (
+            <p className="inv-print-trn">
+              الرقم الضريبي / TRN: {settings.taxRegistrationNumber || settings.taxNumber}
+            </p>
+          )}
+        </div>
 
-          {/* Document Type */}
-          <div style={{ textAlign: "center", margin: "15px 0", padding: "8px", background: "#f5f5f5", border: "1px solid #ddd" }}>
-            <strong style={{ fontSize: "16px" }}>{typeLabel.ar}</strong>
-            <br />
-            <span style={{ fontSize: "12px", direction: "ltr" }}>{typeLabel.en}</span>
-          </div>
+        {/* Document Type Badge */}
+        <div className="inv-print-type-badge">
+          <strong className="inv-print-type-ar">{typeLabel.ar}</strong>
+          <br />
+          <span className="inv-print-type-en">{typeLabel.en}</span>
+        </div>
 
-          {/* Invoice Meta */}
-          <table style={{ width: "100%", marginBottom: "15px", fontSize: "11px" }}>
-            <tbody>
+        {/* Invoice Meta */}
+        <table className="inv-print-meta">
+          <tbody>
+            <tr>
+              <td className="inv-print-meta-cell">
+                <strong>رقم الفاتورة / Invoice #:</strong> {invoice.invoiceNumber}
+              </td>
+              <td className="inv-print-meta-cell inv-print-text-left">
+                <strong>التاريخ / Date:</strong> {invoice.date}
+              </td>
+            </tr>
+            {invoice.uuid && (
               <tr>
-                <td style={{ width: "50%" }}>
-                  <strong>رقم الفاتورة / Invoice #:</strong> {invoice.invoiceNumber}
-                </td>
-                <td style={{ width: "50%", textAlign: "left" }}>
-                  <strong>التاريخ / Date:</strong> {invoice.date}
+                <td colSpan={2} className="inv-print-uuid">
+                  UUID: {invoice.uuid}
                 </td>
               </tr>
-              {invoice.uuid && (
-                <tr>
-                  <td colSpan={2} style={{ fontSize: "9px", color: "#666" }}>
-                    UUID: {invoice.uuid}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+            )}
+          </tbody>
+        </table>
 
-          {/* Buyer Info (B2B) */}
-          {(invoice.buyerName || invoice.buyerTrn) && (
-            <div style={{ marginBottom: "15px", padding: "10px", border: "1px solid #ddd" }}>
-              <strong>معلومات المشتري / Buyer Information</strong>
-              <table style={{ width: "100%", marginTop: "5px", fontSize: "11px" }}>
-                <tbody>
-                  {invoice.buyerName && (
-                    <tr>
-                      <td><strong>الاسم / Name:</strong> {invoice.buyerName}</td>
-                    </tr>
-                  )}
-                  {invoice.buyerTrn && (
-                    <tr>
-                      <td><strong>الرقم الضريبي / TRN:</strong> {invoice.buyerTrn}</td>
-                    </tr>
-                  )}
-                  {invoice.buyerAddress && (
-                    <tr>
-                      <td><strong>العنوان / Address:</strong> {invoice.buyerAddress}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Client Info (B2C) */}
-          {!invoice.buyerName && (
-            <div style={{ marginBottom: "15px", fontSize: "11px" }}>
-              <strong>العميل / Client:</strong> {invoice.clientName} — {invoice.clientPhone}
-            </div>
-          )}
-
-          {/* Items Table */}
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "15px" }}>
-            <thead>
-              <tr style={{ background: "#f5f5f5", borderBottom: "2px solid #333" }}>
-                <th style={{ padding: "6px", textAlign: "right", borderLeft: "1px solid #ddd" }}>#</th>
-                <th style={{ padding: "6px", textAlign: "right", borderLeft: "1px solid #ddd" }}>الوصف<br /><span style={{ fontSize: "9px" }}>Description</span></th>
-                <th style={{ padding: "6px", textAlign: "center", borderLeft: "1px solid #ddd" }}>الكمية<br /><span style={{ fontSize: "9px" }}>Qty</span></th>
-                <th style={{ padding: "6px", textAlign: "center", borderLeft: "1px solid #ddd" }}>السعر<br /><span style={{ fontSize: "9px" }}>Price</span></th>
-                <th style={{ padding: "6px", textAlign: "center", borderLeft: "1px solid #ddd" }}>الخصم<br /><span style={{ fontSize: "9px" }}>Discount</span></th>
-                <th style={{ padding: "6px", textAlign: "center", borderLeft: "1px solid #ddd" }}>الضريبة %<br /><span style={{ fontSize: "9px" }}>Tax %</span></th>
-                <th style={{ padding: "6px", textAlign: "center", borderLeft: "1px solid #ddd" }}>مبلغ الضريبة<br /><span style={{ fontSize: "9px" }}>Tax Amt</span></th>
-                <th style={{ padding: "6px", textAlign: "center" }}>الإجمالي<br /><span style={{ fontSize: "9px" }}>Total</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoice.items.map((item, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{i + 1}</td>
-                  <td style={{ padding: "5px", borderLeft: "1px solid #eee" }}>{item.description}</td>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{item.quantity}</td>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{item.unitPrice.toFixed(2)}</td>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{item.discount.toFixed(2)}</td>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{item.taxRate ?? invoice.taxRate}%</td>
-                  <td style={{ padding: "5px", textAlign: "center", borderLeft: "1px solid #eee" }}>{(item.taxAmount ?? 0).toFixed(2)}</td>
-                  <td style={{ padding: "5px", textAlign: "center" }}>{item.total.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Tax Breakdown */}
-          {taxBreakdown.length > 0 && (
-            <div style={{ marginBottom: "15px" }}>
-              <strong>تفصيل الضريبة / Tax Breakdown</strong>
-              <table style={{ width: "50%", borderCollapse: "collapse", marginTop: "5px", marginRight: "auto" }}>
-                <thead>
-                  <tr style={{ background: "#f5f5f5", borderBottom: "1px solid #ddd" }}>
-                    <th style={{ padding: "4px 8px", textAlign: "right" }}>النسبة / Rate</th>
-                    <th style={{ padding: "4px 8px", textAlign: "center" }}>المبلغ الخاضع / Taxable</th>
-                    <th style={{ padding: "4px 8px", textAlign: "center" }}>الضريبة / VAT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {taxBreakdown.map((row, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-                      <td style={{ padding: "4px 8px" }}>{row.rate}%</td>
-                      <td style={{ padding: "4px 8px", textAlign: "center" }}>{row.taxableAmount.toFixed(2)}</td>
-                      <td style={{ padding: "4px 8px", textAlign: "center" }}>{row.vatAmount.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Totals */}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
-            <table style={{ width: "40%", borderCollapse: "collapse" }}>
+        {/* Buyer Info (B2B) */}
+        {(invoice.buyerName || invoice.buyerTrn) && (
+          <div className="inv-print-buyer">
+            <strong>معلومات المشتري / Buyer Information</strong>
+            <table className="inv-print-buyer-table">
               <tbody>
-                <tr style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "4px 8px" }}>المجموع / Subtotal</td>
-                  <td style={{ padding: "4px 8px", textAlign: "left" }}>{formatCurrency(invoice.subtotal, currency)}</td>
-                </tr>
-                {(invoice.discountTotal ?? 0) > 0 && (
-                  <tr style={{ borderBottom: "1px solid #eee" }}>
-                    <td style={{ padding: "4px 8px" }}>الخصم / Discount</td>
-                    <td style={{ padding: "4px 8px", textAlign: "left" }}>-{formatCurrency(invoice.discountTotal!, currency)}</td>
+                {invoice.buyerName && (
+                  <tr>
+                    <td><strong>الاسم / Name:</strong> {invoice.buyerName}</td>
                   </tr>
                 )}
-                <tr style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "4px 8px" }}>المبلغ الخاضع / Taxable</td>
-                  <td style={{ padding: "4px 8px", textAlign: "left" }}>{formatCurrency(taxableAmount, currency)}</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "4px 8px" }}>الضريبة / VAT ({invoice.taxRate}%)</td>
-                  <td style={{ padding: "4px 8px", textAlign: "left" }}>{formatCurrency(invoice.taxAmount, currency)}</td>
-                </tr>
-                <tr style={{ borderTop: "2px solid #333", fontWeight: "bold", fontSize: "14px" }}>
-                  <td style={{ padding: "6px 8px" }}>الإجمالي / Grand Total</td>
-                  <td style={{ padding: "6px 8px", textAlign: "left" }}>{formatCurrency(invoice.total, currency)}</td>
-                </tr>
+                {invoice.buyerTrn && (
+                  <tr>
+                    <td><strong>الرقم الضريبي / TRN:</strong> {invoice.buyerTrn}</td>
+                  </tr>
+                )}
+                {invoice.buyerAddress && (
+                  <tr>
+                    <td><strong>العنوان / Address:</strong> {invoice.buyerAddress}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+        )}
 
-          {/* QR Code */}
-          {invoice.qrCode && (
-            <div style={{ textAlign: "center", marginBottom: "15px" }}>
-              <QrCodeImage data={invoice.qrCode} size={150} />
-            </div>
-          )}
-
-          {/* Notes */}
-          {invoice.notes && (
-            <div style={{ marginBottom: "15px", padding: "8px", border: "1px solid #eee", fontSize: "11px" }}>
-              <strong>ملاحظات / Notes:</strong> {invoice.notes}
-            </div>
-          )}
-
-          {/* Footer */}
-          <div style={{ textAlign: "center", fontSize: "10px", color: "#888", borderTop: "1px solid #ddd", paddingTop: "10px" }}>
-            تم الإنشاء بواسطة {settings.businessName} / Generated by {settings.businessNameEn || settings.businessName}
+        {/* Client Info (B2C) */}
+        {!invoice.buyerName && (
+          <div className="inv-print-client">
+            <strong>العميل / Client:</strong> {invoice.clientName} — {invoice.clientPhone}
           </div>
+        )}
+
+        {/* Items Table */}
+        <table className="inv-print-table">
+          <thead>
+            <tr className="inv-print-table-header">
+              <th className="inv-print-th">#</th>
+              <th className="inv-print-th">الوصف<br /><span className="inv-print-th-en">Description</span></th>
+              <th className="inv-print-th inv-print-text-center">الكمية<br /><span className="inv-print-th-en">Qty</span></th>
+              <th className="inv-print-th inv-print-text-center">السعر<br /><span className="inv-print-th-en">Price</span></th>
+              <th className="inv-print-th inv-print-text-center">الخصم<br /><span className="inv-print-th-en">Discount</span></th>
+              <th className="inv-print-th inv-print-text-center">الضريبة %<br /><span className="inv-print-th-en">Tax %</span></th>
+              <th className="inv-print-th inv-print-text-center">مبلغ الضريبة<br /><span className="inv-print-th-en">Tax Amt</span></th>
+              <th className="inv-print-th inv-print-text-center">الإجمالي<br /><span className="inv-print-th-en">Total</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoice.items.map((item, i) => (
+              <tr key={i} className="inv-print-row">
+                <td className="inv-print-td inv-print-text-center">{i + 1}</td>
+                <td className="inv-print-td">{item.description}</td>
+                <td className="inv-print-td inv-print-text-center">{item.quantity}</td>
+                <td className="inv-print-td inv-print-text-center">{item.unitPrice.toFixed(2)}</td>
+                <td className="inv-print-td inv-print-text-center">{item.discount.toFixed(2)}</td>
+                <td className="inv-print-td inv-print-text-center">{item.taxRate ?? invoice.taxRate}%</td>
+                <td className="inv-print-td inv-print-text-center">{(item.taxAmount ?? 0).toFixed(2)}</td>
+                <td className="inv-print-td inv-print-text-center">{item.total.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Tax Breakdown */}
+        {taxBreakdown.length > 0 && (
+          <div className="inv-print-tax-section">
+            <strong>تفصيل الضريبة / Tax Breakdown</strong>
+            <table className="inv-print-tax-table">
+              <thead>
+                <tr className="inv-print-table-header">
+                  <th className="inv-print-tax-th">النسبة / Rate</th>
+                  <th className="inv-print-tax-th inv-print-text-center">المبلغ الخاضع / Taxable</th>
+                  <th className="inv-print-tax-th inv-print-text-center">الضريبة / VAT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {taxBreakdown.map((row, i) => (
+                  <tr key={i} className="inv-print-row">
+                    <td className="inv-print-tax-td">{row.rate}%</td>
+                    <td className="inv-print-tax-td inv-print-text-center">{row.taxableAmount.toFixed(2)}</td>
+                    <td className="inv-print-tax-td inv-print-text-center">{row.vatAmount.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Totals */}
+        <div className="inv-print-totals-wrap">
+          <table className="inv-print-totals">
+            <tbody>
+              <tr className="inv-print-totals-row">
+                <td className="inv-print-totals-label">المجموع / Subtotal</td>
+                <td className="inv-print-totals-value">{formatCurrency(invoice.subtotal, currency)}</td>
+              </tr>
+              {(invoice.discountTotal ?? 0) > 0 && (
+                <tr className="inv-print-totals-row">
+                  <td className="inv-print-totals-label">الخصم / Discount</td>
+                  <td className="inv-print-totals-value">-{formatCurrency(invoice.discountTotal!, currency)}</td>
+                </tr>
+              )}
+              <tr className="inv-print-totals-row">
+                <td className="inv-print-totals-label">المبلغ الخاضع / Taxable</td>
+                <td className="inv-print-totals-value">{formatCurrency(taxableAmount, currency)}</td>
+              </tr>
+              <tr className="inv-print-totals-row">
+                <td className="inv-print-totals-label">الضريبة / VAT ({invoice.taxRate}%)</td>
+                <td className="inv-print-totals-value">{formatCurrency(invoice.taxAmount, currency)}</td>
+              </tr>
+              <tr className="inv-print-grand-total">
+                <td className="inv-print-totals-label">الإجمالي / Grand Total</td>
+                <td className="inv-print-totals-value">{formatCurrency(invoice.total, currency)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* QR Code */}
+        {invoice.qrCode && (
+          <div className="inv-print-qr">
+            <QrCodeImage data={invoice.qrCode} size={150} />
+          </div>
+        )}
+
+        {/* Notes */}
+        {invoice.notes && (
+          <div className="inv-print-notes">
+            <strong>ملاحظات / Notes:</strong> {invoice.notes}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="inv-print-footer">
+          تم الإنشاء بواسطة {settings.businessName} / Generated by {settings.businessNameEn || settings.businessName}
         </div>
       </div>
 
       {/* Receipt 80mm Layout */}
-      <div className="print-receipt-80-view hidden" dir="rtl">
-        <div style={{ fontFamily: "Arial, sans-serif", fontSize: "11px", color: "#000", maxWidth: "72mm", margin: "0 auto" }}>
-          {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: "8px" }}>
-            <strong style={{ fontSize: "14px" }}>{settings.businessName}</strong>
-            {settings.businessNameEn && <div style={{ fontSize: "10px", direction: "ltr" }}>{settings.businessNameEn}</div>}
-            {settings.businessAddress && <div style={{ fontSize: "9px" }}>{settings.businessAddress}</div>}
-            {settings.businessPhone && <div style={{ fontSize: "9px", direction: "ltr" }}>{settings.businessPhone}</div>}
-            {(settings.taxRegistrationNumber || settings.taxNumber) && (
-              <div style={{ fontSize: "9px", marginTop: "2px" }}>
-                الرقم الضريبي: {settings.taxRegistrationNumber || settings.taxNumber}
-              </div>
-            )}
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "4px 0" }} />
-
-          {/* Document Type */}
-          <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>
-            {typeLabel.ar}
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "4px 0" }} />
-
-          {/* Invoice Meta */}
-          <div style={{ fontSize: "10px", marginBottom: "6px" }}>
-            <div>رقم: {invoice.invoiceNumber}</div>
-            <div>التاريخ: {invoice.date}</div>
-            <div>العميل: {invoice.clientName}</div>
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "4px 0" }} />
-
-          {/* Items */}
-          {invoice.items.map((item, i) => (
-            <div key={i} style={{ marginBottom: "4px", fontSize: "10px" }}>
-              <div>{item.description}</div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{item.quantity} × {item.unitPrice.toFixed(2)}</span>
-                <span>{item.total.toFixed(2)}</span>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ borderTop: "1px dashed #000", margin: "6px 0" }} />
-
-          {/* Totals */}
-          <div style={{ fontSize: "10px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>المجموع</span>
-              <span>{invoice.subtotal.toFixed(2)}</span>
-            </div>
-            {(invoice.discountTotal ?? 0) > 0 && (
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>الخصم</span>
-                <span>-{invoice.discountTotal!.toFixed(2)}</span>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>الضريبة ({invoice.taxRate}%)</span>
-              <span>{invoice.taxAmount.toFixed(2)}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", fontSize: "13px", borderTop: "1px solid #000", paddingTop: "4px", marginTop: "4px" }}>
-              <span>الإجمالي</span>
-              <span>{formatCurrency(invoice.total, currency)}</span>
-            </div>
-          </div>
-
-          {/* QR Code */}
-          {invoice.qrCode && (
-            <div style={{ textAlign: "center", margin: "8px 0" }}>
-              <QrCodeImage data={invoice.qrCode} size={100} />
+      <div className="print-receipt-80-view hidden inv-print inv-receipt inv-receipt-80" dir="rtl">
+        {/* Header */}
+        <div className="inv-receipt-header">
+          <strong className="inv-receipt-biz-name">{settings.businessName}</strong>
+          {settings.businessNameEn && <div className="inv-receipt-biz-en">{settings.businessNameEn}</div>}
+          {settings.businessAddress && <div className="inv-receipt-detail">{settings.businessAddress}</div>}
+          {settings.businessPhone && <div className="inv-receipt-detail inv-print-ltr">{settings.businessPhone}</div>}
+          {(settings.taxRegistrationNumber || settings.taxNumber) && (
+            <div className="inv-receipt-detail inv-receipt-trn">
+              الرقم الضريبي: {settings.taxRegistrationNumber || settings.taxNumber}
             </div>
           )}
+        </div>
 
-          <div style={{ borderTop: "1px dashed #000", margin: "6px 0" }} />
+        <div className="inv-print-separator" />
 
-          {/* Thank You */}
-          <div style={{ textAlign: "center", fontSize: "10px", margin: "6px 0" }}>
-            <div>شكراً لزيارتكم</div>
-            <div style={{ direction: "ltr" }}>Thank you for visiting</div>
+        {/* Document Type */}
+        <div className="inv-receipt-type">{typeLabel.ar}</div>
+
+        <div className="inv-print-separator" />
+
+        {/* Invoice Meta */}
+        <div className="inv-receipt-meta">
+          <div>رقم: {invoice.invoiceNumber}</div>
+          <div>التاريخ: {invoice.date}</div>
+          <div>العميل: {invoice.clientName}</div>
+        </div>
+
+        <div className="inv-print-separator" />
+
+        {/* Items */}
+        {invoice.items.map((item, i) => (
+          <div key={i} className="inv-receipt-item">
+            <div>{item.description}</div>
+            <div className="inv-receipt-item-line">
+              <span>{item.quantity} × {item.unitPrice.toFixed(2)}</span>
+              <span>{item.total.toFixed(2)}</span>
+            </div>
           </div>
+        ))}
+
+        <div className="inv-print-separator inv-print-separator-lg" />
+
+        {/* Totals */}
+        <div className="inv-receipt-totals">
+          <div className="inv-receipt-totals-row">
+            <span>المجموع</span>
+            <span>{invoice.subtotal.toFixed(2)}</span>
+          </div>
+          {(invoice.discountTotal ?? 0) > 0 && (
+            <div className="inv-receipt-totals-row">
+              <span>الخصم</span>
+              <span>-{invoice.discountTotal!.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="inv-receipt-totals-row">
+            <span>الضريبة ({invoice.taxRate}%)</span>
+            <span>{invoice.taxAmount.toFixed(2)}</span>
+          </div>
+          <div className="inv-receipt-grand-total">
+            <span>الإجمالي</span>
+            <span>{formatCurrency(invoice.total, currency)}</span>
+          </div>
+        </div>
+
+        {/* QR Code */}
+        {invoice.qrCode && (
+          <div className="inv-print-qr inv-receipt-qr">
+            <QrCodeImage data={invoice.qrCode} size={100} />
+          </div>
+        )}
+
+        <div className="inv-print-separator" />
+
+        {/* Thank You */}
+        <div className="inv-receipt-thanks">
+          <div>شكراً لزيارتكم</div>
+          <div className="inv-print-ltr">Thank you for visiting</div>
         </div>
       </div>
 
       {/* Receipt 58mm Layout */}
-      <div className="print-receipt-58-view hidden" dir="rtl">
-        <div style={{ fontFamily: "Arial, sans-serif", fontSize: "9px", color: "#000", maxWidth: "48mm", margin: "0 auto" }}>
-          {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: "6px" }}>
-            <strong style={{ fontSize: "11px" }}>{settings.businessName}</strong>
-            {(settings.taxRegistrationNumber || settings.taxNumber) && (
-              <div style={{ fontSize: "8px" }}>
-                {settings.taxRegistrationNumber || settings.taxNumber}
-              </div>
-            )}
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "3px 0" }} />
-
-          <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "10px", margin: "3px 0" }}>
-            {typeLabel.ar}
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "3px 0" }} />
-
-          <div style={{ fontSize: "8px", marginBottom: "4px" }}>
-            <div>{invoice.invoiceNumber}</div>
-            <div>{invoice.date}</div>
-            <div>{invoice.clientName}</div>
-          </div>
-
-          <div style={{ borderTop: "1px dashed #000", margin: "3px 0" }} />
-
-          {/* Items */}
-          {invoice.items.map((item, i) => (
-            <div key={i} style={{ marginBottom: "3px", fontSize: "8px" }}>
-              <div>{item.description}</div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{item.quantity}×{item.unitPrice.toFixed(2)}</span>
-                <span>{item.total.toFixed(2)}</span>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ borderTop: "1px dashed #000", margin: "4px 0" }} />
-
-          {/* Totals */}
-          <div style={{ fontSize: "8px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>المجموع</span>
-              <span>{invoice.subtotal.toFixed(2)}</span>
-            </div>
-            {invoice.taxAmount > 0 && (
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>الضريبة</span>
-                <span>{invoice.taxAmount.toFixed(2)}</span>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", fontSize: "11px", borderTop: "1px solid #000", paddingTop: "2px", marginTop: "2px" }}>
-              <span>الإجمالي</span>
-              <span>{invoice.total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          {/* QR Code */}
-          {invoice.qrCode && (
-            <div style={{ textAlign: "center", margin: "6px 0" }}>
-              <QrCodeImage data={invoice.qrCode} size={80} />
+      <div className="print-receipt-58-view hidden inv-print inv-receipt inv-receipt-58" dir="rtl">
+        {/* Header */}
+        <div className="inv-receipt-header">
+          <strong className="inv-receipt-biz-name">{settings.businessName}</strong>
+          {(settings.taxRegistrationNumber || settings.taxNumber) && (
+            <div className="inv-receipt-detail">
+              {settings.taxRegistrationNumber || settings.taxNumber}
             </div>
           )}
+        </div>
 
-          <div style={{ textAlign: "center", fontSize: "8px", margin: "4px 0" }}>
-            شكراً لزيارتكم
+        <div className="inv-print-separator" />
+
+        <div className="inv-receipt-type">{typeLabel.ar}</div>
+
+        <div className="inv-print-separator" />
+
+        <div className="inv-receipt-meta">
+          <div>{invoice.invoiceNumber}</div>
+          <div>{invoice.date}</div>
+          <div>{invoice.clientName}</div>
+        </div>
+
+        <div className="inv-print-separator" />
+
+        {/* Items */}
+        {invoice.items.map((item, i) => (
+          <div key={i} className="inv-receipt-item">
+            <div>{item.description}</div>
+            <div className="inv-receipt-item-line">
+              <span>{item.quantity}×{item.unitPrice.toFixed(2)}</span>
+              <span>{item.total.toFixed(2)}</span>
+            </div>
           </div>
+        ))}
+
+        <div className="inv-print-separator inv-print-separator-lg" />
+
+        {/* Totals */}
+        <div className="inv-receipt-totals">
+          <div className="inv-receipt-totals-row">
+            <span>المجموع</span>
+            <span>{invoice.subtotal.toFixed(2)}</span>
+          </div>
+          {invoice.taxAmount > 0 && (
+            <div className="inv-receipt-totals-row">
+              <span>الضريبة</span>
+              <span>{invoice.taxAmount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="inv-receipt-grand-total">
+            <span>الإجمالي</span>
+            <span>{invoice.total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* QR Code */}
+        {invoice.qrCode && (
+          <div className="inv-print-qr inv-receipt-qr">
+            <QrCodeImage data={invoice.qrCode} size={80} />
+          </div>
+        )}
+
+        <div className="inv-receipt-thanks">
+          شكراً لزيارتكم
         </div>
       </div>
     </div>

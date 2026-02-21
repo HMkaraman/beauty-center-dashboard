@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Printer, ChevronDown } from "lucide-react";
+import { ArrowRight, Pencil, Printer, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useInvoice } from "@/lib/hooks/use-invoices";
 import { useSettings } from "@/lib/hooks/use-settings";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { InvoicePrintView } from "./invoice-print-view";
+import { NewInvoiceSheet } from "./new-invoice-sheet";
 import { QrCodeImage } from "./qr-code-image";
 import { Price } from "@/components/ui/price";
 
@@ -30,10 +31,12 @@ function getInvoiceTypeTranslationKey(type?: string): string {
 
 export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
   const t = useTranslations("invoices");
+  const tc = useTranslations("common");
   const router = useRouter();
   const { data: invoice, isLoading: invoiceLoading } = useInvoice(invoiceId);
   const { data: settings, isLoading: settingsLoading } = useSettings();
   const cleanupRef = useRef<(() => void) | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   const handlePrint = useCallback((mode: PrintMode) => {
     // Clean up any previous handler
@@ -108,6 +111,12 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
             {t("backToInvoices")}
           </Button>
 
+          <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="h-4 w-4 me-2" />
+            {tc("editItem")}
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -128,6 +137,7 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
 
         {/* Header Card */}
@@ -299,6 +309,8 @@ export function InvoiceDetailPage({ invoiceId }: InvoiceDetailPageProps) {
 
       {/* Print Views (hidden on screen, visible on print) */}
       {settings && <InvoicePrintView invoice={invoice} settings={settings} />}
+
+      <NewInvoiceSheet open={editOpen} onOpenChange={setEditOpen} editItem={invoice} />
     </>
   );
 }

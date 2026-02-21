@@ -58,7 +58,8 @@
     "newAppointment": "موعد جديد",
     "addClient": "إضافة عميل",
     "recordExpense": "تسجيل مصروف",
-    "viewReports": "عرض التقارير"
+    "viewReports": "عرض التقارير",
+    "newInvoice": "فاتورة جديدة"
   },
   "filters": {
     "today": "اليوم",

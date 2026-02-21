@@ -58,7 +58,8 @@
     "newAppointment": "New Appointment",
     "addClient": "Add Client",
     "recordExpense": "Record Expense",
-    "viewReports": "View Reports"
+    "viewReports": "View Reports",
+    "newInvoice": "New Invoice"
   },
   "filters": {
     "today": "Today",
