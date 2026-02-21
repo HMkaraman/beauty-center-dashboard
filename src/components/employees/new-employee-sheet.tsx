@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
@@ -32,7 +32,7 @@ export function NewEmployeeSheet({ open, onOpenChange, editItem }: NewEmployeeSh
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
   const { data: sectionsData } = useSections({ limit: 100 });
-  const allSections = sectionsData?.data ?? [];
+  const allSections = useMemo(() => sectionsData?.data ?? [], [sectionsData?.data]);
   const setSectionEmployees = useSetSectionEmployees();
   const [form, setForm] = useState(emptyForm);
   const [selectedSectionIds, setSelectedSectionIds] = useState<string[]>([]);
