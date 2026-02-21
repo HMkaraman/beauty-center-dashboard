@@ -59,7 +59,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const validated = result.data;
 
-    // Fetch the current appointment to check old status
+    // Fetch the current appointment to check old status and enforce rules
     const [existing] = await db
       .select()
       .from(appointments)
@@ -68,6 +68,18 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       );
 
     if (!existing) return notFound("Appointment not found");
+
+    // Block status changes on completed appointments unless user is owner/admin/manager
+    if (
+      existing.status === "completed" &&
+      validated.status &&
+      validated.status !== "completed"
+    ) {
+      const role = session.user.role;
+      if (role !== "owner" && role !== "admin" && role !== "manager") {
+        return badRequest("Only managers can change the status of a completed appointment");
+      }
+    }
 
     // Check for scheduling conflicts if any scheduling fields changed
     const schedulingChanged =

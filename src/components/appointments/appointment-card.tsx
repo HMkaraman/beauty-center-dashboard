@@ -20,6 +20,7 @@ import {
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { Appointment, AppointmentStatus } from "@/types";
 import { Price } from "@/components/ui/price";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
 
@@ -45,6 +46,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
   const t = useTranslations("appointments");
   const locale = useLocale();
   const router = useRouter();
+  const { isManager } = usePermissions();
 
   return (
     <motion.div
@@ -76,7 +78,7 @@ export function AppointmentCard({ data, onEdit, onDelete, onCheckout, onStatusCh
                 <DropdownMenuItem onClick={() => onCheckout?.(data)}>{t("checkout")}</DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => router.push(`/appointments/${data.id}/edit`)}>{t("edit")}</DropdownMenuItem>
-              {onStatusChange && (
+              {onStatusChange && !(data.status === "completed" && !isManager) && (
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>

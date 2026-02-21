@@ -103,6 +103,7 @@
     "statusNoShow": "لم يحضر",
     "statusWaiting": "في الانتظار",
     "statusInProgress": "جاري التنفيذ",
+    "completedStatusLocked": "لا يمكن تغيير حالة الموعد المكتمل. تواصل مع الإدارة.",
     "appointmentsList": "قائمة المواعيد",
     "newAppointment": "موعد جديد",
     "client": "العميل",

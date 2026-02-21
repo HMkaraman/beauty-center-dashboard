@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { Appointment, AppointmentStatus } from "@/types";
 import { Price } from "@/components/ui/price";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const STATUSES: AppointmentStatus[] = ["confirmed", "pending", "waiting", "in-progress", "cancelled", "completed", "no-show"];
 
@@ -50,6 +51,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
   const t = useTranslations("appointments");
   const locale = useLocale();
   const router = useRouter();
+  const { isManager } = usePermissions();
 
   return (
     <div className="hidden md:block rounded-lg border border-border bg-card overflow-x-auto">
@@ -105,7 +107,7 @@ export function AppointmentsTable({ data, onEdit, onDelete, onCheckout, onStatus
                       <DropdownMenuItem onClick={() => onCheckout?.(appointment)}>{t("checkout")}</DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={() => router.push(`/appointments/${appointment.id}/edit`)}>{t("edit")}</DropdownMenuItem>
-                    {onStatusChange && (
+                    {onStatusChange && !(appointment.status === "completed" && !isManager) && (
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>{t("status")}</DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>

@@ -103,6 +103,7 @@
     "statusNoShow": "No Show",
     "statusWaiting": "Waiting",
     "statusInProgress": "In Progress",
+    "completedStatusLocked": "Completed appointment status cannot be changed. Contact management.",
     "appointmentsList": "Appointments List",
     "newAppointment": "New Appointment",
     "client": "Client",

@@ -27,6 +27,7 @@ import { InjectableConsumptionSheet } from "./injectable-consumption-sheet";
 import { useAppointmentDetails, useUpdateAppointment, useDeleteAppointmentAttachment } from "@/lib/hooks/use-appointments";
 import { useService } from "@/lib/hooks/use-services";
 import { useConsumptionLogs } from "@/lib/hooks/use-consumption-tracking";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Price } from "@/components/ui/price";
 import type { Appointment, AppointmentStatus } from "@/types";
 
@@ -54,6 +55,7 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
   const { data, isLoading, error } = useAppointmentDetails(appointmentId);
   const updateAppointment = useUpdateAppointment();
   const deleteAttachment = useDeleteAppointmentAttachment();
+  const { isManager } = usePermissions();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [laserSheetOpen, setLaserSheetOpen] = useState(false);
   const [injectableSheetOpen, setInjectableSheetOpen] = useState(false);
@@ -307,7 +309,11 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
         {/* Status Change */}
         <div className="border-t border-border p-6">
           <p className="mb-2 text-sm font-medium text-muted-foreground">{t("status")}</p>
-          <Select value={appointment.status} onValueChange={handleStatusChange}>
+          <Select
+            value={appointment.status}
+            onValueChange={handleStatusChange}
+            disabled={appointment.status === "completed" && !isManager}
+          >
             <SelectTrigger className="w-full sm:w-64">
               <SelectValue />
             </SelectTrigger>
@@ -319,6 +325,9 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
               ))}
             </SelectContent>
           </Select>
+          {appointment.status === "completed" && !isManager && (
+            <p className="mt-2 text-xs text-muted-foreground">{t("completedStatusLocked")}</p>
+          )}
         </div>
       </div>
 

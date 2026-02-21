@@ -58,7 +58,7 @@ export function ReceptionPageContent() {
   const updateAppointment = useUpdateAppointment();
   const invalidateReception = useInvalidateReception();
 
-  const [viewMode, setViewMode] = useState<ViewMode>("day");
+  const [viewMode, setViewMode] = useState<ViewMode>("board");
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [bookingOpen, setBookingOpen] = useState(false);
   const [checkerOpen, setCheckerOpen] = useState(false);
