@@ -52,6 +52,8 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
         unitPrice: parseFloat(item.unitPrice),
         discount: parseFloat(item.discount),
         total: parseFloat(item.total),
+        taxRate: item.taxRate ? parseFloat(item.taxRate) : undefined,
+        taxAmount: item.taxAmount ? parseFloat(item.taxAmount) : undefined,
       })),
     });
   } catch (error) {
@@ -229,6 +231,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         unitPrice: parseFloat(item.unitPrice),
         discount: parseFloat(item.discount),
         total: parseFloat(item.total),
+        taxRate: item.taxRate ? parseFloat(item.taxRate) : undefined,
+        taxAmount: item.taxAmount ? parseFloat(item.taxAmount) : undefined,
       })),
     });
   } catch (error) {

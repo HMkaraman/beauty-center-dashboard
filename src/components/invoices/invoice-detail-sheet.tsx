@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
@@ -16,6 +17,7 @@ interface InvoiceDetailSheetProps {
 export function InvoiceDetailSheet({ open, onOpenChange, invoice }: InvoiceDetailSheetProps) {
   const t = useTranslations("invoices");
   const locale = useLocale();
+  const router = useRouter();
 
   if (!invoice) return null;
 
@@ -110,6 +112,15 @@ export function InvoiceDetailSheet({ open, onOpenChange, invoice }: InvoiceDetai
         </div>
 
         <SheetFooter>
+          <Button
+            variant="default"
+            onClick={() => {
+              onOpenChange(false);
+              router.push(`/invoices/${invoice.id}`);
+            }}
+          >
+            {t("viewFullDetails")}
+          </Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{t("close")}</Button>
         </SheetFooter>
       </SheetContent>

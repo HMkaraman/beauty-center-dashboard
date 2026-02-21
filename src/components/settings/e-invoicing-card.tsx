@@ -21,11 +21,10 @@ export function EInvoicingCard() {
 
   useEffect(() => {
     if (settings) {
-      const s = settings as Record<string, unknown>;
       setForm({
-        eInvoicingEnabled: s.eInvoicingEnabled === 1 || s.eInvoicingEnabled === true,
-        eInvoicingMode: (s.eInvoicingMode as string) || "none",
-        zatcaEnvironment: (s.zatcaEnvironment as string) || "sandbox",
+        eInvoicingEnabled: settings.eInvoicingEnabled === 1 || settings.eInvoicingEnabled === true,
+        eInvoicingMode: settings.eInvoicingMode || "none",
+        zatcaEnvironment: settings.zatcaEnvironment || "sandbox",
       });
     }
   }, [settings]);
@@ -36,7 +35,7 @@ export function EInvoicingCard() {
         eInvoicingEnabled: form.eInvoicingEnabled,
         eInvoicingMode: form.eInvoicingMode,
         zatcaEnvironment: form.zatcaEnvironment,
-      } as Record<string, unknown>,
+      },
       {
         onSuccess: () => toast.success(tc("updateSuccess")),
         onError: () => toast.error(tc("error")),

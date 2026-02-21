@@ -37,17 +37,18 @@ export function FinanceRevenueChart({ data }: FinanceRevenueChartProps) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   const translatedData = data.map((d) => {
-    // If the name looks like an i18n key (e.g. "finance.services"), translate it
-    // Otherwise use the name as-is (e.g. DB service names)
+    // Only translate names that look like i18n keys (ASCII, e.g. "catSkincare")
+    // DB service names (often Arabic) are used as-is
     const key = d.name.replace("finance.", "");
     let name: string;
-    try {
-      name = t(key);
-      // next-intl returns the key if not found, so check if it's different
-      if (name === key && !d.name.startsWith("finance.")) {
+    if (/^[a-zA-Z][\w.]*$/.test(key)) {
+      try {
+        const translated = t(key);
+        name = translated !== key ? translated : d.name;
+      } catch {
         name = d.name;
       }
-    } catch {
+    } else {
       name = d.name;
     }
     return { ...d, name };

@@ -23,9 +23,16 @@ export interface Settings {
   taxEnabled?: number | boolean;
   exchangeRates?: string | null;
   nextInvoiceNumber?: number;
+  nextCreditNoteNumber?: number;
   smsEnabled?: number | boolean;
   emailEnabled?: number | boolean;
-  [key: string]: unknown;
+  taxRegistrationNumber?: string;
+  businessAddress?: string;
+  businessPhone?: string;
+  invoicePrefix?: string;
+  eInvoicingEnabled?: number | boolean;
+  eInvoicingMode?: string;
+  zatcaEnvironment?: string;
 }
 
 export interface WorkingHours {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
+import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -53,7 +54,11 @@ export function InvoiceTable({ data, onView, onVoid, selectedIds, onToggle, onTo
             return (
               <tr key={invoice.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
                 {onToggle && <td className="px-4 py-3 w-10"><Checkbox checked={selectedIds?.includes(invoice.id) ?? false} onCheckedChange={() => onToggle(invoice.id)} /></td>}
-                <td className="px-4 py-3 font-english font-medium text-foreground">{invoice.invoiceNumber}</td>
+                <td className="px-4 py-3 font-english font-medium text-foreground">
+                  <Link href={`/invoices/${invoice.id}`} className="hover:text-gold underline-offset-4 hover:underline transition-colors">
+                    {invoice.invoiceNumber}
+                  </Link>
+                </td>
                 <td className="px-4 py-3 font-english text-muted-foreground">{invoice.date}</td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{invoice.clientName}</p>

@@ -125,3 +125,63 @@
     font-family: var(--font-outfit), sans-serif;
   }
 }
+
+/* Print styles */
+@media print {
+  nav,
+  aside,
+  header,
+  [data-sidebar],
+  [data-mobile-nav],
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  main,
+  [data-main-content] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-a4 .print-a4-view {
+    display: block !important;
+  }
+  .print-a4 .print-receipt-80-view,
+  .print-a4 .print-receipt-58-view {
+    display: none !important;
+  }
+
+  .print-receipt-80 .print-receipt-80-view {
+    display: block !important;
+  }
+  .print-receipt-80 .print-a4-view,
+  .print-receipt-80 .print-receipt-58-view {
+    display: none !important;
+  }
+
+  .print-receipt-58 .print-receipt-58-view {
+    display: block !important;
+  }
+  .print-receipt-58 .print-a4-view,
+  .print-receipt-58 .print-receipt-80-view {
+    display: none !important;
+  }
+}
+
+@page {
+  size: A4 portrait;
+  margin: 15mm;
+}

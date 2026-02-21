@@ -72,6 +72,8 @@ export async function GET(req: NextRequest) {
           unitPrice: parseFloat(item.unitPrice),
           discount: parseFloat(item.discount),
           total: parseFloat(item.total),
+          taxRate: item.taxRate ? parseFloat(item.taxRate) : undefined,
+          taxAmount: item.taxAmount ? parseFloat(item.taxAmount) : undefined,
         })),
     }));
 
@@ -350,6 +352,8 @@ export async function POST(req: NextRequest) {
           unitPrice: parseFloat(item.unitPrice),
           discount: parseFloat(item.discount),
           total: parseFloat(item.total),
+          taxRate: item.taxRate ? parseFloat(item.taxRate) : undefined,
+          taxAmount: item.taxAmount ? parseFloat(item.taxAmount) : undefined,
         })),
       },
       201

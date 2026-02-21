@@ -22,9 +22,9 @@ export function TaxRegistrationCard() {
   useEffect(() => {
     if (settings) {
       setForm({
-        taxRegistrationNumber: (settings as Record<string, unknown>).taxRegistrationNumber as string || "",
-        businessAddress: (settings as Record<string, unknown>).businessAddress as string || "",
-        businessPhone: (settings as Record<string, unknown>).businessPhone as string || "",
+        taxRegistrationNumber: settings.taxRegistrationNumber || "",
+        businessAddress: settings.businessAddress || "",
+        businessPhone: settings.businessPhone || "",
       });
     }
   }, [settings]);
@@ -35,7 +35,7 @@ export function TaxRegistrationCard() {
         taxRegistrationNumber: form.taxRegistrationNumber || undefined,
         businessAddress: form.businessAddress || undefined,
         businessPhone: form.businessPhone || undefined,
-      } as Record<string, unknown>,
+      },
       {
         onSuccess: () => toast.success(tc("updateSuccess")),
         onError: () => toast.error(tc("error")),

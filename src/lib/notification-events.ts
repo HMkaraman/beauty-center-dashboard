@@ -68,7 +68,7 @@ const NOTIFICATION_EVENTS: Record<string, NotificationEventConfig> = {
     bodyTemplateAr: "{{invoiceNumber}} - {{clientName}} - {{total}}",
     bodyTemplateEn: "{{invoiceNumber}} - {{clientName}} - {{total}}",
     targetRoles: ["owner", "admin", "manager"],
-    actionUrlTemplate: "/finance",
+    actionUrlTemplate: "/invoices/{{entityId}}",
   },
   client_created: {
     category: "client",

@@ -21,11 +21,10 @@ export function InvoiceNumberingCard() {
 
   useEffect(() => {
     if (settings) {
-      const s = settings as Record<string, unknown>;
       setForm({
-        invoicePrefix: (s.invoicePrefix as string) || "INV",
-        nextInvoiceNumber: (s.nextInvoiceNumber as number) || 1,
-        nextCreditNoteNumber: (s.nextCreditNoteNumber as number) || 1,
+        invoicePrefix: settings.invoicePrefix || "INV",
+        nextInvoiceNumber: settings.nextInvoiceNumber || 1,
+        nextCreditNoteNumber: settings.nextCreditNoteNumber || 1,
       });
     }
   }, [settings]);
@@ -34,7 +33,7 @@ export function InvoiceNumberingCard() {
     updateSettings.mutate(
       {
         invoicePrefix: form.invoicePrefix,
-      } as Record<string, unknown>,
+      },
       {
         onSuccess: () => toast.success(tc("updateSuccess")),
         onError: () => toast.error(tc("error")),
