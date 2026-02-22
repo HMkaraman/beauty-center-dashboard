@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import { ConsentStatusBadge } from "./consent-status-badge";
 import type { HealingJourney, HealingJourneyStatus } from "@/types";
 
 interface ClientHealingJourneysTableProps {
@@ -11,6 +12,7 @@ interface ClientHealingJourneysTableProps {
   onView: (journey: HealingJourney) => void;
   onEdit: (journey: HealingJourney) => void;
   onDelete: (journey: HealingJourney) => void;
+  canEdit?: (journey: HealingJourney) => boolean;
 }
 
 function StatusBadge({ status }: { status: HealingJourneyStatus }) {
@@ -24,7 +26,7 @@ function StatusBadge({ status }: { status: HealingJourneyStatus }) {
   return <Badge className={className}>{label}</Badge>;
 }
 
-export function ClientHealingJourneysTable({ data, onView, onEdit, onDelete }: ClientHealingJourneysTableProps) {
+export function ClientHealingJourneysTable({ data, onView, onEdit, onDelete, canEdit = () => true }: ClientHealingJourneysTableProps) {
   const t = useTranslations("clients");
 
   if (data.length === 0) {
@@ -51,7 +53,12 @@ export function ClientHealingJourneysTable({ data, onView, onEdit, onDelete }: C
           {data.map((journey) => (
             <tr key={journey.id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 text-foreground font-medium">{journey.title}</td>
-              <td className="px-4 py-3"><StatusBadge status={journey.status} /></td>
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <StatusBadge status={journey.status} />
+                  <ConsentStatusBadge status={journey.consentStatus} />
+                </div>
+              </td>
               <td className="px-4 py-3 font-english text-muted-foreground">{journey.startDate}</td>
               <td className="px-4 py-3 font-english text-muted-foreground">{journey.entriesCount}</td>
               <td className="px-4 py-3">
@@ -59,12 +66,16 @@ export function ClientHealingJourneysTable({ data, onView, onEdit, onDelete }: C
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onView(journey)}>
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(journey)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete(journey)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {canEdit(journey) && (
+                    <>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(journey)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete(journey)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>

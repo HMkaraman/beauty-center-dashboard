@@ -81,3 +81,14 @@ export function useDeleteJourneyEntry() {
     },
   });
 }
+
+export function useConsentAction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ clientId, journeyId, data }: { clientId: string; journeyId: string; data: { action: string; signatureUrl?: string } }) =>
+      healingJourneysApi.consent(clientId, journeyId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["healing-journeys"] });
+    },
+  });
+}

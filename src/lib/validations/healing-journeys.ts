@@ -63,6 +63,12 @@ export const journeyEntrySchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+export const consentActionSchema = z.object({
+  action: z.enum(["request_approval", "approve", "reject"]),
+  signatureUrl: z.string().optional(),
+});
+
 export type HealingJourneyFormData = z.infer<typeof healingJourneySchema>;
 export type JourneyEntryFormData = z.infer<typeof journeyEntrySchema>;
 export type JourneyAttachmentFormData = z.infer<typeof journeyAttachmentSchema>;
+export type ConsentActionData = z.infer<typeof consentActionSchema>;

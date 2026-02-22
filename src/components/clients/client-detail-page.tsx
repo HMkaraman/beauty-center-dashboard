@@ -33,6 +33,8 @@ import { NewHealingJourneySheet } from "./new-healing-journey-sheet";
 import { HealingJourneyUpdatesSheet } from "./healing-journey-updates-sheet";
 import { useClientDetails, useHealingJourneys, useDeleteHealingJourney, useUpdateAppointment, useDeleteAppointment } from "@/lib/hooks";
 import { Price } from "@/components/ui/price";
+import { usePermissions } from "@/hooks/use-permissions";
+import { useSession } from "next-auth/react";
 import type { HealingJourney, AppointmentStatus } from "@/types";
 
 interface ClientDetailPageProps {
@@ -43,6 +45,8 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
   const t = useTranslations("clients");
   const tc = useTranslations("common");
   const router = useRouter();
+  const { data: session } = useSession();
+  const { isManager } = usePermissions();
   const { data, isLoading, error } = useClientDetails(clientId);
   const { data: healingJourneys } = useHealingJourneys(clientId);
   const deleteJourney = useDeleteHealingJourney();
@@ -54,6 +58,9 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
   const [editingJourney, setEditingJourney] = useState<HealingJourney | null>(null);
   const [updatesSheetOpen, setUpdatesSheetOpen] = useState(false);
   const [viewingJourney, setViewingJourney] = useState<HealingJourney | null>(null);
+
+  const canEditJourney = (journey: HealingJourney) =>
+    isManager || journey.createdById === session?.user?.id;
 
   const handleApptStatusChange = (id: string, status: AppointmentStatus) => {
     updateAppointment.mutate(
@@ -292,6 +299,7 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
             onView={handleViewJourney}
             onEdit={handleEditJourney}
             onDelete={handleDeleteJourney}
+            canEdit={canEditJourney}
           />
           {/* Mobile cards */}
           <div className="space-y-3 md:hidden">
@@ -307,6 +315,7 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
                   onView={handleViewJourney}
                   onEdit={handleEditJourney}
                   onDelete={handleDeleteJourney}
+                  canEdit={canEditJourney}
                 />
               ))
             )}
@@ -344,6 +353,7 @@ export function ClientDetailPage({ clientId }: ClientDetailPageProps) {
         onOpenChange={setUpdatesSheetOpen}
         clientId={clientId}
         journey={viewingJourney}
+        clientName={client.name}
       />
     </div>
   );

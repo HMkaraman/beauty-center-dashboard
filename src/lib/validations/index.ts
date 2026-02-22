@@ -30,9 +30,11 @@ export {
   healingJourneySchema,
   journeyEntrySchema,
   journeyAttachmentSchema,
+  consentActionSchema,
   type HealingJourneyFormData,
   type JourneyEntryFormData,
   type JourneyAttachmentFormData,
+  type ConsentActionData,
 } from "./healing-journeys";
 export { activityNoteSchema, type ActivityNoteFormData } from "./activity-logs";
 export { sectionSchema, serviceCategorySchema, type SectionFormData, type ServiceCategoryFormData } from "./sections";

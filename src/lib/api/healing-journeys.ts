@@ -43,4 +43,10 @@ export const healingJourneysApi = {
       `/clients/${clientId}/healing-journeys/${journeyId}/entries?entryId=${entryId}`,
       { method: "DELETE" }
     ),
+
+  consent: (clientId: string, journeyId: string, data: { action: string; signatureUrl?: string }) =>
+    apiFetch(
+      `/clients/${clientId}/healing-journeys/${journeyId}/consent`,
+      { method: "POST", body: JSON.stringify(data) }
+    ),
 };

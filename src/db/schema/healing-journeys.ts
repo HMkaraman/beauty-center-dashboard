@@ -13,6 +13,12 @@ export const healingJourneyStatusEnum = pgEnum("healing_journey_status", [
   "paused",
 ]);
 
+export const consentStatusEnum = pgEnum("consent_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
 export const journeyEntryTypeEnum = pgEnum("journey_entry_type", [
   "session",
   "prescription",
@@ -39,6 +45,12 @@ export const healingJourneys = pgTable("healing_journeys", {
   startDate: varchar("start_date", { length: 10 }).notNull(),
   endDate: varchar("end_date", { length: 10 }),
   primaryServiceId: text("primary_service_id").references(() => services.id, { onDelete: "set null" }),
+  createdById: text("created_by_id"),
+  consentStatus: consentStatusEnum("consent_status"),
+  signatureUrl: text("signature_url"),
+  consentSignedAt: timestamp("consent_signed_at"),
+  consentRequestedAt: timestamp("consent_requested_at"),
+  consentRequestedById: text("consent_requested_by_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

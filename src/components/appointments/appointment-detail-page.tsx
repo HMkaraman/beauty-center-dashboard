@@ -22,6 +22,7 @@ import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { CheckoutSheet } from "@/components/invoices/checkout-sheet";
 import { ActivityTimeline } from "@/components/activity/activity-timeline";
 import { ClientLeftoverBanner } from "./client-leftover-banner";
+import { AppointmentHealingJourneys } from "./appointment-healing-journeys";
 import { LaserConsumptionSheet } from "./laser-consumption-sheet";
 import { InjectableConsumptionSheet } from "./injectable-consumption-sheet";
 import { useAppointmentDetails, useUpdateAppointment, useDeleteAppointmentAttachment } from "@/lib/hooks/use-appointments";
@@ -330,6 +331,11 @@ export function AppointmentDetailPage({ appointmentId }: AppointmentDetailPagePr
           )}
         </div>
       </div>
+
+      {/* Healing Journeys */}
+      {appointment.clientId && (
+        <AppointmentHealingJourneys appointment={appointment} />
+      )}
 
       {/* Group Appointments */}
       {groupAppointments.length > 0 && (

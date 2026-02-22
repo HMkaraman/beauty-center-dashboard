@@ -41,6 +41,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         startDate: healingJourneys.startDate,
         endDate: healingJourneys.endDate,
         primaryServiceId: healingJourneys.primaryServiceId,
+        createdById: healingJourneys.createdById,
+        consentStatus: healingJourneys.consentStatus,
+        signatureUrl: healingJourneys.signatureUrl,
+        consentSignedAt: healingJourneys.consentSignedAt,
+        consentRequestedAt: healingJourneys.consentRequestedAt,
         createdAt: healingJourneys.createdAt,
         updatedAt: healingJourneys.updatedAt,
         entriesCount: sql<number>`COALESCE(${entriesCountSubquery.count}, 0)`.as("entries_count"),
@@ -88,6 +93,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         startDate: validated.startDate,
         endDate: validated.endDate,
         primaryServiceId: validated.primaryServiceId,
+        createdById: session.user.id,
       })
       .returning();
 

@@ -120,6 +120,20 @@
       "when": 1771692053092,
       "tag": "0016_melted_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1771713238555,
+      "tag": "0017_acoustic_eternals",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1771715783137,
+      "tag": "0018_wooden_toad_men",
+      "breakpoints": true
     }
   ]
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 import {
   ImagePlus, X, Stethoscope, FileText, StickyNote, Camera, Trophy, Plus, Trash2, Play,
+  ClipboardCheck, PenLine, Download,
 } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
@@ -14,16 +15,40 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { HealingJourneyStatusBadge } from "./client-healing-journeys-table";
-import { useJourneyEntries, useCreateJourneyEntry, useDeleteJourneyEntry } from "@/lib/hooks/use-healing-journeys";
+import { ConsentStatusBadge } from "./consent-status-badge";
+import { ConsentSignatureDialog } from "./consent-signature-dialog";
+import { useJourneyEntries, useCreateJourneyEntry, useDeleteJourneyEntry, useConsentAction } from "@/lib/hooks/use-healing-journeys";
+import { useSettings } from "@/lib/hooks/use-settings";
 import { useUpload } from "@/hooks/use-upload";
 import type { HealingJourney, JourneyEntry, JourneyEntryType, AttachmentLabel, JourneyAttachment } from "@/types";
 import { Price } from "@/components/ui/price";
+import dynamic from "next/dynamic";
+
+const ConsentPdfDownload = dynamic(
+  () => import("./consent-pdf-download").then((m) => m.ConsentPdfDownload),
+  { ssr: false }
+);
+
+interface PrefillSessionEntry {
+  appointmentId: string;
+  serviceName: string;
+  serviceId?: string;
+  doctorName?: string;
+  doctorId?: string;
+  employeeName?: string;
+  employeeId?: string;
+  price?: number;
+  duration?: number;
+  date: string;
+}
 
 interface HealingJourneyTimelineSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   clientId: string;
   journey: HealingJourney | null;
+  clientName?: string;
+  prefillSessionEntry?: PrefillSessionEntry;
 }
 
 const entryTypeConfig: Record<JourneyEntryType, { icon: typeof Stethoscope; color: string }> = {
@@ -193,14 +218,18 @@ function AttachmentsDisplay({ attachments, t }: { attachments: JourneyAttachment
   );
 }
 
-export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journey }: HealingJourneyTimelineSheetProps) {
+export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journey, clientName, prefillSessionEntry }: HealingJourneyTimelineSheetProps) {
   const t = useTranslations("clients");
   const locale = useLocale();
   const { data: entries, isLoading } = useJourneyEntries(clientId, journey?.id ?? "");
   const createEntry = useCreateJourneyEntry();
   const deleteEntry = useDeleteJourneyEntry();
+  const consentAction = useConsentAction();
+  const { data: settings } = useSettings();
   const { upload, isUploading } = useUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const prefillAppliedRef = useRef(false);
+  const [signDialogOpen, setSignDialogOpen] = useState(false);
 
   const [entryType, setEntryType] = useState<JourneyEntryType>("note");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -230,6 +259,25 @@ export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journ
     label: AttachmentLabel;
   }[]>([]);
   const [attachmentLabel, setAttachmentLabel] = useState<AttachmentLabel>("general");
+
+  // Prefill session entry from appointment data
+  useEffect(() => {
+    if (open && prefillSessionEntry && !prefillAppliedRef.current) {
+      setShowForm(true);
+      setEntryType("session");
+      setDate(prefillSessionEntry.date);
+      setServiceName(prefillSessionEntry.serviceName);
+      setDoctorName(prefillSessionEntry.doctorName ?? "");
+      setEmployeeName(prefillSessionEntry.employeeName ?? "");
+      setPrice(prefillSessionEntry.price != null ? String(prefillSessionEntry.price) : "");
+      setDuration(prefillSessionEntry.duration != null ? String(prefillSessionEntry.duration) : "");
+      prefillAppliedRef.current = true;
+    }
+    if (!open) {
+      prefillAppliedRef.current = false;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -308,6 +356,12 @@ export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journ
         employeeName: employeeName || undefined,
         price: price ? Number(price) : undefined,
         duration: duration ? Number(duration) : undefined,
+        ...(prefillSessionEntry ? {
+          appointmentId: prefillSessionEntry.appointmentId,
+          serviceId: prefillSessionEntry.serviceId,
+          doctorId: prefillSessionEntry.doctorId,
+          employeeId: prefillSessionEntry.employeeId,
+        } : {}),
       };
     } else if (entryType === "prescription") {
       data = {
@@ -341,20 +395,102 @@ export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journ
     );
   };
 
+  const handleRequestApproval = () => {
+    if (!journey) return;
+    consentAction.mutate(
+      { clientId, journeyId: journey.id, data: { action: "request_approval" } },
+      { onSuccess: () => toast.success(t("consentRequested")) }
+    );
+  };
+
+  const handleApprove = (signatureUrl: string) => {
+    if (!journey) return;
+    consentAction.mutate(
+      { clientId, journeyId: journey.id, data: { action: "approve", signatureUrl } },
+      {
+        onSuccess: () => {
+          toast.success(t("consentApproved"));
+          setSignDialogOpen(false);
+        },
+      }
+    );
+  };
+
+  const handleReject = () => {
+    if (!journey) return;
+    consentAction.mutate(
+      { clientId, journeyId: journey.id, data: { action: "reject" } },
+      {
+        onSuccess: () => {
+          toast.success(t("consentRejected"));
+          setSignDialogOpen(false);
+        },
+      }
+    );
+  };
+
   if (!journey) return null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="overflow-y-auto w-full sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+          <SheetTitle className="flex items-center gap-2 flex-wrap">
             {journey.title}
             <HealingJourneyStatusBadge status={journey.status} />
+            <ConsentStatusBadge status={journey.consentStatus} />
           </SheetTitle>
           <SheetDescription className="sr-only">{t("viewEntries")}</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 space-y-6 px-4">
+          {/* Consent Actions */}
+          <div className="flex flex-wrap gap-2">
+            {(!journey.consentStatus || journey.consentStatus === "rejected") && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+                onClick={handleRequestApproval}
+                disabled={consentAction.isPending}
+              >
+                <ClipboardCheck className="h-3.5 w-3.5" />
+                {t("requestApproval")}
+              </Button>
+            )}
+            {journey.consentStatus === "pending" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+                onClick={() => setSignDialogOpen(true)}
+              >
+                <PenLine className="h-3.5 w-3.5" />
+                {t("signNow")}
+              </Button>
+            )}
+            {journey.consentStatus === "approved" && (
+              <>
+                {journey.signatureUrl && (
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={journey.signatureUrl}
+                      alt="Signature"
+                      className="h-8 rounded border border-border bg-white"
+                    />
+                  </div>
+                )}
+                {settings && (
+                  <ConsentPdfDownload
+                    journey={journey}
+                    entries={entries ?? []}
+                    clientName={clientName ?? ""}
+                    settings={settings}
+                  />
+                )}
+              </>
+            )}
+          </div>
           {/* Timeline of entries */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -573,6 +709,18 @@ export function HealingJourneyUpdatesSheet({ open, onOpenChange, clientId, journ
           )}
         </div>
       </SheetContent>
+
+      {journey.consentStatus === "pending" && (
+        <ConsentSignatureDialog
+          open={signDialogOpen}
+          onOpenChange={setSignDialogOpen}
+          journey={journey}
+          entries={entries ?? []}
+          clientName={clientName ?? ""}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
+      )}
     </Sheet>
   );
 }

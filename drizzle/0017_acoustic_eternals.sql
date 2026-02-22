@@ -1,0 +1,1 @@
+ALTER TABLE "healing_journeys" ADD COLUMN "created_by_id" text;

@@ -588,6 +588,7 @@ export interface FinancialPeriod {
 
 // Healing Journeys
 export type HealingJourneyStatus = "active" | "completed" | "paused";
+export type ConsentStatus = "pending" | "approved" | "rejected";
 
 export interface HealingJourney {
   id: string;
@@ -598,7 +599,12 @@ export interface HealingJourney {
   startDate: string;
   endDate?: string;
   primaryServiceId?: string;
+  createdById?: string;
   entriesCount: number;
+  consentStatus?: ConsentStatus | null;
+  signatureUrl?: string | null;
+  consentSignedAt?: string | null;
+  consentRequestedAt?: string | null;
   createdAt: string;
 }
 

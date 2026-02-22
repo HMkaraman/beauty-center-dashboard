@@ -18,11 +18,13 @@ interface NewHealingJourneySheetProps {
   onOpenChange: (open: boolean) => void;
   clientId: string;
   editItem?: HealingJourney | null;
+  defaultServiceId?: string;
+  defaultStartDate?: string;
 }
 
 const emptyForm = { title: "", description: "", status: "active" as HealingJourneyStatus, startDate: "", endDate: "", primaryServiceId: "" };
 
-export function NewHealingJourneySheet({ open, onOpenChange, clientId, editItem }: NewHealingJourneySheetProps) {
+export function NewHealingJourneySheet({ open, onOpenChange, clientId, editItem, defaultServiceId, defaultStartDate }: NewHealingJourneySheetProps) {
   const t = useTranslations("clients");
   const tc = useTranslations("common");
   const createJourney = useCreateHealingJourney();
@@ -41,8 +43,13 @@ export function NewHealingJourneySheet({ open, onOpenChange, clientId, editItem 
         primaryServiceId: editItem.primaryServiceId ?? "",
       });
     } else {
-      setForm(emptyForm);
+      setForm({
+        ...emptyForm,
+        primaryServiceId: defaultServiceId ?? "",
+        startDate: defaultStartDate ?? "",
+      });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editItem, open]);
 
   const handleSubmit = () => {
